@@ -63,9 +63,19 @@ function cellForPosition(zoom: number, pixelOffset: number[], dimensions: Dimens
     ]
 }
 
-function drawPixels(context: CanvasRenderingContext2D, zoom: number, pixelOffset: number[], dimensions: Dimensions, worldTranslation: number[], pixelData: PixelData, hoveredCell: number[] | undefined) {
+function drawImage(context: CanvasRenderingContext2D, imageUrl: string, zoom: number) {
+    console.log("zoom", zoom)
+    const image = new Image();
+    image.src = imageUrl;
+    image.onload = () => {
+        context.drawImage(image, 0, 0, image.width * zoom, image.height * zoom);
+    };
+}
 
+
+function drawPixels(context: CanvasRenderingContext2D, zoom: number, pixelOffset: number[], dimensions: Dimensions, worldTranslation: number[], pixelData: PixelData, hoveredCell: number[] | undefined) {
     const cellSize = getCellSize(dimensions, zoom)
+    drawImage(context, 'coast.png', cellSize); // Add this line
 
     const gridDimensions = [
         Math.ceil(dimensions.width / cellSize),
