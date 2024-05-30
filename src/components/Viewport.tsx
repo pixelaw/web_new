@@ -1,33 +1,21 @@
 import React, {useRef, useEffect, useState} from 'react';
+import {numRGBAToHex} from '../utils.ts'
+import {Pixel, Tile} from "../types.ts";
 
 export type Dimensions = {
     width: number;
     height: number;
 };
 
-
-export type Pixel = {
-    id: string
-    color: string
-    text: string
-    owner: string
-    action: string
-}
-
-export type PixelData = {
-    data: Map<string, Pixel>;
-    color: Map<string, number>;
-}
-
 interface ViewportProps {
-    pixelData: PixelData;
+    getTile: (key: string) => HTMLImageElement | undefined;
+    getPixel: (key: string) => Pixel | undefined;
     dimensions: Dimensions;
     zoom: number;
     center: number[];
     onCenterChange: (newCenter: number[]) => void;
     onWorldviewChange: (newWorldview: number[][]) => void;
 }
-
 
 function getCellSize(dimensions: Dimensions, zoom: number) {
     return dimensions.width > dimensions.height
@@ -63,19 +51,30 @@ function cellForPosition(zoom: number, pixelOffset: number[], dimensions: Dimens
     ]
 }
 
-function drawImage(context: CanvasRenderingContext2D, imageUrl: string, zoom: number) {
-    console.log("zoom", zoom)
-    const image = new Image();
-    image.src = imageUrl;
-    image.onload = () => {
-        context.drawImage(image, 0, 0, image.width * zoom, image.height * zoom);
-    };
+async function drawTiles(
+    context: CanvasRenderingContext2D,
+    zoom: number,
+    pixelOffset: number[],
+    dimensions: Dimensions,
+    worldTranslation: number[],
+    getTile: (key: string) => Tile | undefined
+) {
+    const img = getTile("0_0")
+    if(!img) return
+
+    context.drawImage(img,0,0,400, 400)
 }
 
-
-function drawPixels(context: CanvasRenderingContext2D, zoom: number, pixelOffset: number[], dimensions: Dimensions, worldTranslation: number[], pixelData: PixelData, hoveredCell: number[] | undefined) {
+function drawPixels(
+    context: CanvasRenderingContext2D,
+    zoom: number,
+    pixelOffset: number[],
+    dimensions: Dimensions,
+    worldTranslation: number[],
+    hoveredCell: number[] | undefined,
+    getPixel: (key: string) => Pixel | undefined
+) {
     const cellSize = getCellSize(dimensions, zoom)
-    drawImage(context, 'coast.png', cellSize); // Add this line
 
     const gridDimensions = [
         Math.ceil(dimensions.width / cellSize),
@@ -93,10 +92,11 @@ function drawPixels(context: CanvasRenderingContext2D, zoom: number, pixelOffset
             ]
 
             // Don't draw if there is no data
-            if (!pixelData.color.has(`${worldCoords[0]},${worldCoords[1]}`)) continue
+            let pixel = getPixel(`${worldCoords[0]},${worldCoords[1]}`)
+            if (!pixel) continue
 
             // @ts-ignore
-            context.fillStyle = numRGBAToHex(pixelData.color.get(`${worldCoords[0]},${worldCoords[1]}`));
+            context.fillStyle = numRGBAToHex(pixel.color);
 
 
             // Draw a filled rectangle
@@ -109,13 +109,15 @@ function drawPixels(context: CanvasRenderingContext2D, zoom: number, pixelOffset
         }
     }
     if (hoveredCell && zoom > 2) {
-        // Draw the hovered cell a bit bigger :-)
-        const worldCoords = [
-            hoveredCell[0] - worldTranslation[0],
-            hoveredCell[1] - worldTranslation[1]
-        ]
-        context.fillStyle = numRGBAToHex(pixelData.color.get(`${worldCoords[0]},${worldCoords[1]}`));
 
+        const worldCoords = viewToWorld(worldTranslation, hoveredCell)
+        let pixel = getPixel(`${worldCoords[0]},${worldCoords[1]}`)
+
+        context.fillStyle = numRGBAToHex(
+            pixel ? pixel.color : 0
+        );
+
+        // Draw the hovered cell a bit bigger :-)
         context.fillRect(
             (pixelOffset[0] - cellSize) + (hoveredCell[0] * cellSize) - 10,
             (pixelOffset[1] - cellSize) + (hoveredCell[1] * cellSize) - 10,
@@ -126,14 +128,8 @@ function drawPixels(context: CanvasRenderingContext2D, zoom: number, pixelOffset
     }
 }
 
-export const numRGBAToHex = (rgba: number | undefined) => {
-    if(rgba==undefined) return "#0000EE"    // TODO Maybe return default color?
-    let color = rgba >>> 8
-    return '#' + (color).toString(16).padStart(6, "0")
-}
-
 function drawGrid(context: CanvasRenderingContext2D, zoom: number, pixelOffset: number[], dimensions: { width: any; height: any; }) {
-    console.log("drawGrid")
+
     const cellSize = getCellSize(dimensions, zoom)
 
     const startDrawingAtX = pixelOffset[0] - cellSize
@@ -158,7 +154,6 @@ function drawGrid(context: CanvasRenderingContext2D, zoom: number, pixelOffset: 
 
 }
 
-
 function viewToWorld(worldTranslation: number[], viewportCoord: number[]): number[] {
 
     let x = viewportCoord[0] - worldTranslation[0]
@@ -172,12 +167,13 @@ function viewToWorld(worldTranslation: number[], viewportCoord: number[]): numbe
 
 const Viewport: React.FC<ViewportProps> = (
     {
-        pixelData,
         dimensions,
         zoom: initialZoom,
         center: initialCenter,
         onCenterChange,
-        onWorldviewChange
+        onWorldviewChange,
+        getPixel,
+        getTile
     }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [pixelOffset, setPixelOffset] = useState<number[]>([0, 0]);
@@ -187,7 +183,6 @@ const Viewport: React.FC<ViewportProps> = (
     const [center, setCenter] = useState(initialCenter);
     const [worldTranslation, setWorldTranslation] = useState([0, 0]);
     const [hoveredCell, setHoveredCell] = useState<number[] | undefined>(undefined);
-
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -200,7 +195,7 @@ const Viewport: React.FC<ViewportProps> = (
         canvas.width = dimensions.width;
         canvas.height = dimensions.height;
 
-        if (zoom > 4) drawGrid(context, zoom, pixelOffset, dimensions)
+        // if (zoom > 4) drawGrid(context, zoom, pixelOffset, dimensions)
         const cellSize = getCellSize(dimensions, zoom)
 
         const gridDimensions = [
@@ -212,15 +207,23 @@ const Viewport: React.FC<ViewportProps> = (
             Math.floor(gridDimensions[0] / 2),
             Math.floor(gridDimensions[1] / 2)
         ])
-        drawPixels(context, zoom, pixelOffset, dimensions, worldTranslation, pixelData, hoveredCell)
 
-        if (zoom > 2) drawGrid(context, zoom, pixelOffset, dimensions)
+        if (zoom > 1) {
+            drawGrid(context, zoom, pixelOffset, dimensions)
+            drawPixels(context, zoom, pixelOffset, dimensions, worldTranslation, hoveredCell, getPixel)
+
+        }else{
+            drawTiles(context, zoom, pixelOffset, dimensions, worldTranslation, getTile)
+        }
+
         drawOutline(context, dimensions)
 
-        onCenterChange(center)
-        // TODO
-        onWorldviewChange([[]])
-    }, [dimensions, zoom, pixelOffset, hoveredCell]);
+    }, [dimensions, zoom, pixelOffset, hoveredCell, getPixel]);
+
+    // useEffect(() => {
+    //     console.log("Viewport getPixel changed")
+    //
+    // }, [getPixel]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -274,6 +277,8 @@ const Viewport: React.FC<ViewportProps> = (
 
         canvas.addEventListener('wheel', handleWheel, {passive: false});
 
+        onCenterChange(center)
+        onWorldviewChange([[]])
         return () => {
             canvas.removeEventListener('wheel', handleWheel);
         };
@@ -313,19 +318,19 @@ const Viewport: React.FC<ViewportProps> = (
             setPixelOffset(newOffset);
             setWorldTranslation(newWorldTranslation)
             setLastDragPoint([e.clientX, e.clientY]);
+            onWorldviewChange([[]])
+            onCenterChange(center)
         } else {
             const rect = e.currentTarget.getBoundingClientRect();
 
             const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
 
-            let worldCell = viewToWorld(worldTranslation, viewportCell)
-
-            console.log(
-                "hovering: ",
-                viewportCell,
-                "world:",
-                worldCell
-            )
+            // console.log(
+            //     "hovering: ",
+            //     viewportCell,
+            //     "world:",
+            //     viewToWorld(worldTranslation, viewportCell)
+            // )
             setHoveredCell(viewportCell);
         }
 
