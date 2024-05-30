@@ -19,3 +19,5 @@ export interface TileStore {
     tiles: { [key: string]: Tile };
     getTile: (key: string) => Promise<Tile | undefined>;
 };
+
+const TILE_SIZE = 100   // 100 by 100 pixels

@@ -62,15 +62,19 @@ function App() {
             getTile={getTile}
             getPixel={getPixel}
             dimensions={{width: 800, height: 600}}
-            zoom={0.5}
+            zoom={21}
             center={[10,10]}
             onWorldviewChange={onWorldviewChange}
             onCenterChange={onCenterChange}
+            onZoomChange={onZoomChange}
         />
     </>
   )
 }
 
+function onZoomChange (newZoom: number){
+    console.log("onZoomChange", newZoom)
+}
 function onWorldviewChange (newWorldview: number[][]){
     console.log("onWorldviewChange", newWorldview)
 }
