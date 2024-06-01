@@ -9,15 +9,26 @@ export type Pixel = {
 export type Tile = HTMLImageElement
 
 export interface PixelStore  {
-    pixels: { [key: string]: Pixel };
     getPixel: (key: string) => Pixel | undefined;
     setPixel: (key: string, pixel: Pixel) => void;
     setPixels: (pixels: {key: string, pixel: Pixel}[]) => void;
 };
 
 export interface TileStore {
-    tiles: { [key: string]: Tile };
-    getTile: (key: string) => Promise<Tile | undefined>;
-};
+    getTile: (key: string) => Tile | undefined;
+    setTile: (key: string, tile: Tile) => Promise<void>;
+    setTiles: (tiles: { key: string, tile: Tile }[]) => Promise<void>;
+    getTileset : (pixelPerCell:number, bounds: Bounds) => Tileset | undefined;
+}
 
-const TILE_SIZE = 100   // 100 by 100 pixels
+export interface Tileset {
+    tileSize: number,
+    scaleFactor: number,
+    bounds: Bounds,
+    tiles: (Tile | undefined)[]
+}
+
+export type Dimension = [width: number, height: number];
+export type Coordinate = [number, number];
+export type Bounds = [topLeft: Coordinate, bottomRight: Coordinate];
+

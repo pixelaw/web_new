@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Pixel } from "../types.ts";
+import {Pixel, PixelStore} from "../types.ts";
 import {produce} from 'immer';
 
 type State = { [key: string]: Pixel };
 
-export function useSimplePixelStore() {
+export function useSimplePixelStore(): PixelStore {
     const [state, setState] = useState<State>({});
 
     const getPixel = (key: string): Pixel | undefined => {

@@ -1,11 +1,11 @@
 import {useState, useEffect, useRef} from 'react';
-import { Tile } from "../types.ts";
+import {Tile, Tileset, TileStore} from "../types.ts";
 import {set as setIdb, get as getIdb, keys} from 'idb-keyval';
 
 type State = { [key: string]: HTMLImageElement | undefined };
 
 
-export function useSimpleTileStore() {
+export function useSimpleTileStore(): TileStore {
     const [state, setState] = useState<State>({});
     const tilesLoadedRef = useRef(false); // Add this line
 
@@ -13,11 +13,15 @@ export function useSimpleTileStore() {
         if (tilesLoadedRef.current) return
         (async () => {
             const keysArray = await keys();
-            const tilesObj:Record<string, Tile | undefined> = {};
+            const tilesObj: Record<string, Tile | undefined> = {};
             for (const key of keysArray) {
                 if (typeof key === 'string') {
-                    const base64 = await getIdb(key)
-                    tilesObj[key] = await loadImage(base64);
+                    try {
+                        const base64 = await getIdb(key)
+                        tilesObj[key] = await loadImage(base64);
+                    }catch(e){
+                        console.log(e)
+                    }
                 }
             }
             setState(tilesObj);
@@ -25,13 +29,29 @@ export function useSimpleTileStore() {
         })();
     }, []);
 
+    // @ts-ignore
+    const getTileset = (cellPerPixel: number, bounds: Bounds): Tileset | undefined => {
+        const {topLeft, bottomRight} = bounds
+        console.log(topLeft, bottomRight)
+
+        // For now lets serve level 1 unless requested is 10 or more
+        let actualCellPerPixel = cellPerPixel < 10 ? 1 : 10
+
+        return {
+            tileSize: 10,
+            bounds: bounds,
+            scaleFactor: actualCellPerPixel,
+            tiles: [state["1_0_0"]]
+        }
+    };
+
     const getTile = (key: string): Tile | undefined => {
         if (!state[key]) {
-
+            console.log(key)
             fetchImage(`${key}.png`).then(async base64Img => {
                 await setIdb(key, base64Img);
                 const img = await loadImage(base64Img);
-                setState(prevState => ({ ...prevState, [key]: img }));
+                setState(prevState => ({...prevState, [key]: img}));
 
             }).catch(e => {
                 console.error('Error loading image:', e);
@@ -42,20 +62,21 @@ export function useSimpleTileStore() {
 
     const setTile = async (key: string, tile: Tile): Promise<void> => {
         await setIdb(key, tile);
-        setState({ ...state, [key]: tile });
+        setState({...state, [key]: tile});
     };
 
     const setTiles = async (tiles: { key: string, tile: Tile }[]): Promise<void> => {
-        const newTiles = { ...state };
-        for (const { key, tile } of tiles) {
+        const newTiles = {...state};
+        for (const {key, tile} of tiles) {
             await setIdb(key, tile);
             newTiles[key] = tile;
         }
         setState(newTiles);
     };
 
-    return { getTile, setTile, setTiles };
+    return {getTile, setTile, setTiles, getTileset};
 }
+
 const loadImage = (base64: string): Promise<HTMLImageElement> => {
 
     return new Promise((resolve, reject) => {

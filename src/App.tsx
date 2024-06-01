@@ -1,8 +1,8 @@
 import UPNG from 'upng-js';
 import './App.css'
 import Viewport from "./components/Viewport.tsx";
-import {useEffect, useRef} from "react";
-import {Pixel} from "./types.ts";
+import {useEffect, useRef, useState} from "react";
+import {Coordinate, Pixel} from "./types.ts";
 import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 
@@ -39,17 +39,24 @@ async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string
 }
 
 function App() {
+    const [zoom, setZoom] = useState<number>(1);
+    const [center, setCenter] = useState<Coordinate>([10, 10]);
+
+    const resetViewport = () => {
+        setZoom(1);
+        setCenter([10, 10]);
+    };
+
     const filledRef = useRef(false);
 
-    const { getPixel, setPixels } = useSimplePixelStore();
-    const { getTile } = useSimpleTileStore();
+    const pixelStore = useSimplePixelStore();
+    const tileStore = useSimpleTileStore();
 
     useEffect(() => {
         if (!filledRef.current) {
 
             const fetchData = async () => {
-                await fillPixelData("/kq3.png", setPixels);
-                await getTile("0_0")
+                await fillPixelData("/kq3.png", pixelStore.setPixels);
             };
             fetchData();
             filledRef.current = true;
@@ -58,12 +65,13 @@ function App() {
 
   return (
     <>
+        <button onClick={resetViewport}>reset</button>
         <Viewport
-            getTile={getTile}
-            getPixel={getPixel}
-            dimensions={{width: 800, height: 600}}
-            zoom={21}
-            center={[10,10]}
+            tileStore={tileStore}
+            pixelStore={pixelStore}
+            dimensions={[800,400]}
+            zoom={zoom}
+            center={center}
             onWorldviewChange={onWorldviewChange}
             onCenterChange={onCenterChange}
             onZoomChange={onZoomChange}
