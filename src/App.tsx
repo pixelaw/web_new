@@ -7,7 +7,7 @@ import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 
 
-async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void){
+async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
     // Fetch PNG file
     const response = await fetch(imageUrl);
     const arrayBuffer = await response.arrayBuffer();
@@ -24,15 +24,17 @@ async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string
 
             // Get RGB color from PNG
             const r = rgbaValues[idx];
-            const g = rgbaValues[idx+1];
-            const b = rgbaValues[idx+2];
-            const a = rgbaValues[idx+3];
+            const g = rgbaValues[idx + 1];
+            const b = rgbaValues[idx + 2];
+            const a = rgbaValues[idx + 3];
             // Encode RGB color to int
             const color = (r << 24) | (g << 16) | (b << 8) | a;
 
-            pixels.push({key: `${x},${y}`, pixel: {
+            pixels.push({
+                key: `${x},${y}`, pixel: {
                     action: "", color, id: "", owner: "", text: ""
-                }})
+                }
+            })
         }
     }
     setPixels(pixels)
@@ -63,30 +65,32 @@ function App() {
         }
     }, []);
 
-  return (
-    <>
-        <button onClick={resetViewport}>reset</button>
-        <Viewport
-            tileStore={tileStore}
-            pixelStore={pixelStore}
-            dimensions={[800,400]}
-            zoom={zoom}
-            center={center}
-            onWorldviewChange={onWorldviewChange}
-            onCenterChange={onCenterChange}
-            onZoomChange={onZoomChange}
-        />
-    </>
-  )
+    return (
+        <>
+            <button onClick={resetViewport}>reset</button>
+            <Viewport
+                tileStore={tileStore}
+                pixelStore={pixelStore}
+                dimensions={[800, 400]}
+                zoom={zoom}
+                center={center}
+                onWorldviewChange={onWorldviewChange}
+                onCenterChange={onCenterChange}
+                onZoomChange={onZoomChange}
+            />
+        </>
+    )
 }
 
-function onZoomChange (newZoom: number){
+function onZoomChange(newZoom: number) {
     console.log("onZoomChange", newZoom)
 }
-function onWorldviewChange (newWorldview: number[][]){
+
+function onWorldviewChange(newWorldview: number[][]) {
     console.log("onWorldviewChange", newWorldview)
 }
-function onCenterChange (newCenter: number[]){
+
+function onCenterChange(newCenter: number[]) {
     console.log("onCenterChange", newCenter)
 
 }

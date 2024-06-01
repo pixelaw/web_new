@@ -19,7 +19,7 @@ export function useSimpleTileStore(): TileStore {
                     try {
                         const base64 = await getIdb(key)
                         tilesObj[key] = await loadImage(base64);
-                    }catch(e){
+                    } catch (e) {
                         console.log(e)
                     }
                 }

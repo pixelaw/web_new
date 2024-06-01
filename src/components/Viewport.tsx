@@ -17,7 +17,7 @@ interface ViewportProps {
     onWorldviewChange: (newWorldview: Bounds) => void;
 }
 
-function getCellSize( zoom: number) {
+function getCellSize(zoom: number) {
     return zoom / ZOOM_FACTOR
     // return dimensions.width > dimensions.height
     //     ? dimensions.height * (zoom / 1000)
@@ -86,7 +86,7 @@ async function drawTiles(
     - From factor and world coords get the tile indexes (for factor 1 its the same, for factor 4 multiply)
 
      */
-    const cellSize = getCellSize( zoom)
+    const cellSize = getCellSize(zoom)
 
     const gridDimensions = [
         Math.ceil(dimensions[0] / cellSize),
@@ -119,9 +119,9 @@ async function drawTiles(
 
     const tileset = tileStore.getTileset(
         zoom / ZOOM_FACTOR,
-        [        topleft,        bottomright]
+        [topleft, bottomright]
     )
-    if(!tileset) return
+    if (!tileset) return
 
     const {tiles, tileSize, scaleFactor} = tileset
     // Based on the size of the tiles and the zoomlevel (pixels per cell divided by ZOOMFACTOR), figure out where to draw
@@ -140,7 +140,7 @@ function drawPixels(
     hoveredCell: Coordinate | undefined,
     getPixel: (key: string) => Pixel | undefined
 ) {
-    const cellSize = getCellSize( zoom)
+    const cellSize = getCellSize(zoom)
 
     const gridDimensions = [
         Math.ceil(dimensions[0] / cellSize),
@@ -199,7 +199,7 @@ function drawGrid(context: CanvasRenderingContext2D, zoom: number, pixelOffset: 
     height: any;
 }) {
 
-    const cellSize = getCellSize( zoom)
+    const cellSize = getCellSize(zoom)
 
     const startDrawingAtX = pixelOffset[0] - cellSize
     const endDrawingAtX = dimensions.width + pixelOffset[0]
@@ -252,7 +252,7 @@ const Viewport: React.FC<ViewportProps> = (
     const [zoom, setZoom] = useState<number>(initialZoom);
     const [center, setCenter] = useState<Coordinate>(initialCenter);
     const [worldTranslation, setWorldTranslation] = useState<Coordinate>([0, 0]);
-    const [hoveredCell, setHoveredCell] = useState<Coordinate| undefined>(undefined);
+    const [hoveredCell, setHoveredCell] = useState<Coordinate | undefined>(undefined);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -327,7 +327,7 @@ const Viewport: React.FC<ViewportProps> = (
                         dimensions,
                         [e.clientX - rect.left, e.clientY - rect.top]
                     )
-                    const cellSize = getCellSize( zoom)
+                    const cellSize = getCellSize(zoom)
 
                     const gridDimensions = [
                         Math.ceil(dimensions[0] / cellSize),
@@ -357,7 +357,7 @@ const Viewport: React.FC<ViewportProps> = (
         canvas.addEventListener('wheel', handleWheel, {passive: false});
 
         onCenterChange(center)
-        onWorldviewChange([[0,0],[0,0]])//TODO
+        onWorldviewChange([[0, 0], [0, 0]])//TODO
         onZoomChange(zoom)
         return () => {
             canvas.removeEventListener('wheel', handleWheel);
@@ -398,7 +398,7 @@ const Viewport: React.FC<ViewportProps> = (
             setPixelOffset(newOffset);
             setWorldTranslation(newWorldTranslation)
             setLastDragPoint([e.clientX, e.clientY]);
-            onWorldviewChange([[0,0],[0,0]])//TODO
+            onWorldviewChange([[0, 0], [0, 0]])//TODO
             onCenterChange(center)
         } else {
             if (zoom > ZOOM_TILEMODE) {
