@@ -87,7 +87,7 @@ function onZoomChange(newZoom: number) {
 }
 
 function onWorldviewChange(newWorldview: number[][]) {
-    console.log("onWorldviewChange", newWorldview)
+    // console.log("onWorldviewChange", newWorldview)
 }
 
 function onCenterChange(newCenter: number[]) {

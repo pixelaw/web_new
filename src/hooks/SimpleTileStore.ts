@@ -1,5 +1,5 @@
 import {useState, useEffect, useRef} from 'react';
-import {Tile, Tileset, TileStore} from "../types.ts";
+import {Bounds, Tile, Tileset, TileStore} from "../types.ts";
 import {set as setIdb, get as getIdb, keys} from 'idb-keyval';
 
 type State = { [key: string]: HTMLImageElement | undefined };
@@ -29,9 +29,9 @@ export function useSimpleTileStore(): TileStore {
         })();
     }, []);
 
-    // @ts-ignore
+
     const getTileset = (cellPerPixel: number, bounds: Bounds): Tileset | undefined => {
-        const {topLeft, bottomRight} = bounds
+        const [topLeft, bottomRight] = bounds
         console.log(topLeft, bottomRight)
 
         // For now lets serve level 1 unless requested is 10 or more
