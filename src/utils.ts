@@ -1,7 +1,7 @@
-import {Coordinate, Dimension} from "./types.ts";
+import {Coordinate, MAX_UINT32} from "./types.ts";
 import {ZOOM_FACTOR} from "./components/Viewport/constants.ts";
 
-export function randomColor(): number{
+export function randomColor(): number {
     // Generate random RGB color
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);
@@ -12,7 +12,7 @@ export function randomColor(): number{
 }
 
 export const numRGBAToHex = (rgba: number | undefined) => {
-    if(rgba==undefined) return "#0000EE"    // TODO Maybe return default color?
+    if (rgba == undefined) return "#0000EE"    // TODO Maybe return default color?
     let color = rgba >>> 8
     return '#' + (color).toString(16).padStart(6, "0")
 }
@@ -23,29 +23,32 @@ export async function clearIdb() {
 
     const request = indexedDB.open(DB_NAME);
 
-    request.onsuccess = function(_event) {
+    request.onsuccess = function (_event) {
         const db = request.result;
         const transaction = db.transaction([DB_STORE_NAME], 'readwrite');
         const objectStore = transaction.objectStore(DB_STORE_NAME);
         objectStore.clear();
     };
 }
-export function cellForPosition(zoom: number, pixelOffset: Coordinate, _dimensions: Dimension, position: Coordinate): Coordinate {
+
+export function cellForPosition(
+    zoom: number,
+    pixelOffset: Coordinate,
+    position: Coordinate
+): Coordinate {
+
     const cellSize = getCellSize(zoom)
 
-    const startDrawingAtX = pixelOffset[0] - cellSize
-    // const endDrawingAtX = dimensions.width + pixelOffset[0]
+    const [offsetLeft, offsetTop] = pixelOffset
+    const [posX, posY] = position
 
-    const startDrawingAtY = pixelOffset[1] - cellSize
-    // const endDrawingAtY = dimensions.height + pixelOffset[1]
+    const startDrawingAtX = offsetLeft - cellSize
+    const startDrawingAtY = offsetTop - cellSize
 
-    const x = Math.floor((position[0] - startDrawingAtX) / cellSize)
-    const y = Math.floor((position[1] - startDrawingAtY) / cellSize)
+    const x = Math.floor((posX - startDrawingAtX) / cellSize)
+    const y = Math.floor((posY - startDrawingAtY) / cellSize)
 
-    return [
-        x,
-        y
-    ]
+    return [x, y]
 }
 
 export function getCellSize(zoom: number) {
@@ -53,12 +56,17 @@ export function getCellSize(zoom: number) {
 }
 
 export function worldToView(worldTranslation: Coordinate, worldCoord: Coordinate): Coordinate {
+    const MAX_VIEW_SIZE = 1000000
 
-    let x = worldCoord[0] + worldTranslation[0]
-    let y = worldCoord[1] + worldTranslation[1]
+    const [worldX, worldY] = worldCoord
+    const [transX, transY] = worldTranslation
 
-    x = x < 0xFFFFFFFF ? x : x - 0xFFFFFFFF;
-    y = y < 0xFFFFFFFF ? y : y - 0xFFFFFFFF;
+    let x = worldX + transX
+    let y = worldY + transY
+
+    // View is max MAX_VIEW_SIZE wide, so an X of more than that is unlikely
+    if (x > MAX_VIEW_SIZE) x = 1 - MAX_UINT32 % x
+    if (y > MAX_VIEW_SIZE) y = 1 - MAX_UINT32 % y
 
     return [x, y];
 }

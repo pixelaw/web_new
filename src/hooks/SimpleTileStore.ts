@@ -16,7 +16,6 @@ export function useSimpleTileStore(): TileStore {
     useEffect(() => {
         if (tilesLoadedRef.current) return
 
-
         (async () => {
             setIsLoading(true);
             const keysArray = await keys();
@@ -25,6 +24,7 @@ export function useSimpleTileStore(): TileStore {
                 if (typeof key === 'string') {
                     try {
                         const base64 = await getIdb(key)
+                        if(base64.length == 0) continue
                         tilesObj[key] = await loadImage(base64);
                     } catch (e) {
                         console.log("Error loading", key, e)
@@ -41,7 +41,7 @@ export function useSimpleTileStore(): TileStore {
     const getTileset = (scaleFactor: number, bounds: Bounds): Tileset | undefined => {
         const [topLeft, bottomRight] = bounds
         if(isLoading) return
-        console.log("getTileset", scaleFactor, topLeft, bottomRight)
+        // console.log("getTileset", scaleFactor, topLeft, bottomRight)
 
 
         // Choose the tileset Scalefactor based on what's requested
@@ -85,6 +85,7 @@ export function useSimpleTileStore(): TileStore {
         const width = distance(leftTileCoord, rightTileCoord)
         const height = distance(topTileCoord, bottomTileCoord)
 
+        console.log("leftTileCoord", leftTileCoord)
 
         for (let x = 0; x <= width; x += tileWorldSize) {
             let tileRow: (Tile | undefined | null)[] = []
@@ -92,7 +93,7 @@ export function useSimpleTileStore(): TileStore {
 
                 const tileX = changeWrapped(leftTileCoord , x);
                 const tileY = changeWrapped(topTileCoord, y);
-
+                // console.log(`${tileScaleFactor}_${TILESIZE}_${tileX}_${tileY}`)
                 tileRow.push(
                     getTile(`${tileScaleFactor}_${TILESIZE}_${tileX}_${tileY}`)
                 )
@@ -123,13 +124,13 @@ export function useSimpleTileStore(): TileStore {
                 // Cannot use immer here because it won't work with HTMLImageElement, which is a read-only type
                 setState(prevState => ({...prevState, [key]: img}));
 
-            }).catch(e => {
+            }).catch(_e => {
                 setIdb(key, "").then(() => {
                     setState(produce(draftState => {
                         draftState[key] = null;
                     }));
                 });
-                console.error('Error loading image:', key, e);
+                // console.info('Error loading image:', key, e);
             });
 
         }

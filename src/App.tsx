@@ -7,7 +7,7 @@ import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 
-const DEFAULT_ZOOM = 100
+const DEFAULT_ZOOM = 150
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
 
 async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
@@ -80,7 +80,7 @@ function App() {
             <Index
                 tileStore={tileStore}
                 pixelStore={pixelStore}
-                dimensions={[800, 400]}
+                dimensions={[400, 400]}
                 zoom={zoom}
                 center={center}
                 onWorldviewChange={onWorldviewChange}
@@ -91,16 +91,16 @@ function App() {
     )
 }
 
-function onZoomChange(newZoom: number) {
-    console.log("onZoomChange", newZoom)
+function onZoomChange(_newZoom: number) {
+    console.log("onZoomChange", _newZoom)
 }
 
 function onWorldviewChange(_newWorldview: number[][]) {
-    // console.log("onWorldviewChange", newWorldview)
+    // console.log("onWorldviewChange", _newWorldview)
 }
 
-function onCenterChange(newCenter: number[]) {
-    console.log("onCenterChange", newCenter)
+function onCenterChange(_newCenter: number[]) {
+    // console.log("onCenterChange", _newCenter)
 
 }
 

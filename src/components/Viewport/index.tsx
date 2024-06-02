@@ -1,8 +1,11 @@
 import React, {useRef, useEffect, useState} from 'react';
 import {Bounds, Coordinate, Dimension, PixelStore, TileStore} from "../../types.ts";
-import {drawGrid, drawOutline, drawPixels, drawTiles} from "./draw.ts";
 import {cellForPosition, getCellSize} from "../../utils.ts";
 import {ZOOM_MAX, ZOOM_STEP, ZOOM_TILEMODE} from "./constants.ts";
+import {drawPixels} from "./drawPixels.ts";
+import {drawOutline} from "./drawOutline.ts";
+import {drawTiles} from "./drawTiles.ts";
+import {drawGrid} from "./drawGrid.ts";
 
 interface ViewportProps {
     pixelStore: PixelStore;
@@ -78,7 +81,6 @@ const Index: React.FC<ViewportProps> = (
 
 
     useEffect(() => {
-        console.log("tileRender triggered")
         if (zoom <= ZOOM_TILEMODE) {
             const canvas = canvasRef.current;
             if (!canvas) return;
@@ -107,12 +109,7 @@ const Index: React.FC<ViewportProps> = (
                     newZoom += ZOOM_STEP
 
                     // Adjust world transform
-                    const mouse = cellForPosition(
-                        zoom,
-                        pixelOffset,
-                        dimensions,
-                        [e.clientX - rect.left, e.clientY - rect.top]
-                    )
+                    const mouse = cellForPosition(zoom, pixelOffset, [e.clientX - rect.left, e.clientY - rect.top])
                     const cellSize = getCellSize(zoom)
 
                     const gridDimensions = [
@@ -195,7 +192,7 @@ const Index: React.FC<ViewportProps> = (
             if (zoom > ZOOM_TILEMODE) {
                 const rect = e.currentTarget.getBoundingClientRect();
 
-                const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
+                const viewportCell = cellForPosition(zoom, pixelOffset, [e.clientX - rect.left, e.clientY - rect.top])
 
                 // console.log(
                 //     "hovering: ",
