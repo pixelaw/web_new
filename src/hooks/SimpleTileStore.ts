@@ -1,36 +1,34 @@
+import {produce} from 'immer';
 import {useState, useEffect, useRef} from 'react';
 import {Bounds, MAX_UINT32, Tile, Tileset, TileStore} from "../types.ts";
 import {set as setIdb, get as getIdb, keys} from 'idb-keyval';
 
-type State = { [key: string]: HTMLImageElement | undefined };
+type State = { [key: string]: HTMLImageElement | undefined | null };
 
 const TILESIZE = 100
-
+/*
 function createPlaceholder(){
     const result = new Image();
     result.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC';
     result.width = TILESIZE
     result.height = TILESIZE
     return result
-}
+}*/
 
 export function useSimpleTileStore(): TileStore {
     const [state, setState] = useState<State>({});
     const tilesLoadedRef = useRef(false); // Add this line
-    const placeholder = useRef<HTMLImageElement | undefined>(undefined); // Add this line
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         if (tilesLoadedRef.current) return
 
-        placeholder.current = createPlaceholder(); // Assign the created image to the ref
 
         (async () => {
             setIsLoading(true);
             const keysArray = await keys();
             const tilesObj: Record<string, Tile | undefined> = {};
             for (const key of keysArray) {
-                console.log("loading keys from idb: ", key)
                 if (typeof key === 'string') {
                     try {
                         const base64 = await getIdb(key)
@@ -74,25 +72,34 @@ export function useSimpleTileStore(): TileStore {
         const tileBounds: Bounds = [[leftTileCoord, topTileCoord], [rightTileCoord, bottomTileCoord]]
 
         let tileRows = []
-        function incrementWrapped(nr: number, increment: number){
-            let result = nr + increment
-            if(result > MAX_UINT32) return (result % (MAX_UINT32 + 1))
-            else return result
+
+        // TODO check if this works with negative change
+        function changeWrapped(nr: number, change: number){
+            nr >>>= 0;
+            let result=((nr >>> 0) + change) >>> 0
+            if(nr > result){
+                result -= result % tileWorldSize
+            }
+            return result
         }
-        function distance(left: number, right: number): number{
-            return right >= left
-                ? right - left // not wrapping
-                : MAX_UINT32 - left + right // wrapping
+
+        function distance(begin: number, end: number): number{
+            return end >= begin
+                ? end - begin // not wrapping
+                : MAX_UINT32 - begin + end // wrapping
         }
 
         const width = distance(leftTileCoord, rightTileCoord)
         const height = distance(topTileCoord, bottomTileCoord)
 
+
         for (let x = 0; x <= width; x += tileWorldSize) {
-            let tileRow: (Tile | undefined)[] = []
+            let tileRow: (Tile | undefined | null)[] = []
             for (let y = 0; y <= height; y+=tileWorldSize) {
-                const tileX = incrementWrapped(leftTileCoord , x);
-                const tileY = incrementWrapped(topTileCoord, y);
+
+                const tileX = changeWrapped(leftTileCoord , x);
+                const tileY = changeWrapped(topTileCoord, y);
+
                 tileRow.push(
                     getTile(`${tileScaleFactor}_${TILESIZE}_${tileX}_${tileY}`)
                 )
@@ -108,21 +115,30 @@ export function useSimpleTileStore(): TileStore {
         }
     };
 
-    const getTile = (key: string): Tile | undefined => {
+    const getTile = (key: string): Tile | undefined | null => {
 
-        if (!state[key]) {
+        if (state[key] === undefined) {
 
-            // TODO performance can be improved by using immer or something
-            setState(prevState => ({...prevState, [key]: placeholder.current}));
+            setState(produce(draftState => {
+                draftState[key] = null;
+            }));
+
             fetchImage(`http://localhost:3000/tiles/${key}.png`).then(async base64Img => {
                 await setIdb(key, base64Img);
                 const img = await loadImage(base64Img);
 
+                // Cannot use immer here because it won't work with HTMLImageElement, which is a read-only type
                 setState(prevState => ({...prevState, [key]: img}));
 
             }).catch(e => {
-                console.error('Error loading image:', e);
+                setIdb(key, "").then(() => {
+                    setState(produce(draftState => {
+                        draftState[key] = null;
+                    }));
+                });
+                console.error('Error loading image:', key, e);
             });
+
         }
         return state[key];
     };

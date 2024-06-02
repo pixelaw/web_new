@@ -136,18 +136,23 @@ async function drawTiles(
     // tiles have scalefactor, and need to be adjusted
     const tileRenderSize = tileSize * (zoom / ZOOM_FACTOR)
 
+    const TILE_PADDING = 1
+
+    // Determine the offsets to paint the tiles at
+
     // Draw
     for (let y = 0; y < tileset.tileRows[0].length; y++) {
         for (let x = 0; x < tileset.tileRows.length; x++) {
-            console.log(x,y)
-            const img =tileset.tileRows[x][y]
-            if(!img) continue
+
+            const tile =tileset.tileRows[x][y]
+            if(tile == null || tile == undefined) continue
+
             context.drawImage(
-                img,
-                x * tileRenderSize + 1,
-                y * tileRenderSize+ 1,
-                tileRenderSize -2,
-                tileRenderSize -2
+                tile,
+                x * tileRenderSize + TILE_PADDING,
+                y * tileRenderSize+ TILE_PADDING,
+                tileRenderSize -TILE_PADDING*2,
+                tileRenderSize -TILE_PADDING *2
             )
         }
     }
@@ -372,7 +377,12 @@ const Viewport: React.FC<ViewportProps> = (
                     setWorldTranslation(worldTranslate)
                 }
             } else {
-                if (zoom > 0) newZoom -= ZOOM_STEP
+                // TODO deal with minimum zoom and scalefactor
+                if (zoom > 60) {
+                    newZoom -= ZOOM_STEP
+                }else if(zoom - 5 > 25){
+                    newZoom -= 5
+                }
             }
 
 
