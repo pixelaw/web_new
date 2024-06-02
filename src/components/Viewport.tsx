@@ -92,13 +92,15 @@ async function drawTiles(
     ]
 
     const topleft = viewToWorld(worldTranslation, [0, 0])
-    const bottomright = viewToWorld(worldTranslation, cellForPosition(
+    const br = cellForPosition(
         zoom,
         pixelOffset,
         dimensions,
-        [0, dimensions[1]]
-    ))
+        [dimensions[0], dimensions[1]]
+    )
+    const bottomright = viewToWorld(worldTranslation, br)
 
+/*
     // TODO we want to also request offscreen coords - or should we send cellSize so the tile engine can decide?
     // If tilesize > cellSize, always giving one extra tile around the requested area is okay
 
@@ -114,6 +116,7 @@ async function drawTiles(
     // zoomed out 100x (zoom=1): coordPerPixel = 100
     // zoomed in 100x (zoom=100) : coordPerPixel = 0.1 (so 10 pixelPerCoord)
     // const cellPerPixel = ZOOM_FACTOR / zoom
+*/
 
     const tileset = tileStore.getTileset(
         zoom / ZOOM_FACTOR,
@@ -124,11 +127,30 @@ async function drawTiles(
     const {tileRows, tileSize, scaleFactor, bounds: [tileTopLeft, tileBottomRight]} = tileset
     // Based on the size of the tiles and the zoomlevel (pixels per cell divided by ZOOMFACTOR), figure out where to draw
 
-    console.log("tileRows", tileset.tileRows)
-    console.log("tilebounds", tileTopLeft, tileBottomRight)
+    console.log("tileRows", tileRows)
+    console.log("tileSize", tileSize)
+    console.log("scaleFactor", scaleFactor)
+    console.log("tilebounds", tileTopLeft[0], tileTopLeft[1], tileBottomRight[0], tileBottomRight[1])
 
-    if (!tileset.tileRows[0][0]) return
-    context.drawImage(tileset.tileRows[0][0], 0, 0, 600, 600)
+
+    // tiles have scalefactor, and need to be adjusted
+    const tileRenderSize = tileSize * (zoom / ZOOM_FACTOR)
+
+    // Draw
+    for (let y = 0; y < tileset.tileRows[0].length; y++) {
+        for (let x = 0; x < tileset.tileRows.length; x++) {
+            console.log(x,y)
+            const img =tileset.tileRows[x][y]
+            if(!img) continue
+            context.drawImage(
+                img,
+                x * tileRenderSize + 1,
+                y * tileRenderSize+ 1,
+                tileRenderSize -2,
+                tileRenderSize -2
+            )
+        }
+    }
 }
 
 function drawPixels(
@@ -196,7 +218,7 @@ function drawPixels(
 
 function drawGrid(context: CanvasRenderingContext2D, zoom: number, pixelOffset: Coordinate, dimensions: Dimension) {
 
-    const [width, height]  =dimensions
+    const [width, height] = dimensions
     const cellSize = getCellSize(zoom)
 
     const startDrawingAtX = pixelOffset[0] - cellSize

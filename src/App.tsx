@@ -7,7 +7,7 @@ import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 
-const DEFAULT_ZOOM = 300
+const DEFAULT_ZOOM = 100
 const DEFAULT_CENTER = [4294967294,0]
 
 async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {

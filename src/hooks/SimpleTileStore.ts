@@ -117,6 +117,7 @@ export function useSimpleTileStore(): TileStore {
             fetchImage(`http://localhost:3000/tiles/${key}.png`).then(async base64Img => {
                 await setIdb(key, base64Img);
                 const img = await loadImage(base64Img);
+
                 setState(prevState => ({...prevState, [key]: img}));
 
             }).catch(e => {
