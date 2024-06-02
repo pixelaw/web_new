@@ -6,14 +6,7 @@ import {set as setIdb, get as getIdb, keys} from 'idb-keyval';
 type State = { [key: string]: HTMLImageElement | undefined | null };
 
 const TILESIZE = 100
-/*
-function createPlaceholder(){
-    const result = new Image();
-    result.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC';
-    result.width = TILESIZE
-    result.height = TILESIZE
-    return result
-}*/
+
 
 export function useSimpleTileStore(): TileStore {
     const [state, setState] = useState<State>({});
