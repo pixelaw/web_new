@@ -8,7 +8,7 @@ import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 
 const DEFAULT_ZOOM = 100
-const DEFAULT_CENTER = [4294967294,0]
+const DEFAULT_CENTER: Coordinate = [4294967294,0]
 
 async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
     // Fetch PNG file
@@ -95,7 +95,7 @@ function onZoomChange(newZoom: number) {
     console.log("onZoomChange", newZoom)
 }
 
-function onWorldviewChange(newWorldview: number[][]) {
+function onWorldviewChange(_newWorldview: number[][]) {
     // console.log("onWorldviewChange", newWorldview)
 }
 

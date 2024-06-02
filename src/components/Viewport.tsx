@@ -1,6 +1,6 @@
 import React, {useRef, useEffect, useState} from 'react';
 import {numRGBAToHex} from '../utils.ts'
-import {Bounds, Coordinate, Dimension, Pixel, PixelStore, Tile, Tileset, TileStore} from "../types.ts";
+import {Bounds, Coordinate, Dimension, Pixel, PixelStore, TileStore} from "../types.ts";
 
 
 const ZOOM_TILEMODE = 300
@@ -84,12 +84,12 @@ async function drawTiles(
     - From factor and world coords get the tile indexes (for factor 1 its the same, for factor 4 multiply)
 
      */
-    const cellSize = getCellSize(zoom)
+    // const cellSize = getCellSize(zoom)
 
-    const gridDimensions = [
+/*    const _gridDimensions = [
         Math.ceil(dimensions[0] / cellSize),
         Math.ceil(dimensions[1] / cellSize)
-    ]
+    ]*/
 
     const topleft = viewToWorld(worldTranslation, [0, 0])
     const br = cellForPosition(
@@ -453,7 +453,7 @@ const Viewport: React.FC<ViewportProps> = (
 
     };
 
-    const handleMouseUp = (e: React.MouseEvent) => {
+    const handleMouseUp = (_e: React.MouseEvent) => {
         // const rect = e.currentTarget.getBoundingClientRect();
         // const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
         //
