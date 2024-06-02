@@ -66,7 +66,7 @@ const Index: React.FC<ViewportProps> = (
         if (zoom > ZOOM_TILEMODE) {
 
             drawPixels(context, zoom, pixelOffset, dimensions, worldTranslation, hoveredCell, pixelStore.getPixel)
-            console.log("cellSize", cellSize)
+
             drawOutline(context, dimensions)
 
         }

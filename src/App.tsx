@@ -7,7 +7,7 @@ import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 
-const DEFAULT_ZOOM = 100
+const DEFAULT_ZOOM = 1010
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
 
 async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
@@ -65,7 +65,7 @@ function App() {
         if (!filledRef.current) {
 
             const fetchData = async () => {
-                await fillPixelData("/kq3.png", pixelStore.setPixels);
+                await fillPixelData("/drawing.png", pixelStore.setPixels);
             };
             fetchData();
             filledRef.current = true;

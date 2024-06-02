@@ -85,15 +85,12 @@ export function useSimpleTileStore(): TileStore {
         const width = distance(leftTileCoord, rightTileCoord)
         const height = distance(topTileCoord, bottomTileCoord)
 
-        console.log("leftTileCoord", leftTileCoord)
-
         for (let x = 0; x <= width; x += tileWorldSize) {
             let tileRow: (Tile | undefined | null)[] = []
             for (let y = 0; y <= height; y+=tileWorldSize) {
 
                 const tileX = changeWrapped(leftTileCoord , x);
                 const tileY = changeWrapped(topTileCoord, y);
-                // console.log(`${tileScaleFactor}_${TILESIZE}_${tileX}_${tileY}`)
                 tileRow.push(
                     getTile(`${tileScaleFactor}_${TILESIZE}_${tileX}_${tileY}`)
                 )
