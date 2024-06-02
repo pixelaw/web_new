@@ -64,6 +64,7 @@ export async function drawTiles(
         // zoomed in 100x (zoom=100) : coordPerPixel = 0.1 (so 10 pixelPerCoord)
         // const cellPerPixel = ZOOM_FACTOR / zoom
     */
+const scaleFactor = zoom / ZOOM_FACTOR
 
     const tileset = tileStore.getTileset(
         zoom / ZOOM_FACTOR,
@@ -71,25 +72,33 @@ export async function drawTiles(
     )
     if (!tileset) return
 
-    const {tileRows, tileSize, scaleFactor, bounds: [tileTopLeft, tileBottomRight]} = tileset
-    // Based on the size of the tiles and the zoomlevel (pixels per cell divided by ZOOMFACTOR), figure out where to draw
+    const {tileRows, tileSize, scaleFactor: tileScaleFactor, bounds: [tileTopLeft, tileBottomRight]} = tileset
 
-    // console.log("tileRows", tileRows)
-    // console.log("tileSize", tileSize)
-    // console.log("scaleFactor", scaleFactor)
-    // console.log("tilebounds", tileTopLeft[0], tileTopLeft[1], tileBottomRight[0], tileBottomRight[1])
-    //
+    // TODO deal with tileScaleFactor other than 1 (when zoomed out very far)
 
-    // tiles have scalefactor, and need to be adjusted
     const tileRenderSize = tileSize * (zoom / ZOOM_FACTOR)
 
     const TMP_TILE_GAPS = 0 //during dev, to see the tiles
 
-    // TODO Determine the offsets to paint the tiles at
-    // TODO at zoomlevels !=100 its weird,
-    // the offset rolls over together with the tilecoord, but its one behind?
-    const [leftOffset, topOffset] = worldToView(worldTranslation, tileTopLeft)
+    const [rawLeftOffset, rawTopOffset] = worldToView(worldTranslation, tileTopLeft);
+    const leftOffset = (rawLeftOffset * scaleFactor) % tileRenderSize;
+    const topOffset = (rawTopOffset * scaleFactor) % tileRenderSize;
+
+    console.log("tileRenderSize", tileRenderSize)
+
+    console.log("raw offsets", rawLeftOffset, rawTopOffset)
     console.log("offsets", leftOffset, topOffset)
+
+
+    /*
+    # Issue with "jumping tiles" when panning
+    - when moving to the left, offset goes from 0 to -100
+    - when it reaches -100, it rolls over to 0
+    - at the same time, the tile returned switches to one more to the left
+        - the "jump" is not an entire tile's width
+        - the jump is not happening at zoom=100
+    - it seems dependent on zoomlevel, but why?
+     */
 
     // Draw
     for (let y = 0; y < tileset.tileRows[0].length; y++) {
