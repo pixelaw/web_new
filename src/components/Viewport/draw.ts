@@ -1,6 +1,6 @@
 import {Coordinate, Dimension, Pixel, TileStore} from "../../types.ts";
-import {cellForPosition, viewToWorld} from "../../utils.ts";
-import {ZOOM_FACTOR} from "./constants.ts";
+import {cellForPosition, getCellSize, numRGBAToHex, viewToWorld} from "../../utils.ts";
+import {ZOOM_FACTOR, ZOOM_TILEMODE} from "./constants.ts";
 
 export function drawGrid(context: CanvasRenderingContext2D, zoom: number, pixelOffset: Coordinate, dimensions: Dimension) {
 
