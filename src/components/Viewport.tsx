@@ -3,8 +3,10 @@ import {numRGBAToHex} from '../utils.ts'
 import {Bounds, Coordinate, Dimension, Pixel, PixelStore, Tile, Tileset, TileStore} from "../types.ts";
 
 
-const ZOOM_TILEMODE = 10
+const ZOOM_TILEMODE = 300
 const ZOOM_FACTOR = 100
+const ZOOM_STEP = 50
+const ZOOM_MAX = 4000
 
 interface ViewportProps {
     pixelStore: PixelStore;
@@ -19,10 +21,6 @@ interface ViewportProps {
 
 function getCellSize(zoom: number) {
     return zoom / ZOOM_FACTOR
-    // return dimensions.width > dimensions.height
-    //     ? dimensions.height * (zoom / 1000)
-    //     : dimensions.width * (zoom / 1000)
-
 }
 
 function drawOutline(context: CanvasRenderingContext2D, dimensions: Dimension) {
@@ -113,8 +111,8 @@ async function drawTiles(
     // with zoom = 100, its 1 pixel per cell, and zoom 1000 is 10 pixels per cell
     // const scaleFactor = zoom / ZOOM_FACTOR
 
-    // zoomed out 100x: coordPerPixel = 100
-    // zoomed in 100x : coordPerPixel = 0.1 (so 10 pixelPerCoord)
+    // zoomed out 100x (zoom=1): coordPerPixel = 100
+    // zoomed in 100x (zoom=100) : coordPerPixel = 0.1 (so 10 pixelPerCoord)
     // const cellPerPixel = ZOOM_FACTOR / zoom
 
     const tileset = tileStore.getTileset(
@@ -123,12 +121,14 @@ async function drawTiles(
     )
     if (!tileset) return
 
-    const {tiles, tileSize, scaleFactor} = tileset
+    const {tileRows, tileSize, scaleFactor, bounds: [tileTopLeft, tileBottomRight]} = tileset
     // Based on the size of the tiles and the zoomlevel (pixels per cell divided by ZOOMFACTOR), figure out where to draw
 
+    console.log("tileRows", tileset.tileRows)
+    console.log("tilebounds", tileTopLeft, tileBottomRight)
 
-    if (!tileset.tiles[0]) return
-    context.drawImage(tileset.tiles[0], 0, 0, 600, 600)
+    if (!tileset.tileRows[0][0]) return
+    context.drawImage(tileset.tileRows[0][0], 0, 0, 600, 600)
 }
 
 function drawPixels(
@@ -194,28 +194,26 @@ function drawPixels(
     }
 }
 
-function drawGrid(context: CanvasRenderingContext2D, zoom: number, pixelOffset: Coordinate, dimensions: {
-    width: any;
-    height: any;
-}) {
+function drawGrid(context: CanvasRenderingContext2D, zoom: number, pixelOffset: Coordinate, dimensions: Dimension) {
 
+    const [width, height]  =dimensions
     const cellSize = getCellSize(zoom)
 
     const startDrawingAtX = pixelOffset[0] - cellSize
-    const endDrawingAtX = dimensions.width + pixelOffset[0]
+    const endDrawingAtX = width + pixelOffset[0]
 
     const startDrawingAtY = pixelOffset[1] % cellSize
-    const endDrawingAtY = dimensions.height + pixelOffset[1] % cellSize
+    const endDrawingAtY = height + pixelOffset[1] % cellSize
 
     context.beginPath();
 
     for (let i = startDrawingAtX; i <= endDrawingAtX; i += cellSize) {
         context.moveTo(i, 0);
-        context.lineTo(i, dimensions.height);
+        context.lineTo(i, height);
     }
     for (let j = startDrawingAtY; j <= endDrawingAtY; j += cellSize) {
         context.moveTo(0, j);
-        context.lineTo(dimensions.width, j);
+        context.lineTo(width, j);
     }
     context.strokeStyle = "#ddd";
     context.stroke();
@@ -266,7 +264,7 @@ const Viewport: React.FC<ViewportProps> = (
         canvas.height = dimensions[1];
         context.imageSmoothingEnabled = false
 
-        // if (zoom > 4) drawGrid(context, zoom, pixelOffset, dimensions)
+        if (zoom > 500) drawGrid(context, zoom, pixelOffset, dimensions)
         const cellSize = getCellSize(zoom)
 
         const gridDimensions = [
@@ -278,9 +276,9 @@ const Viewport: React.FC<ViewportProps> = (
             Math.floor(gridDimensions[0] / 2),
             Math.floor(gridDimensions[1] / 2)
         ])
-
+        // console.log("zoom", zoom)
         if (zoom > ZOOM_TILEMODE) {
-            // drawGrid(context, zoom, pixelOffset, dimensions)
+
             drawPixels(context, zoom, pixelOffset, dimensions, worldTranslation, hoveredCell, pixelStore.getPixel)
             console.log("cellSize", cellSize)
             drawOutline(context, dimensions)
@@ -290,8 +288,14 @@ const Viewport: React.FC<ViewportProps> = (
 
     }, [dimensions, zoom, pixelOffset, hoveredCell, pixelStore.getPixel]);
 
+    // TODO
+    useEffect(() => {
+        setCenter(initialCenter);
+    }, [initialCenter]);
+
 
     useEffect(() => {
+        console.log("tileRender triggered")
         if (zoom <= ZOOM_TILEMODE) {
             const canvas = canvasRef.current;
             if (!canvas) return;
@@ -312,13 +316,12 @@ const Viewport: React.FC<ViewportProps> = (
 
             const rect = canvas.getBoundingClientRect();
 
-            const zoomStep = 1
 
             // adjust the world translate here?
             let newZoom = zoom
             if (e.deltaY <= 0) {
-                if (zoom < 400) {
-                    newZoom += zoomStep
+                if (zoom < ZOOM_MAX) {
+                    newZoom += ZOOM_STEP
 
                     // Adjust world transform
                     const mouse = cellForPosition(
@@ -347,7 +350,7 @@ const Viewport: React.FC<ViewportProps> = (
                     setWorldTranslation(worldTranslate)
                 }
             } else {
-                if (zoom > 0) newZoom -= zoomStep
+                if (zoom > 0) newZoom -= ZOOM_STEP
             }
 
 
@@ -419,17 +422,17 @@ const Viewport: React.FC<ViewportProps> = (
     };
 
     const handleMouseUp = (e: React.MouseEvent) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
-
-        let worldCell = viewToWorld(worldTranslation, viewportCell)
-
-        console.log(
-            "clicked cell viewport: ",
-            viewportCell,
-            "world:",
-            worldCell
-        )
+        // const rect = e.currentTarget.getBoundingClientRect();
+        // const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
+        //
+        // let worldCell = viewToWorld(worldTranslation, viewportCell)
+        //
+        // console.log(
+        //     "clicked cell viewport: ",
+        //     viewportCell,
+        //     "world:",
+        //     worldCell
+        // )
 
         setIsDragging(false);
     };

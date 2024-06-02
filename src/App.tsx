@@ -5,7 +5,10 @@ import {useEffect, useRef, useState} from "react";
 import {Coordinate, Pixel} from "./types.ts";
 import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
+import {clearIdb} from "./utils.ts";
 
+const DEFAULT_ZOOM = 300
+const DEFAULT_CENTER = [4294967294,0]
 
 async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
     // Fetch PNG file
@@ -41,12 +44,16 @@ async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string
 }
 
 function App() {
-    const [zoom, setZoom] = useState<number>(1);
-    const [center, setCenter] = useState<Coordinate>([10, 10]);
+    const [zoom, setZoom] = useState<number>(DEFAULT_ZOOM);
+    const [center, setCenter] = useState<Coordinate>(DEFAULT_CENTER);
 
     const resetViewport = () => {
-        setZoom(1);
-        setCenter([10, 10]);
+        setZoom(DEFAULT_ZOOM);
+        setCenter(DEFAULT_CENTER);
+    };
+
+    const centerUp = () => {
+        setCenter([center[0], center[1]+1000]);
     };
 
     const filledRef = useRef(false);
@@ -67,7 +74,9 @@ function App() {
 
     return (
         <>
+            <button onClick={centerUp}>centerUp</button>
             <button onClick={resetViewport}>reset</button>
+            <button onClick={clearIdb}>Clear IndexedDB</button>
             <Viewport
                 tileStore={tileStore}
                 pixelStore={pixelStore}

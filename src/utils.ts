@@ -13,3 +13,17 @@ export const numRGBAToHex = (rgba: number | undefined) => {
     let color = rgba >>> 8
     return '#' + (color).toString(16).padStart(6, "0")
 }
+
+export async function clearIdb() {
+    const DB_NAME = 'keyval-store'; // replace with your database name
+    const DB_STORE_NAME = 'keyval'; // replace with your store name
+
+    const request = indexedDB.open(DB_NAME);
+
+    request.onsuccess = function(event) {
+        const db = request.result;
+        const transaction = db.transaction([DB_STORE_NAME], 'readwrite');
+        const objectStore = transaction.objectStore(DB_STORE_NAME);
+        objectStore.clear();
+    };
+}
