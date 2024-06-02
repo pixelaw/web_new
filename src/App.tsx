@@ -1,6 +1,6 @@
 import UPNG from 'upng-js';
 import './App.css'
-import Viewport from "./components/Viewport.tsx";
+import Index from "./components/Viewport";
 import {useEffect, useRef, useState} from "react";
 import {Coordinate, Pixel} from "./types.ts";
 import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
@@ -77,7 +77,7 @@ function App() {
             <button onClick={centerUp}>centerUp</button>
             <button onClick={resetViewport}>reset</button>
             <button onClick={clearIdb}>Clear IndexedDB</button>
-            <Viewport
+            <Index
                 tileStore={tileStore}
                 pixelStore={pixelStore}
                 dimensions={[800, 400]}
