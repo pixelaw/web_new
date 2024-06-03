@@ -65,6 +65,7 @@ function App() {
     const tileStore = useSimpleTileStore();
 
     useEffect(() => {
+        console.log("App rerender")
         tileStore.setBaseURL("localhost:3001/tiles")
         if (!filledRef.current) {
 

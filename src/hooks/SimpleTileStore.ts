@@ -4,7 +4,7 @@ import {Bounds, MAX_UINT32, Tile, Tileset, TileStore} from "../types.ts";
 import {set as setIdb, get as getIdb, keys} from 'idb-keyval';
 import {useWs} from "./websocket.ts";
 
-type State = { [key: string]: HTMLImageElement | undefined | null };
+type State = { [key: string]: HTMLImageElement | undefined | "" };
 
 const TILESIZE = 100
 
@@ -24,22 +24,20 @@ export function useSimpleTileStore(): TileStore {
 
 
     useEffect(() => {
-        if (tilesLoadedRef.current) return
+        console.log("useEffect tileset")
+        if (tilesLoadedRef.current  ) return
 
-        (async () => {
+        async function loadFromIdb() {
             setIsLoading(true);
             const keysArray = await keys();
-            const tilesObj: Record<string, Tile | undefined | null> = {};
+            const tilesObj: Record<string, Tile | undefined | ""> = {};
 
             for (const key of keysArray) {
                 if (typeof key === 'string') {
                     try {
                         const base64 = await getIdb(key)
                         if(base64.length == 0){
-
-                            setState(produce(draftState => {
-                                draftState[key] = null;
-                            }));
+                            tilesObj[key] = ""
                         }else{
                             tilesObj[key] = await loadImage(base64)
                         }
@@ -52,13 +50,17 @@ export function useSimpleTileStore(): TileStore {
             setState(tilesObj);
             tilesLoadedRef.current = true
             setIsLoading(false);
-        })();
+        }
+
+        loadFromIdb()
+
     }, []);
 
     const getTileset = (scaleFactor: number, bounds: Bounds): Tileset | undefined => {
         const [topLeft, bottomRight] = bounds
+        console.log("loading while tileset",isLoading)
         if(isLoading) return
-        // console.log("getTileset", scaleFactor, topLeft, bottomRight)
+        console.log("getTileset", scaleFactor, topLeft, bottomRight)
 
 
         // Choose the tileset Scalefactor based on what's requested
@@ -103,7 +105,7 @@ export function useSimpleTileStore(): TileStore {
         const height = distance(topTileCoord, bottomTileCoord)
 
         for (let x = 0; x <= width; x += tileWorldSize) {
-            let tileRow: (Tile | undefined | null)[] = []
+            let tileRow: (Tile | undefined | "")[] = []
             for (let y = 0; y <= height; y+=tileWorldSize) {
 
                 const tileX = changeWrapped(leftTileCoord , x);
@@ -123,12 +125,12 @@ export function useSimpleTileStore(): TileStore {
         }
     };
 
-    const getTile = (key: string): Tile | undefined | null => {
+    const getTile = (key: string): Tile | undefined | "" => {
 
         if (state[key] === undefined) {
 
             setState(produce(draftState => {
-                draftState[key] = null;
+                draftState[key] = "";
             }));
 
             fetchImage(`${window.location.protocol}//${baseURL}/${key}.png`).then(async base64Img => {
@@ -141,7 +143,7 @@ export function useSimpleTileStore(): TileStore {
             }).catch(_e => {
                 setIdb(key, "").then(() => {
                     setState(produce(draftState => {
-                        draftState[key] = null;
+                        draftState[key] = "";
                     }));
                 });
                 // console.info('Error loading image:', key, e);
