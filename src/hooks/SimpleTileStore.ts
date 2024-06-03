@@ -2,16 +2,26 @@ import {produce} from 'immer';
 import {useState, useEffect, useRef} from 'react';
 import {Bounds, MAX_UINT32, Tile, Tileset, TileStore} from "../types.ts";
 import {set as setIdb, get as getIdb, keys} from 'idb-keyval';
+import {useWs} from "./websocket.ts";
 
 type State = { [key: string]: HTMLImageElement | undefined | null };
 
 const TILESIZE = 100
 
-
 export function useSimpleTileStore(): TileStore {
     const [state, setState] = useState<State>({});
     const tilesLoadedRef = useRef(false); // Add this line
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [baseURL, setBaseURL] = useState<string>('localhost:3001/tiles/');
+    const [ready, val, send] = useWs(`ws://${baseURL}`)
+
+    useEffect(() => {
+        if (ready) {
+            console.log("ws ready")
+            send("test message")
+        }
+    }, [ready, send]) // make sure to include send in dependency array
+
 
     useEffect(() => {
         if (tilesLoadedRef.current) return
@@ -19,13 +29,21 @@ export function useSimpleTileStore(): TileStore {
         (async () => {
             setIsLoading(true);
             const keysArray = await keys();
-            const tilesObj: Record<string, Tile | undefined> = {};
+            const tilesObj: Record<string, Tile | undefined | null> = {};
+
             for (const key of keysArray) {
                 if (typeof key === 'string') {
                     try {
                         const base64 = await getIdb(key)
-                        if(base64.length == 0) continue
-                        tilesObj[key] = await loadImage(base64);
+                        if(base64.length == 0){
+
+                            setState(produce(draftState => {
+                                draftState[key] = null;
+                            }));
+                        }else{
+                            tilesObj[key] = await loadImage(base64)
+                        }
+
                     } catch (e) {
                         console.log("Error loading", key, e)
                     }
@@ -36,7 +54,6 @@ export function useSimpleTileStore(): TileStore {
             setIsLoading(false);
         })();
     }, []);
-
 
     const getTileset = (scaleFactor: number, bounds: Bounds): Tileset | undefined => {
         const [topLeft, bottomRight] = bounds
@@ -114,7 +131,7 @@ export function useSimpleTileStore(): TileStore {
                 draftState[key] = null;
             }));
 
-            fetchImage(`http://localhost:3000/tiles/${key}.png`).then(async base64Img => {
+            fetchImage(`${window.location.protocol}//${baseURL}/${key}.png`).then(async base64Img => {
                 await setIdb(key, base64Img);
                 const img = await loadImage(base64Img);
 
@@ -148,7 +165,7 @@ export function useSimpleTileStore(): TileStore {
         setState(newTiles);
     };
 
-    return {getTile, setTile, setTiles, getTileset};
+    return {getTile, setTile, setTiles, getTileset, setBaseURL};
 }
 
 const loadImage = (base64: string): Promise<HTMLImageElement> => {

@@ -7,7 +7,10 @@ import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 
-const DEFAULT_ZOOM = 1010
+const ZOOM_TILEMODE = 200
+const ZOOM_PIXELMODE = 1010
+
+const DEFAULT_ZOOM = ZOOM_TILEMODE
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
 
 async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
@@ -62,6 +65,7 @@ function App() {
     const tileStore = useSimpleTileStore();
 
     useEffect(() => {
+        tileStore.setBaseURL("localhost:3001/tiles")
         if (!filledRef.current) {
 
             const fetchData = async () => {

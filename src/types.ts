@@ -17,6 +17,7 @@ export interface PixelStore  {
 export interface TileStore {
     getTile: (key: string) => Tile | undefined | null;
     setTile: (key: string, tile: Tile) => Promise<void>;
+    setBaseURL: (value: string) => void;
     setTiles: (tiles: { key: string, tile: Tile }[]) => Promise<void>;
     getTileset : (scaleFactor:number, bounds: Bounds) => Tileset | undefined;
 }
