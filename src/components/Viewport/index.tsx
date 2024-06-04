@@ -107,7 +107,7 @@ const Index: React.FC<ViewportProps> = (
             bufferContext.canvas.height = height
             bufferContext.imageSmoothingEnabled = false
 
-            bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+            // bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
 
             drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
             drawOutline(bufferContext, dimensions)

@@ -29,8 +29,8 @@ export function worldToView(
     // Adjust in case the tile is on the border
     // Because tiles that cross the border are not rendered tileSize, but actually a bit shorter
     // This is because MAX_UINT32 ends in 295 and our tilesizes are typically multiples of 100
-    x = (worldX + tileSize > MAX_UINT32) ? x - (tileSize - MAX_UINT32 % tileSize) : x
-    y = (worldY + tileSize > MAX_UINT32) ? y - (tileSize - MAX_UINT32 % tileSize) : y
+    x = (worldX + tileSize >= MAX_UINT32) ? x - (tileSize - MAX_UINT32 % tileSize) : x
+    y = (worldY + tileSize >= MAX_UINT32) ? y - (tileSize - MAX_UINT32 % tileSize) : y
 
     // Scale
     x = (x * scaleFactor) % tileRenderSize;
