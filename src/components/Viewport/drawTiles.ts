@@ -30,7 +30,6 @@ export function worldToView(
     x = (worldX + tileSize >= MAX_UINT32) ? x - (tileSize - MAX_UINT32 % tileSize) : x
     y = (worldY + tileSize >= MAX_UINT32) ? y - (tileSize - MAX_UINT32 % tileSize) : y
 
-    console.log("prescale" , x,y)
     // Scale
     x = (x * scaleFactor) % tileRenderSize;
     y = (y * scaleFactor) % tileRenderSize;
@@ -46,11 +45,10 @@ export function drawTiles(
     worldTranslation: Coordinate,
     tileStore: TileStore
 ) {
-    console.group("drawTiles")
+
     const topleft = viewToWorld(worldTranslation, [0, 0])
     const br = cellForPosition(zoom, pixelOffset, [dimensions[0], dimensions[1]])
     const bottomright = viewToWorld(worldTranslation, br)
-
 
     const scaleFactor = zoom / ZOOM_FACTOR
 
@@ -62,21 +60,14 @@ export function drawTiles(
 
     const {tileRows, tileSize, bounds: [tileTopLeft]} = tileset
 
-    const [tileLeft, tileTop] = tileTopLeft
+
     // TODO deal with tileScaleFactor other than 1 (when zoomed out very far)
 
     const tileRenderSize = tileSize * scaleFactor
 
-    const TMP_TILE_GAPS = 0 //during dev, to see the tiles
-    // console.log("TRS", tileRenderSize)
-    // console.log("SF", scaleFactor)
-
-    console.log("tile", tileLeft, tileTop)
 
     const [leftOffset, topOffset] = worldToView(worldTranslation, tileTopLeft, scaleFactor, tileSize);
 
-    console.log("offset" ,pixelOffset)
-    console.log("offsets",leftOffset, topOffset)
 
     const [viewX, viewY] = pixelOffset
 
@@ -91,10 +82,10 @@ export function drawTiles(
 
             context.drawImage(
                 tile,
-                viewX + leftOffset + (x * tileRenderSize + TMP_TILE_GAPS),
-                viewY +topOffset + (y * tileRenderSize + TMP_TILE_GAPS),
-                tileRenderSize - (TMP_TILE_GAPS * 2),
-                tileRenderSize - (TMP_TILE_GAPS * 2)
+                viewX + leftOffset + (x * tileRenderSize),
+                viewY + topOffset + (y * tileRenderSize),
+                tileRenderSize,
+                tileRenderSize
             )
         }
     }
