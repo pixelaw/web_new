@@ -55,21 +55,7 @@ export function getCellSize(zoom: number) {
     return zoom / ZOOM_FACTOR
 }
 
-export function worldToView(worldTranslation: Coordinate, worldCoord: Coordinate): Coordinate {
-    const MAX_VIEW_SIZE = 1000000
 
-    const [worldX, worldY] = worldCoord
-    const [transX, transY] = worldTranslation
-
-    let x = worldX + transX
-    let y = worldY + transY
-
-    // View is max MAX_VIEW_SIZE wide, so an X of more than that is unlikely
-    if (x > MAX_VIEW_SIZE) x = 1 - MAX_UINT32 % x
-    if (y > MAX_VIEW_SIZE) y = 1 - MAX_UINT32 % y
-
-    return [x, y];
-}
 
 export function viewToWorld(worldTranslation: Coordinate, viewportCoord: Coordinate): Coordinate {
 

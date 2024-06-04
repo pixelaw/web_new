@@ -7,7 +7,7 @@ import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 
-const ZOOM_TILEMODE = 200
+const ZOOM_TILEMODE = 980
 const ZOOM_PIXELMODE = 1010
 
 const DEFAULT_ZOOM = ZOOM_TILEMODE
@@ -59,7 +59,7 @@ function App() {
         setCenter([center[0], center[1]+1000]);
     };
 
-    const filledRef = useRef(false);
+    const fetchedDemoPixels = useRef(false);
 
     const pixelStore = useSimplePixelStore();
     const tileStore = useSimpleTileStore();
@@ -67,13 +67,13 @@ function App() {
     useEffect(() => {
         console.log("App rerender")
         tileStore.setBaseURL("localhost:3001/tiles")
-        if (!filledRef.current) {
+        if (!fetchedDemoPixels.current) {
 
-            const fetchData = async () => {
+            const fetchDemoPixels = async () => {
                 await fillPixelData("/drawing.png", pixelStore.setPixels);
             };
-            fetchData();
-            filledRef.current = true;
+            // fetchDemoPixels();
+            fetchedDemoPixels.current = true;
         }
     }, []);
 
@@ -97,7 +97,7 @@ function App() {
 }
 
 function onZoomChange(_newZoom: number) {
-    console.log("onZoomChange", _newZoom)
+    // console.log("onZoomChange", _newZoom)
 }
 
 function onWorldviewChange(_newWorldview: number[][]) {

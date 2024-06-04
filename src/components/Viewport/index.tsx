@@ -7,6 +7,10 @@ import {drawOutline} from "./drawOutline.ts";
 import {drawTiles} from "./drawTiles.ts";
 import {drawGrid} from "./drawGrid.ts";
 
+const bufferCanvas = document.createElement('canvas');
+const bufferContext = bufferCanvas.getContext('2d');
+
+
 interface ViewportProps {
     pixelStore: PixelStore;
     tileStore: TileStore;
@@ -38,24 +42,33 @@ const Index: React.FC<ViewportProps> = (
     const [worldTranslation, setWorldTranslation] = useState<Coordinate>([0, 0]);
     const [hoveredCell, setHoveredCell] = useState<Coordinate | undefined>(undefined);
 
+    // Render when in pixel mode
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const context = canvas.getContext('2d');
         if (!context) return;
+        if (!bufferContext) return;
+
+        const [width, height] = dimensions
 
         // Set canvas
-        canvas.width = dimensions[0];
-        canvas.height = dimensions[1];
+        canvas.width = width;
+        canvas.height = height;
         context.imageSmoothingEnabled = false
 
-        if (zoom > 500) drawGrid(context, zoom, pixelOffset, dimensions)
+        bufferContext.canvas.width = width
+        bufferContext.canvas.height = height
+        bufferContext.imageSmoothingEnabled = false
+
+        bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+
         const cellSize = getCellSize(zoom)
 
         const gridDimensions = [
-            Math.ceil(dimensions[0] / cellSize),
-            Math.ceil(dimensions[1] / cellSize)
+            Math.ceil(width / cellSize),
+            Math.ceil(height / cellSize)
         ]
 
         setCenter([
@@ -65,31 +78,43 @@ const Index: React.FC<ViewportProps> = (
         // console.log("zoom", zoom)
         if (zoom > ZOOM_TILEMODE) {
 
-            drawPixels(context, zoom, pixelOffset, dimensions, worldTranslation, hoveredCell, pixelStore.getPixel)
+            drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawOutline(context, dimensions)
+            drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, hoveredCell, pixelStore.getPixel)
 
+            drawOutline(bufferContext, dimensions)
+
+            console.log("drawing pixels")
+            context.drawImage(bufferCanvas, 0, 0);
         }
+
 
 
     }, [dimensions, zoom, pixelOffset, hoveredCell, pixelStore.getPixel]);
 
-    // TODO
-    useEffect(() => {
-        setCenter(initialCenter);
-    }, [initialCenter]);
 
-
+    // Render when in Tile mode
     useEffect(() => {
         if (zoom <= ZOOM_TILEMODE) {
             const canvas = canvasRef.current;
             if (!canvas) return;
+            if (!bufferContext) return;
 
             const context = canvas.getContext('2d');
             if (!context) return;
+            const [width, height] = dimensions
 
-            drawTiles(context, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
-            drawOutline(context, dimensions)
+            bufferContext.canvas.width = width
+            bufferContext.canvas.height = height
+            bufferContext.imageSmoothingEnabled = false
+
+            bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
+            drawOutline(bufferContext, dimensions)
+
+
+            context.drawImage(bufferCanvas, 0, 0);
         }
     }, [dimensions, zoom, pixelOffset, tileStore.getTileset]);
 
@@ -151,6 +176,11 @@ const Index: React.FC<ViewportProps> = (
             canvas.removeEventListener('wheel', handleWheel);
         };
     }, [zoom]);
+
+    // TODO
+    useEffect(() => {
+        setCenter(initialCenter);
+    }, [initialCenter]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);

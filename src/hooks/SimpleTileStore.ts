@@ -12,26 +12,64 @@ export function useSimpleTileStore(): TileStore {
     const [state, setState] = useState<State>({});
     const tilesLoadedRef = useRef(false); // Add this line
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [baseURL, setBaseURL] = useState<string>('localhost:3001/tiles/');
+    const [baseURL, setBaseURL] = useState<string>('localhost:3001/tiles');
     const [ready, val, send] = useWs(`ws://${baseURL}`)
+    const fetchCounter = useRef(0);
+
+
+    const getImage = (key: string) => {
+        fetchCounter.current++
+        fetchImage(`${window.location.protocol}//${baseURL}/${key}.png`).then(async base64Img => {
+            await setIdb(key, base64Img);
+            const img = await loadImage(base64Img);
+
+            // Cannot use immer here because it won't work with HTMLImageElement, which is a read-only type
+            setState(prevState => ({...prevState, [key]: img}));
+            fetchCounter.current--
+            console.log("setState to img")
+
+        }).catch(_e => {
+            setIdb(key, "").then(() => {
+                setState(produce(draftState => {
+                    draftState[key] = "";
+                }));
+                console.log("setState to ''")
+                fetchCounter.current--
+
+            });
+            // console.info('Error loading image:', key, e);
+        });
+    }
 
     useEffect(() => {
         if (ready) {
-            console.log("ws ready")
-            send("test message")
+            // console.log("ws ready")
         }
-    }, [ready, send]) // make sure to include send in dependency array
-
+    }, [ready])
 
     useEffect(() => {
-        console.log("useEffect tileset")
+        if (val) {
+            console.log("from ws", val)
+            try{
+                const {cmd, data}= JSON.parse(val)
+                if(cmd==="tileChanged"){
+                    setTile(data.tileName, undefined)
+                    console.log(cmd,data)
+                }
+            }catch(e){
+                console.error("Error handling incoming websocket", val)
+            }
+        }
+    }, [val]);
+
+    useEffect(() => {
         if (tilesLoadedRef.current  ) return
 
         async function loadFromIdb() {
             setIsLoading(true);
             const keysArray = await keys();
             const tilesObj: Record<string, Tile | undefined | ""> = {};
-
+            console.log("loading keys", keysArray.length)
             for (const key of keysArray) {
                 if (typeof key === 'string') {
                     try {
@@ -58,10 +96,13 @@ export function useSimpleTileStore(): TileStore {
 
     const getTileset = (scaleFactor: number, bounds: Bounds): Tileset | undefined => {
         const [topLeft, bottomRight] = bounds
-        console.log("loading while tileset",isLoading)
+        if(fetchCounter.current > 0) {
+            console.log("skipRender")
+            return
+        }
         if(isLoading) return
-        console.log("getTileset", scaleFactor, topLeft, bottomRight)
 
+        if(ready) send(JSON.stringify({cmd: "subscribe", data: {boundingBox: bounds}}))
 
         // Choose the tileset Scalefactor based on what's requested
         let tileScaleFactor = scaleFactor < 10 ? 1 : 10
@@ -132,30 +173,22 @@ export function useSimpleTileStore(): TileStore {
             setState(produce(draftState => {
                 draftState[key] = "";
             }));
+            console.log("setState to ''")
 
-            fetchImage(`${window.location.protocol}//${baseURL}/${key}.png`).then(async base64Img => {
-                await setIdb(key, base64Img);
-                const img = await loadImage(base64Img);
-
-                // Cannot use immer here because it won't work with HTMLImageElement, which is a read-only type
-                setState(prevState => ({...prevState, [key]: img}));
-
-            }).catch(_e => {
-                setIdb(key, "").then(() => {
-                    setState(produce(draftState => {
-                        draftState[key] = "";
-                    }));
-                });
-                // console.info('Error loading image:', key, e);
-            });
+            getImage(key)
 
         }
         return state[key];
     };
 
-    const setTile = async (key: string, tile: Tile): Promise<void> => {
+    const setTile = async (key: string, tile: Tile | undefined): Promise<void> => {
+        console.log("setTile")
         await setIdb(key, tile);
         setState({...state, [key]: tile});
+
+        getImage(key)
+        console.log("setState to tile")
+
     };
 
     const setTiles = async (tiles: { key: string, tile: Tile }[]): Promise<void> => {
@@ -169,6 +202,8 @@ export function useSimpleTileStore(): TileStore {
 
     return {getTile, setTile, setTiles, getTileset, setBaseURL};
 }
+
+
 
 const loadImage = (base64: string): Promise<HTMLImageElement> => {
 
