@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {Pixel, PixelStore} from "../types.ts";
+import {Bounds, Coordinate, Pixel, PixelStore} from "../types.ts";
 import {produce} from 'immer';
 
 type State = { [key: string]: Pixel };
@@ -9,7 +9,8 @@ export function useSimplePixelStore(): PixelStore {
 
 
 
-    const getPixel = (key: string): Pixel | undefined => {
+    const getPixel = (coord: Coordinate): Pixel | undefined => {
+        const key = `${coord[0]}_${coord[1]}`
         return state[key];
     };
 
@@ -27,5 +28,9 @@ export function useSimplePixelStore(): PixelStore {
         }));
     };
 
-    return { getPixel, setPixel, setPixels };
+    const loadPixels = (_bounds: Bounds): void => {
+        // No implementation for now, SimplePixelStore is a dev tool
+    }
+
+    return { getPixel, setPixel, setPixels, loadPixels };
 }

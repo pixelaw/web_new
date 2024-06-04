@@ -1209,12 +1209,17 @@ graphemer@^1.4.0:
   resolved "https://registry.yarnpkg.com/graphemer/-/graphemer-1.4.0.tgz#fb2f1d55e0e3a1849aeffc90c4fa0dd53a0e66c6"
   integrity sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==
 
-graphql-tag@^2.12.6:
+graphql-tag@^2.10.4, graphql-tag@^2.12.6:
   version "2.12.6"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.12.6.tgz#d441a569c1d2537ef10ca3d1633b48725329b5f1"
   integrity sha512-FdSNcu2QQcWnM2VNvSCCDCVS5PpPqpzgFT8+GXzqJuoDd0CBncxCY278u4mhRO7tMgo2JjgJA5aZ+nWSQ/Z+xg==
   dependencies:
     tslib "^2.1.0"
+
+graphql@^16.8.1:
+  version "16.8.1"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.8.1.tgz#1930a965bef1170603702acdb68aedd3f3cf6f07"
+  integrity sha512-59LZHPdGZVh695Ud9lRzPBVTtlX9ZCV150Er2W43ro37wVof0ctenSaskPPjN7lVTIN8mSZt8PHUNKZuNQUuxw==
 
 has-flag@^3.0.0:
   version "3.0.0"
@@ -1788,6 +1793,21 @@ use-sync-external-store@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
   integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
+
+vite-plugin-graphql-loader@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/vite-plugin-graphql-loader/-/vite-plugin-graphql-loader-3.0.1.tgz#f92a05c68499555fb7bab9a6c99c16e54abacd19"
+  integrity sha512-srY4oik0ObdRsOcUXhfqukx3tqWRj5lDrQN6LU4NdHrujcRcwxp60qEW2Lcc+pprcRJm66YVEFVmJ4/UiXkYvw==
+  dependencies:
+    graphql "^16.8.1"
+    graphql-tag "^2.12.6"
+
+vite-plugin-graphql@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/vite-plugin-graphql/-/vite-plugin-graphql-0.1.0.tgz#f8cf45d4694c4887b8d565a20183c130812870f7"
+  integrity sha512-e8517azfqF7R95gsfQ4WVOySIfmVdK61fJaH0DrH47vVXs+O2BOJF1mkoHV3X65GLDrmMCHp5H+cTmsVlv8kNA==
+  dependencies:
+    graphql-tag "^2.10.4"
 
 vite@^5.2.0:
   version "5.2.11"

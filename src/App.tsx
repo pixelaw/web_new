@@ -6,6 +6,7 @@ import {Coordinate, Pixel} from "./types.ts";
 import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
+import {useToriiPixelStore} from "./hooks/ToriiPixelStore.ts";
 
 const ZOOM_TILEMODE = 3000
 const ZOOM_PIXELMODE = 1010
@@ -61,7 +62,8 @@ function App() {
 
     const fetchedDemoPixels = useRef(false);
 
-    const pixelStore = useSimplePixelStore();
+    // const pixelStore = useSimplePixelStore();
+    const pixelStore = useToriiPixelStore();
     const tileStore = useSimpleTileStore();
 
     useEffect(() => {
@@ -69,10 +71,10 @@ function App() {
         tileStore.setBaseURL("localhost:3001/tiles")
         if (!fetchedDemoPixels.current) {
 
-            const fetchDemoPixels = async () => {
+            const _fetchDemoPixels = async () => {
                 await fillPixelData("/drawing.png", pixelStore.setPixels);
             };
-            // fetchDemoPixels();
+            // _fetchDemoPixels();
             fetchedDemoPixels.current = true;
         }
     }, []);

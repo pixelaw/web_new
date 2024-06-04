@@ -9,7 +9,7 @@ export function drawPixels(
     dimensions: Dimension,
     worldTranslation: Coordinate,
     hoveredCell: Coordinate | undefined,
-    getPixel: (key: string) => Pixel | undefined
+    getPixel: (coord: Coordinate) => Pixel | undefined
 ) {
     const cellSize = getCellSize(zoom)
 
@@ -23,13 +23,13 @@ export function drawPixels(
     for (let x = 0; x <= gridDimensions[0]; x++) {
         for (let y = 0; y <= gridDimensions[1]; y++) {
 
-            const worldCoords = [
+            const worldCoords: Coordinate = [
                 x - worldTranslation[0],
                 y - worldTranslation[1]
             ]
 
             // Don't draw if there is no data
-            let pixel = getPixel(`${worldCoords[0]},${worldCoords[1]}`)
+            let pixel = getPixel(worldCoords)
             if (!pixel) continue
 
             // @ts-ignore
@@ -48,7 +48,7 @@ export function drawPixels(
     if (hoveredCell && zoom > ZOOM_TILEMODE) {
 
         const worldCoords = viewToWorld(worldTranslation, hoveredCell)
-        let pixel = getPixel(`${worldCoords[0]},${worldCoords[1]}`)
+        let pixel = getPixel(worldCoords)
 
         context.fillStyle = numRGBAToHex(
             pixel ? pixel.color : 0

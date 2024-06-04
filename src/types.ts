@@ -1,16 +1,18 @@
 export type Pixel = {
-    id: string
-    color: number
-    text: string
-    owner: string
     action: string
+    color: number
+    owner: string
+    text: string
+    timestamp: string
+    x: number
+    y: number
 }
 
 export type Tile = HTMLImageElement
 
 export interface PixelStore  {
-    getPixel: (key: string) => Pixel | undefined;
-    loadPixels: (x: number, y: number) => void;
+    getPixel: (coordinate: Coordinate) => Pixel | undefined;
+    loadPixels: (bounds: Bounds) => void;
     setPixel: (key: string, pixel: Pixel) => void;
     setPixels: (pixels: {key: string, pixel: Pixel}[]) => void;
 };
