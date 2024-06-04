@@ -1,30 +1,13 @@
-# React + TypeScript + Vite
+# Why this
+I needed a blank canvas (hihi) to fully understand all the elements.
+It turned out in rearchitecting everything from the ground up, mostly to be able to add bitmap tiles.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# What's new
+- Separated the rendering (viewport) from the data (pixels and bitmap tiles)
+- Pixels can now be show based on bitmap tile data from the server's "TileCacher" module
+- Introduced "wrapping" around the unsigned int32 coordinate system. 
+  - So to the left of x=0 is now x=4_294_967_295 but it all "just works"
 
-Currently, two official plugins are available:
+# How to run it
+- It's a regular Vite+React project, but you'll need the PixeLAW Core (dev)container running somewhere too.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
