@@ -7,7 +7,7 @@ import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 
-const ZOOM_TILEMODE = 1000
+const ZOOM_TILEMODE = 3000
 const ZOOM_PIXELMODE = 1010
 
 const DEFAULT_ZOOM = ZOOM_TILEMODE
@@ -85,7 +85,7 @@ function App() {
             <Index
                 tileStore={tileStore}
                 pixelStore={pixelStore}
-                dimensions={[1600, 1000]}
+                dimensions={[1600, 400]}
                 zoom={zoom}
                 center={center}
                 onWorldviewChange={onWorldviewChange}

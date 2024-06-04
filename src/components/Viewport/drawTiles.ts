@@ -11,8 +11,6 @@ export function worldToView(
     const MAX_VIEW_SIZE = 1_000_000
     const tileRenderSize = tileSize * scaleFactor
 
-    // transX is a uint32
-
     const [worldX, worldY] = worldCoord
     const [transX, transY] = worldTranslation
 
@@ -32,6 +30,7 @@ export function worldToView(
     x = (worldX + tileSize >= MAX_UINT32) ? x - (tileSize - MAX_UINT32 % tileSize) : x
     y = (worldY + tileSize >= MAX_UINT32) ? y - (tileSize - MAX_UINT32 % tileSize) : y
 
+    console.log("prescale" , x,y)
     // Scale
     x = (x * scaleFactor) % tileRenderSize;
     y = (y * scaleFactor) % tileRenderSize;
@@ -76,6 +75,10 @@ export function drawTiles(
 
     const [leftOffset, topOffset] = worldToView(worldTranslation, tileTopLeft, scaleFactor, tileSize);
 
+    console.log("offset" ,pixelOffset)
+    console.log("offsets",leftOffset, topOffset)
+
+    const [viewX, viewY] = pixelOffset
 
     // Draw
     for (let y = 0; y < tileRows[0].length; y++) {
@@ -88,8 +91,8 @@ export function drawTiles(
 
             context.drawImage(
                 tile,
-                leftOffset + (x * tileRenderSize + TMP_TILE_GAPS),
-                topOffset + (y * tileRenderSize + TMP_TILE_GAPS),
+                viewX + leftOffset + (x * tileRenderSize + TMP_TILE_GAPS),
+                viewY +topOffset + (y * tileRenderSize + TMP_TILE_GAPS),
                 tileRenderSize - (TMP_TILE_GAPS * 2),
                 tileRenderSize - (TMP_TILE_GAPS * 2)
             )

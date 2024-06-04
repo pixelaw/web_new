@@ -82,6 +82,8 @@ const Index: React.FC<ViewportProps> = (
 
             drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, hoveredCell, pixelStore.getPixel)
 
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
+
             drawOutline(bufferContext, dimensions)
 
             console.log("drawing pixels")
