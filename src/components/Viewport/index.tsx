@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {Bounds, Coordinate, Dimension, PixelStore, TileStore} from "../../types.ts";
+import {Bounds, Coordinate, Dimension, MAX_UINT32, PixelStore, TileStore} from "../../types.ts";
 import {cellForPosition, getCellSize} from "../../utils.ts";
 import {ZOOM_MAX, ZOOM_STEP, ZOOM_TILEMODE} from "./constants.ts";
 import {drawPixels} from "./drawPixels.ts";
@@ -89,7 +89,6 @@ const Index: React.FC<ViewportProps> = (
         }
 
 
-
     }, [dimensions, zoom, pixelOffset, hoveredCell, pixelStore.getPixel]);
 
 
@@ -112,7 +111,6 @@ const Index: React.FC<ViewportProps> = (
 
             drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
             drawOutline(bufferContext, dimensions)
-
 
             context.drawImage(bufferCanvas, 0, 0);
         }
@@ -158,7 +156,7 @@ const Index: React.FC<ViewportProps> = (
                 // TODO deal with minimum zoom and scalefactor
                 if (zoom > 60) {
                     newZoom -= ZOOM_STEP
-                }else if(zoom - 5 > 25){
+                } else if (zoom - 5 > 25) {
                     newZoom -= 5
                 }
             }
@@ -198,15 +196,21 @@ const Index: React.FC<ViewportProps> = (
             ]
 
             // Difference in cells, negative or positive
-            const cellDelta = [
+            const cellDelta: Coordinate = [
                 Math.floor(pixelDelta[0] / cellWidth),
                 Math.floor(pixelDelta[1] / cellWidth)
             ]
 
-            let newWorldTranslation: Coordinate = [
-                worldTranslation[0] + cellDelta[0],
-                worldTranslation[1] + cellDelta[1],
-            ]
+
+            function updateWorldTranslation(worldTranslation: Coordinate, cellDelta: Coordinate): Coordinate {
+
+                let x = (worldTranslation[0] + cellDelta[0] + MAX_UINT32) % MAX_UINT32;
+                let y = (worldTranslation[1] + cellDelta[1] + MAX_UINT32) % MAX_UINT32;
+
+                return [x, y];
+            }
+
+            let newWorldTranslation = updateWorldTranslation(worldTranslation, cellDelta)
 
             const newOffset: Coordinate = [
                 (pixelOffset[0] + e.clientX - lastDragPoint[0] + cellWidth) % cellWidth,

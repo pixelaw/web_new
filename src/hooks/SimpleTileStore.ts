@@ -100,12 +100,15 @@ export function useSimpleTileStore(): TileStore {
             console.log("skipRender")
             return
         }
+        console.debug("getTileset", scaleFactor, JSON.stringify(bounds))
         if(isLoading) return
+
 
         if(ready) send(JSON.stringify({cmd: "subscribe", data: {boundingBox: bounds}}))
 
         // Choose the tileset Scalefactor based on what's requested
-        let tileScaleFactor = scaleFactor < 10 ? 1 : 10
+        // TODO handle scalefactor 10 later
+        let tileScaleFactor = 1 //scaleFactor <= 10 ? 1 : 10
 
         // Determine the world coordinate size of each tile
         // Example, when tilesize is 100 and tileScaleFactor is 10, there will be 1000 world coordinates in one tile's width/height
