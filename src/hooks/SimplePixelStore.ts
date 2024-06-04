@@ -7,6 +7,8 @@ type State = { [key: string]: Pixel };
 export function useSimplePixelStore(): PixelStore {
     const [state, setState] = useState<State>({});
 
+
+
     const getPixel = (key: string): Pixel | undefined => {
         return state[key];
     };

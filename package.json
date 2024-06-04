@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "^3.10.4",
     "@types/upng-js": "^2.1.5",
     "browserify-zlib": "^0.2.0",
+    "graphql-tag": "^2.12.6",
     "idb-keyval": "^6.2.1",
     "immer": "^10.1.1",
     "pngjs3": "^6.1.1",

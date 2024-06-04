@@ -1,0 +1,129 @@
+
+input PixelWhereInput {
+    x: u32
+    xGT: u32
+    xGTE: u32
+    xLT: u32
+    xLTE: u32
+    xNEQ: u32
+    xEQ: u32
+    xNOTIN: [u32]
+    xIN: [u32]
+    xNOTLIKE: u32
+    xLIKE: u32
+    y: u32
+    yGT: u32
+    yGTE: u32
+    yLT: u32
+    yLTE: u32
+    yNEQ: u32
+    yEQ: u32
+    yNOTIN: [u32]
+    yIN: [u32]
+    yNOTLIKE: u32
+    yLIKE: u32
+    created_at: u64
+    created_atGT: u64
+    created_atGTE: u64
+    created_atLT: u64
+    created_atLTE: u64
+    created_atNEQ: u64
+    created_atEQ: u64
+    created_atNOTIN: [u64]
+    created_atIN: [u64]
+    created_atNOTLIKE: u64
+    created_atLIKE: u64
+    updated_at: u64
+    updated_atGT: u64
+    updated_atGTE: u64
+    updated_atLT: u64
+    updated_atLTE: u64
+    updated_atNEQ: u64
+    updated_atEQ: u64
+    updated_atNOTIN: [u64]
+    updated_atIN: [u64]
+    updated_atNOTLIKE: u64
+    updated_atLIKE: u64
+    app: ContractAddress
+    appGT: ContractAddress
+    appGTE: ContractAddress
+    appLT: ContractAddress
+    appLTE: ContractAddress
+    appNEQ: ContractAddress
+    appEQ: ContractAddress
+    appNOTIN: [ContractAddress]
+    appIN: [ContractAddress]
+    appNOTLIKE: ContractAddress
+    appLIKE: ContractAddress
+    color: u32
+    colorGT: u32
+    colorGTE: u32
+    colorLT: u32
+    colorLTE: u32
+    colorNEQ: u32
+    colorEQ: u32
+    colorNOTIN: [u32]
+    colorIN: [u32]
+    colorNOTLIKE: u32
+    colorLIKE: u32
+    owner: ContractAddress
+    ownerGT: ContractAddress
+    ownerGTE: ContractAddress
+    ownerLT: ContractAddress
+    ownerLTE: ContractAddress
+    ownerNEQ: ContractAddress
+    ownerEQ: ContractAddress
+    ownerNOTIN: [ContractAddress]
+    ownerIN: [ContractAddress]
+    ownerNOTLIKE: ContractAddress
+    ownerLIKE: ContractAddress
+    text: felt252
+    textGT: felt252
+    textGTE: felt252
+    textLT: felt252
+    textLTE: felt252
+    textNEQ: felt252
+    textEQ: felt252
+    textNOTIN: [felt252]
+    textIN: [felt252]
+    textNOTLIKE: felt252
+    textLIKE: felt252
+    timestamp: u64
+    timestampGT: u64
+    timestampGTE: u64
+    timestampLT: u64
+    timestampLTE: u64
+    timestampNEQ: u64
+    timestampEQ: u64
+    timestampNOTIN: [u64]
+    timestampIN: [u64]
+    timestampNOTLIKE: u64
+    timestampLIKE: u64
+    action: felt252
+    actionGT: felt252
+    actionGTE: felt252
+    actionLT: felt252
+    actionLTE: felt252
+    actionNEQ: felt252
+    actionEQ: felt252
+    actionNOTIN: [felt252]
+    actionIN: [felt252]
+    actionNOTLIKE: felt252
+    actionLIKE: felt252
+}
+query GetPixels($first: Int, $where: PixelWhereInput, $order: PixelOrder) {
+    pixelModels(first: $first, where: $where, order: $order) {
+        edges {
+            node {
+                x
+                y
+                color
+                owner
+                text
+                timestamp
+                action
+            }
+        }
+        totalCount
+    }
+}
