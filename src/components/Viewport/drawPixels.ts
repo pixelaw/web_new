@@ -24,12 +24,12 @@ export function drawPixels(
         for (let y = 0; y <= gridDimensions[1]; y++) {
 
             const worldCoords: Coordinate = [
-                x - worldTranslation[0],
-                y - worldTranslation[1]
+                x - worldTranslation[0] >>> 0,
+                y - worldTranslation[1] >>> 0
             ]
 
             // Don't draw if there is no data
-            let pixel = getPixel(worldCoords)
+            const pixel = getPixel(worldCoords)
             if (!pixel) continue
 
             context.fillStyle = numRGBAToHex(pixel.color);
@@ -52,20 +52,23 @@ export function drawPixels(
     if (hoveredCell && zoom > ZOOM_TILEMODE) {
 
         const worldCoords = viewToWorld(worldTranslation, hoveredCell)
-        let pixel = getPixel(worldCoords)
+        const pixel = getPixel(worldCoords)
 
         context.fillStyle = numRGBAToHex(
             pixel ? pixel.color : 0
         );
 
-        const startDrawingAtX = Math.max(0, pixelOffset[0] - cellSize);
-        const startDrawingAtY = Math.max(0, pixelOffset[1] - cellSize);
+        const offsetX = pixelOffset[0] == 0 ? 0 : pixelOffset[0] - cellSize
+        const offsetY = pixelOffset[1] == 0 ? 0 : pixelOffset[1] - cellSize
+
+        const startDrawingAtX = offsetX + (hoveredCell[0] * cellSize);
+        const startDrawingAtY =offsetY + (hoveredCell[1] * cellSize) ;
 
 
         // Draw the hovered cell a bit bigger :-)
         context.fillRect(
-            startDrawingAtX + (hoveredCell[0] * cellSize) - 5,
-            startDrawingAtY + (hoveredCell[1] * cellSize) - 5,
+            startDrawingAtX - 5,
+            startDrawingAtY - 5,
             cellSize + 10,
             cellSize + 10
         );
