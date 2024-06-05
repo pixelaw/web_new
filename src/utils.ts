@@ -42,8 +42,9 @@ export function cellForPosition(
     const [offsetLeft, offsetTop] = pixelOffset
     const [posX, posY] = position
 
-    const startDrawingAtX = offsetLeft - cellSize
-    const startDrawingAtY = offsetTop - cellSize
+    // Determine where the topleft cell would start drawing (offscreen because of the scrolling offset)
+    const startDrawingAtX = Math.max(0, offsetLeft - cellSize)
+    const startDrawingAtY = Math.max(0, offsetTop - cellSize)
 
     const x = Math.floor((posX - startDrawingAtX) / cellSize)
     const y = Math.floor((posY - startDrawingAtY) / cellSize)
@@ -54,8 +55,6 @@ export function cellForPosition(
 export function getCellSize(zoom: number) {
     return zoom / ZOOM_FACTOR
 }
-
-
 
 export function viewToWorld(worldTranslation: Coordinate, viewportCoord: Coordinate): Coordinate {
 

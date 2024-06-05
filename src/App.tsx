@@ -8,7 +8,7 @@ import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 import {useToriiPixelStore} from "./hooks/ToriiPixelStore.ts";
 
-const ZOOM_TILEMODE = 3000
+const ZOOM_TILEMODE = 15000
 const ZOOM_PIXELMODE = 1010
 
 const DEFAULT_ZOOM = ZOOM_TILEMODE

@@ -41,6 +41,25 @@ const Index: React.FC<ViewportProps> = (
     const [center, setCenter] = useState<Coordinate>(initialCenter);
     const [worldTranslation, setWorldTranslation] = useState<Coordinate>([0, 0]);
     const [hoveredCell, setHoveredCell] = useState<Coordinate | undefined>(undefined);
+    const [worldView, setWorldView] = useState<Bounds>([[0,0], [0,0]]);
+    const isLoaded = useRef<boolean>(false);
+
+    useEffect(() => {
+        if(isLoaded.current) return
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const context = canvas.getContext('2d');
+        if (!context) return;
+        if (!bufferContext) return;
+
+        const wv = getWorldViewBounds()
+        setWorldView(wv)
+        console.log("Initial Viewport render")
+
+        pixelStore.loadPixels(wv)
+        isLoaded.current = true
+    }, [])
 
     // Render when in pixel mode
     useEffect(() => {
@@ -82,7 +101,7 @@ const Index: React.FC<ViewportProps> = (
 
             drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, hoveredCell, pixelStore.getPixel)
 
-            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
+            // drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
 
             drawOutline(bufferContext, dimensions)
 
@@ -255,6 +274,14 @@ const Index: React.FC<ViewportProps> = (
 
     };
 
+    const getWorldViewBounds = () : Bounds => {
+        const [width, height] = dimensions
+        const topLeft = viewToWorld(worldTranslation, [0, 0])
+        const bottomRightCell = cellForPosition(zoom, pixelOffset, [width, height])
+        const bottomRight = viewToWorld(worldTranslation, bottomRightCell)
+        return [topLeft, bottomRight]
+    }
+
     const handleMouseUp = (_e: React.MouseEvent) => {
         // const rect = e.currentTarget.getBoundingClientRect();
         // const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
@@ -267,12 +294,10 @@ const Index: React.FC<ViewportProps> = (
         //     "world:",
         //     worldCell
         // )
-        const topleft = viewToWorld(worldTranslation, [0, 0])
-        const br = cellForPosition(zoom, pixelOffset, [dimensions[0], dimensions[1]])
-        const bottomright = viewToWorld(worldTranslation, br)
 
+        setWorldView(getWorldViewBounds())
+        pixelStore.loadPixels(worldView)
 
-        pixelStore.loadPixels([topleft, bottomright])
         setIsDragging(false);
     };
 

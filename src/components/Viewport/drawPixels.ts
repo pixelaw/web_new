@@ -35,11 +35,14 @@ export function drawPixels(
             // @ts-ignore
             context.fillStyle = numRGBAToHex(pixel.color);
 
+            const startDrawingAtX = Math.max(0, pixelOffset[0] - cellSize);
+            const startDrawingAtY = Math.max(0, pixelOffset[1] - cellSize);
+
 
             // Draw a filled rectangle
             context.fillRect(
-                (pixelOffset[0] - cellSize) + (x * cellSize) + doBorder,
-                (pixelOffset[1] - cellSize) + (y * cellSize) + doBorder,
+                startDrawingAtX + (x * cellSize) + doBorder,
+                startDrawingAtY + (y * cellSize) + doBorder,
                 cellSize - doBorder,
                 cellSize - doBorder
             );
@@ -54,12 +57,16 @@ export function drawPixels(
             pixel ? pixel.color : 0
         );
 
+        const startDrawingAtX = Math.max(0, pixelOffset[0] - cellSize);
+        const startDrawingAtY = Math.max(0, pixelOffset[1] - cellSize);
+
+
         // Draw the hovered cell a bit bigger :-)
         context.fillRect(
-            (pixelOffset[0] - cellSize) + (hoveredCell[0] * cellSize) - 10,
-            (pixelOffset[1] - cellSize) + (hoveredCell[1] * cellSize) - 10,
-            cellSize + 20,
-            cellSize + 20
+            startDrawingAtX + (hoveredCell[0] * cellSize) - 5,
+            startDrawingAtY + (hoveredCell[1] * cellSize) - 5,
+            cellSize + 10,
+            cellSize + 10
         );
         context.stroke()
     }

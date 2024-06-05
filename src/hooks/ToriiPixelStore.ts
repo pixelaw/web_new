@@ -10,7 +10,8 @@ type State = { [key: string]: Pixel | undefined };
 
 const gqlClient = new ApolloClient({
     uri: 'http://localhost:8080/graphql',
-    cache: new InMemoryCache()
+    cache: new InMemoryCache(),
+    connectToDevTools: false,
 });
 
 
