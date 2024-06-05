@@ -1,6 +1,6 @@
 import React, {useRef, useEffect, useState} from 'react';
 import {Bounds, Coordinate, Dimension, MAX_UINT32, PixelStore, TileStore} from "../../types.ts";
-import {cellForPosition, getCellSize, viewToWorld} from "../../utils.ts";
+import {cellForPosition, getCellSize, updateWorldTranslation, viewToWorld} from "../../utils.ts";
 import {ZOOM_MAX, ZOOM_STEP, ZOOM_TILEMODE} from "./constants.ts";
 import {drawPixels} from "./drawPixels.ts";
 import {drawOutline} from "./drawOutline.ts";
@@ -229,16 +229,7 @@ const Index: React.FC<ViewportProps> = (
                 Math.floor(pixelDelta[1] / cellWidth)
             ]
 
-
-            function updateWorldTranslation(worldTranslation: Coordinate, cellDelta: Coordinate): Coordinate {
-
-                let x = (worldTranslation[0] + cellDelta[0] + MAX_UINT32) % MAX_UINT32;
-                let y = (worldTranslation[1] + cellDelta[1] + MAX_UINT32) % MAX_UINT32;
-
-                return [x, y];
-            }
-
-            let newWorldTranslation = updateWorldTranslation(worldTranslation, cellDelta)
+            const newWorldTranslation = updateWorldTranslation(worldTranslation, cellDelta)
 
             const newOffset: Coordinate = [
                 (pixelOffset[0] + e.clientX - lastDragPoint[0] + cellWidth) % cellWidth,
@@ -256,12 +247,6 @@ const Index: React.FC<ViewportProps> = (
 
                 const viewportCell = cellForPosition(zoom, pixelOffset, [e.clientX - rect.left, e.clientY - rect.top])
 
-                // console.log(
-                //     "hovering: ",
-                //     viewportCell,
-                //     "world:",
-                //     viewToWorld(worldTranslation, viewportCell)
-                // )
                 if (
                     (!hoveredCell && viewportCell) ||
                     hoveredCell && (hoveredCell[0] !== viewportCell[0] || hoveredCell[1] !== viewportCell[1])

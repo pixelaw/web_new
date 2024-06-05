@@ -31,6 +31,15 @@ export async function clearIdb() {
     };
 }
 
+export function updateWorldTranslation(worldTranslation: Coordinate, cellDelta: Coordinate): Coordinate {
+
+    const x = (worldTranslation[0] + cellDelta[0] + MAX_UINT32) % MAX_UINT32;
+    const y = (worldTranslation[1] + cellDelta[1] + MAX_UINT32) % MAX_UINT32;
+
+    return [x, y];
+}
+
+
 export function cellForPosition(
     zoom: number,
     pixelOffset: Coordinate,
