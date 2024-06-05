@@ -32,17 +32,18 @@ export function drawPixels(
             let pixel = getPixel(worldCoords)
             if (!pixel) continue
 
-            // @ts-ignore
             context.fillStyle = numRGBAToHex(pixel.color);
 
-            const startDrawingAtX = Math.max(0, pixelOffset[0] - cellSize);
-            const startDrawingAtY = Math.max(0, pixelOffset[1] - cellSize);
+            const offsetX = pixelOffset[0] == 0 ? 0 : pixelOffset[0] - cellSize
+            const offsetY = pixelOffset[1] == 0 ? 0 : pixelOffset[1] - cellSize
 
+            const startDrawingAtX = offsetX + (x * cellSize);
+            const startDrawingAtY =offsetY + (y * cellSize) ;
 
             // Draw a filled rectangle
             context.fillRect(
-                startDrawingAtX + (x * cellSize) + doBorder,
-                startDrawingAtY + (y * cellSize) + doBorder,
+                startDrawingAtX + doBorder,
+                startDrawingAtY  + doBorder,
                 cellSize - doBorder,
                 cellSize - doBorder
             );
