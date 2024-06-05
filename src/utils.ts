@@ -68,15 +68,14 @@ export function getCellSize(zoom: number) {
     return zoom / ZOOM_FACTOR
 }
 
+// Apply worldTranslation to viewport coordinates
+// Worldtranslation means "number to add to world to get view"
 export function viewToWorld(worldTranslation: Coordinate, viewportCoord: Coordinate): Coordinate {
 
-    let x = viewportCoord[0] - worldTranslation[0]
-    let y = viewportCoord[1] - worldTranslation[1]
-
-    x = x >= 0 ? x : 0xFFFFFFFF + x;
-    y = y >= 0 ? y : 0xFFFFFFFF + y;
-
-    return [x, y];
+    return [
+        (viewportCoord[0] - worldTranslation[0]) >>> 0,
+        (viewportCoord[1] - worldTranslation[1]) >>> 0
+    ];
 }
 
 
@@ -84,6 +83,28 @@ export function viewToWorld(worldTranslation: Coordinate, viewportCoord: Coordin
 
 if (import.meta.vitest) {
     const { it, expect } = import.meta.vitest
+
+    it('viewToWorld should correctly return world coordinates', () => {
+        // all 0, should return all 0 too
+        expect(viewToWorld([0, 0], [0, 0]))
+            .toEqual([0, 0]);
+
+        // No translation should result in same as input
+        expect(viewToWorld([0, 0], [1, 1]))
+            .toEqual([1, 1]);
+
+        // Translation by positive 1 of 0 should give 1
+        expect(viewToWorld([1, 1], [0, 0]))
+            .toEqual([MAX_UINT32 , MAX_UINT32 ]);
+
+        // Moving 1 to rightbottom
+        expect(viewToWorld([MAX_UINT32 - 1, MAX_UINT32 -1], [MAX_UINT32, MAX_UINT32]))
+            .toEqual([1, 1]);
+
+
+        expect(viewToWorld([2, 2], [1, 1]))
+            .toEqual([MAX_UINT32, MAX_UINT32]);
+    });
 
     it('updateWorldTranslation should correctly update world coordinates', () => {
             expect(updateWorldTranslation([0, 0], [0, 0]))
@@ -143,5 +164,6 @@ if (import.meta.vitest) {
         )
             .toEqual([11, 11])
     })
+
 
 }
