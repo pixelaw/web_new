@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {Bounds, Coordinate, Dimension, MAX_UINT32, PixelStore, TileStore} from "../../types.ts";
+import {Bounds, Coordinate, Dimension, PixelStore, TileStore} from "../../types.ts";
 import {cellForPosition, getCellSize, updateWorldTranslation, viewToWorld} from "../../utils.ts";
 import {ZOOM_MAX, ZOOM_STEP, ZOOM_TILEMODE} from "./constants.ts";
 import {drawPixels} from "./drawPixels.ts";
@@ -267,6 +267,7 @@ const Index: React.FC<ViewportProps> = (
         return [topLeft, bottomRight]
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleMouseUp = (_e: React.MouseEvent) => {
         // const rect = e.currentTarget.getBoundingClientRect();
         // const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
