@@ -204,7 +204,7 @@ const Index: React.FC<ViewportProps> = (
     // TODO
     useEffect(() => {
         if (!hoveredCell) return
-        console.log("hoveredCell changed to ", hoveredCell, pixelStore.getPixel(hoveredCell))
+        // console.log("hoveredCell changed to ", hoveredCell, pixelStore.getPixel(hoveredCell))
 
     }, [hoveredCell]);
 
@@ -230,6 +230,14 @@ const Index: React.FC<ViewportProps> = (
             ]
 
             const newWorldTranslation = updateWorldTranslation(worldTranslation, cellDelta)
+
+            if(
+                worldTranslation[0] == 0
+                && newWorldTranslation[0] > worldTranslation[0]
+
+            ){
+                console.log("hee", worldTranslation)
+            }
 
             const newOffset: Coordinate = [
                 (pixelOffset[0] + e.clientX - lastDragPoint[0] + cellWidth) % cellWidth,

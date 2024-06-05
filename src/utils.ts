@@ -31,12 +31,12 @@ export async function clearIdb() {
     };
 }
 
-export function updateWorldTranslation(worldTranslation: Coordinate, cellDelta: Coordinate): Coordinate {
+export function updateWorldTranslation([worldX, worldY]: Coordinate, [cellX, cellY]: Coordinate): Coordinate {
+    return [
+        (cellX + worldX) >>> 0,
+        (cellY + worldY) >>> 0,
+    ]
 
-    const x = (worldTranslation[0] + cellDelta[0] + MAX_UINT32) % MAX_UINT32;
-    const y = (worldTranslation[1] + cellDelta[1] + MAX_UINT32) % MAX_UINT32;
-
-    return [x, y];
 }
 
 
@@ -63,7 +63,6 @@ export function cellForPosition(
 }
 
 
-
 export function getCellSize(zoom: number) {
     return zoom / ZOOM_FACTOR
 }
@@ -79,91 +78,97 @@ export function viewToWorld(worldTranslation: Coordinate, viewportCoord: Coordin
 }
 
 
-
-
 if (import.meta.vitest) {
-    const { it, expect } = import.meta.vitest
-
-    it('viewToWorld should correctly return world coordinates', () => {
-        // all 0, should return all 0 too
-        expect(viewToWorld([0, 0], [0, 0]))
-            .toEqual([0, 0]);
-
-        // No translation should result in same as input
-        expect(viewToWorld([0, 0], [1, 1]))
-            .toEqual([1, 1]);
-
-        // Translation by positive 1 of 0 should give 1
-        expect(viewToWorld([1, 1], [0, 0]))
-            .toEqual([MAX_UINT32 , MAX_UINT32 ]);
-
-        // Moving 1 to rightbottom
-        expect(viewToWorld([MAX_UINT32 - 1, MAX_UINT32 -1], [MAX_UINT32, MAX_UINT32]))
-            .toEqual([1, 1]);
+    const {it, expect, describe} = import.meta.vitest
 
 
-        expect(viewToWorld([2, 2], [1, 1]))
-            .toEqual([MAX_UINT32, MAX_UINT32]);
+    describe("viewToWorld should correctly return world coordinates", () => {
+
+        it('all 0, should return all 0 too', () =>
+            expect(viewToWorld([0, 0], [0, 0]))
+                .toEqual([0, 0])
+        );
+
+        it('No translation should result in same as input', () =>
+            expect(viewToWorld([0, 0], [1, 1]))
+                .toEqual([1, 1])
+        );
+
+        it('Translation by negative 1 of 0 should give -1 (max_uint)', () =>
+            expect(viewToWorld([1, 1], [0, 0]))
+                .toEqual([4_294_967_295, 4_294_967_295])
+        );
+
+        it('Moving [-1,-1] by 2 to rightbottom', () =>
+            expect(viewToWorld([4_294_967_294, 4_294_967_294], [4_294_967_295, 4_294_967_295]))
+                .toEqual([1, 1])
+        );
+
+        it('Moving [1,1] by 2 into the topleft', () =>
+            expect(viewToWorld([2, 2], [1, 1]))
+                .toEqual([4_294_967_295, 4_294_967_295])
+        );
     });
 
-    it('updateWorldTranslation should correctly update world coordinates', () => {
+    describe("updateWorldTranslation should correctly update world coordinates", () => {
+
+        it('should return [0, 0] for input [0, 0], [0, 0]', () =>
             expect(updateWorldTranslation([0, 0], [0, 0]))
-                .toEqual([0, 0]);
+                .toEqual([0, 0])
+        );
 
+        it('should handle negative translation correctly', () =>
             expect(updateWorldTranslation([-1, -1], [-1, -1]))
-                .toEqual([MAX_UINT32 - 2, MAX_UINT32 - 2]);
+                .toEqual([MAX_UINT32 - 1, MAX_UINT32 - 1])
+        );
 
+        it('should handle mixed positive and negative translation', () =>
             expect(updateWorldTranslation([1, 1], [-2, -2]))
-                .toEqual([MAX_UINT32 - 1, MAX_UINT32 - 1]);
+                .toEqual([MAX_UINT32 , MAX_UINT32 ])
+        );
 
+        it('should wrap around correctly', () =>
             expect(updateWorldTranslation([MAX_UINT32 - 1, MAX_UINT32 - 1], [2, 2]))
-                .toEqual([1, 1]);
+                .toEqual([0, 0])
+        );
 
-    })
+        it('should wrap around correctly', () =>
+            expect(updateWorldTranslation([0, 0], [-1, -1]))
+                .toEqual([MAX_UINT32, MAX_UINT32])
+        );
+    });
 
-    it('cellForPosition should return correct cell coordinates', () => {
+    describe("cellForPosition should return correct cell coordinates", () => {
 
-        // 1 pixel onscreen is 1 in the world, and pos is topleft
-        expect(cellForPosition(1000, [0, 0], [0, 0]))
-            .toEqual([0, 0])
+        it('should return [0, 0] for 1 pixel onscreen is 1 in the world, and pos is topleft', () =>
+            expect(cellForPosition(1000, [0, 0], [0, 0]))
+                .toEqual([0, 0])
+        );
 
-        // 1 pixel onscreen is 10 in the world, and pos is topleft
-        expect(cellForPosition(1000, [0, 0], [0, 0]))
-            .toEqual([0, 0])
+        it('should return [0, 0] for 1 pixel onscreen is 10 in the world, and pos is topleft', () =>
+            expect(cellForPosition(1000, [0, 0], [0, 0]))
+                .toEqual([0, 0])
+        );
 
-        // 1 pixel onscreen is 10 in the world, and pos is topleft
-        // There is an offset though, always positive 0-cellSize
-        expect(cellForPosition(1000, [5, 5], [0, 0]))
-            .toEqual([0, 0])
+        it('should handle offset correctly for 1 pixel onscreen is 10 in the world, and pos is topleft', () =>
+            expect(cellForPosition(1000, [5, 5], [0, 0]))
+                .toEqual([0, 0])
+        );
 
-        // 1 pixel onscreen is 10 in the world, and pos is topleft
-        // There is an offset though, always positive 0-cellSize
-        expect(cellForPosition(
-            1000,              // 10 onscreen pixels for a cell
-            [5, 5],          // offset is less than half a cell size
-            [4, 4])           // at pixel 9,9 effectively
-        )
-            .toEqual([0, 0])
+        it('should handle offset correctly for 1 pixel onscreen is 10 in the world, and pos is topleft with specific offset', () =>
+            expect(cellForPosition(1000, [5, 5], [4, 4]))
+                .toEqual([0, 0])
+        );
 
+        it('should handle offset correctly for 1 pixel onscreen is 10 in the world, and pos is topleft with another specific offset', () =>
+            expect(cellForPosition(1000, [1, 1], [4, 4]))
+                .toEqual([1, 1])
+        );
 
-        // 1 pixel onscreen is 10 in the world, and pos is topleft
-        // There is an offset though, always positive 0-cellSize
-        expect(cellForPosition(
-            1000,              // 10 onscreen pixels for a cell
-            [1, 1],          // offset is less than half a cell size
-            [4, 4])           // at pixel 9,9 effectively
-        )
-            .toEqual([1, 1])
-
-        // 1 pixel onscreen is 100 in the world, and pos is topleft
-        // There is an offset though, always positive 0-cellSize
-        expect(cellForPosition(
-            1000,
-            [98, 98],
-            [200, 200])
-        )
-            .toEqual([11, 11])
-    })
-
+        it('should handle larger world coordinates correctly', () =>
+            expect(cellForPosition(1000, [98, 98], [200, 200]))
+                .toEqual([11, 11])
+        );
+    });
 
 }
