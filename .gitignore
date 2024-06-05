@@ -1,5 +1,6 @@
 # dev
 src/assets/tiles
+coverage/
 
 # Logs
 logs
