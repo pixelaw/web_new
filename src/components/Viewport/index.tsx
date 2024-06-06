@@ -129,6 +129,7 @@ const Index: React.FC<ViewportProps> = (
             bufferContext.imageSmoothingEnabled = false
 
             // bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
+            drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
             drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
             drawOutline(bufferContext, dimensions)
@@ -228,7 +229,7 @@ const Index: React.FC<ViewportProps> = (
                 Math.floor(pixelDelta[0] / cellWidth),
                 Math.floor(pixelDelta[1] / cellWidth)
             ]
-            if(cellDelta[0] !==0) console.log(cellDelta[0])
+            // if(cellDelta[0] !==0) console.log(cellDelta[0])
 
             const newWorldTranslation = [
                 (cellDelta[0] + worldTranslation[0]) >>> 0,

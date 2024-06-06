@@ -37,7 +37,7 @@ export function useSimpleTileStore(): TileStore {
                 fetchCounter.current--
 
             });
-            // console.info('Error loading image:', key, e);
+            console.info('Error loading image:', key, e);
         });
     }
 
@@ -95,6 +95,7 @@ export function useSimpleTileStore(): TileStore {
     }, []);
 
     const getTileset = (scaleFactor: number, bounds: Bounds): Tileset | undefined => {
+
         const [topLeft, bottomRight] = bounds
         if(fetchCounter.current > 0) {
             console.log("skipRender")
