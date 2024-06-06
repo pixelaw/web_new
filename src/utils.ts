@@ -31,6 +31,8 @@ export async function clearIdb() {
     };
 }
 
+
+
 export function updateWorldTranslation([worldX, worldY]: Coordinate, [cellX, cellY]: Coordinate): Coordinate {
     return [
         (cellX + worldX) >>> 0,

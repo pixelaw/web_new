@@ -36,10 +36,14 @@ export function drawPixels(
         context.fillRect(x, y, w, h);
     };
 
-    const worldCoords = viewToWorld(worldTranslation, [0, 0])
+    // const worldCoords = viewToWorld(worldTranslation, [0, 0])
 
-    console.log("wc", worldCoords, offsets, pixelOffset)
-    console.log("wt", worldTranslation)
+    // console.log(
+    //     "worldCoords", worldCoords[0],
+    //     "offsets", offsets[0],
+    //     "pixelOffset", pixelOffset[0],
+    //     "wt", worldTranslation[0]
+    // )
 
     for (let x = 0; x <= gridDimensions[0]; x++) {
         for (let y = 0; y <= gridDimensions[1]; y++) {
@@ -72,10 +76,23 @@ function getRect(
 
 }
 
+// Given a pixelOffset, how much of a tile extends beyond the left/top viewport border?
+// Tricky: 0 should yield 0
 function calculateOffsets([x,y]: Coordinate, cellSize: number): [number, number] {
+    /*
+    PROBLEM: viewport changes to "1" and worldcoord changes, without changing offset!
 
-    const offsetX = x == 0 ? 0 : x - cellSize;
-    const offsetY = y == 0 ? 0 : y - cellSize;
+    true viewport 0 worldcoord 0 offset 0 pixeloffset 0 wt 0
+    true viewport 1 worldcoord 1 offset 0 pixeloffset 0 wt 0
+
+    Only solution i can think of now is to simply always do
+        offset = pos - cellsize
+
+    But this starts to draw the cells fully offscreen
+     */
+
+    const offsetX = /*x == 0 ? 0 :*/ x - cellSize;
+    const offsetY = /*y == 0 ? 0 :*/ y - cellSize;
     return [offsetX, offsetY];
 }
 

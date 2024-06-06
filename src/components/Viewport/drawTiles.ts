@@ -10,30 +10,35 @@ export function worldToView(
 ): Coordinate {
     const MAX_VIEW_SIZE = 1_000_000
     const tileRenderSize = tileSize * scaleFactor
-
     const [worldX, worldY] = worldCoord
     const [transX, transY] = worldTranslation
+    // console.log(worldX, transX)
 
     // Apply the transform (without scaling yet)
     let x = (worldX + transX) >>> 0
     let y = (worldY + transY) >>> 0
+    // console.log(x)
 
     // We're expecting x to be related to viewport pixels now, which definitely
     // won't be any more than 100k (8k display is ~8k pixels)
     // If the x value is higher than 100k, we need to wrap it around uint32
-    if (x > MAX_VIEW_SIZE) x = 1 - MAX_UINT32 % x
-    if (y > MAX_VIEW_SIZE) y = 1 - MAX_UINT32 % y
+    if (x > MAX_VIEW_SIZE) x = 0 - MAX_UINT32 % x
+    if (y > MAX_VIEW_SIZE) y = 0 - MAX_UINT32 % y
 
     // Adjust in case the tile is on the border
     // Because tiles that cross the border are not rendered tileSize, but actually a bit shorter
     // This is because MAX_UINT32 ends in 295 and our tilesizes are typically multiples of 100
+    // So in case of a zoom = 100 (1 to 1)
+    //      if tileserver gives MAX_UINT32-95 = 4294967200 for the tile coord
+    //      then we want to translate that to -95 in the viewport, because the tile should start 5 pixels offscreen only
+    //      It will be drawn, but the last 5 pixels (if tilesize 100) will be overwritten by the next iteration
     x = (worldX + tileSize >= MAX_UINT32) ? x - (tileSize - MAX_UINT32 % tileSize) : x
     y = (worldY + tileSize >= MAX_UINT32) ? y - (tileSize - MAX_UINT32 % tileSize) : y
 
     // Scale
     x = (x * scaleFactor) % tileRenderSize;
     y = (y * scaleFactor) % tileRenderSize;
-
+    // console.log(x)
     return [x, y];
 }
 
@@ -66,10 +71,17 @@ export function drawTiles(
     const tileRenderSize = tileSize * scaleFactor
 
 
+    /*
+     Bouncing problem:
+        LeftOffset stays at 0 while viewX makes another cycle
+        So worldToView gets "stuck" in one cycle it seems
+     */
     const [leftOffset, topOffset] = worldToView(worldTranslation, tileTopLeft, scaleFactor, tileSize);
 
 
     const [viewX, viewY] = pixelOffset
+
+    // console.log(tileTopLeft)
 
     // Draw
     for (let y = 0; y < tileRows[0].length; y++) {
@@ -78,8 +90,8 @@ export function drawTiles(
             const tile = tileRows[x][y]
 
             // tile can be null (still loading) or undefined (never loaded)
+            // if(x==0) console.log(viewX , leftOffset , (x * tileRenderSize))
             if (!tile) continue
-
             context.drawImage(
                 tile,
                 viewX + leftOffset + (x * tileRenderSize),

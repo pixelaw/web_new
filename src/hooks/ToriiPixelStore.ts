@@ -22,7 +22,7 @@ export function useToriiPixelStore(): PixelStore {
     // Kick off data fetching. It will write the retrieved Pixel data to the state by itself, and report errors in console.
     function fetchData(bounds: Bounds) : void {
         const [[left, top], [right, bottom]] = bounds
-        console.log("fetchData", left,top,right,bottom )
+        // console.log("fetchData", left,top,right,bottom )
         gqlClient.query({
             query: GET_PIXELS_QUERY,
             variables: {
@@ -50,7 +50,7 @@ export function useToriiPixelStore(): PixelStore {
 
     const loadPixels = ([[left, top], [right, bottom]]: Bounds): void => {
 
-        console.log("loadPixels")
+        // console.log("loadPixels")
         // Determine if the coords wrap
         const xWraps = right - left < 0
         const yWraps = bottom - top < 0

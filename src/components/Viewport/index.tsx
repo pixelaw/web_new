@@ -228,16 +228,20 @@ const Index: React.FC<ViewportProps> = (
                 Math.floor(pixelDelta[0] / cellWidth),
                 Math.floor(pixelDelta[1] / cellWidth)
             ]
+            if(cellDelta[0] !==0) console.log(cellDelta[0])
 
-            const newWorldTranslation = updateWorldTranslation(worldTranslation, cellDelta)
+            const newWorldTranslation = [
+                (cellDelta[0] + worldTranslation[0]) >>> 0,
+                (cellDelta[1] + worldTranslation[1]) >>> 0,
+            ]
 
-            if(
-                worldTranslation[0] == 0
-                && newWorldTranslation[0] > worldTranslation[0]
-
-            ){
-                console.log("hee", worldTranslation)
-            }
+            // if(
+            //     worldTranslation[0] == 0
+            //     && newWorldTranslation[0] > worldTranslation[0]
+            //
+            // ){
+            //     console.log("hee", worldTranslation)
+            // }
 
             const newOffset: Coordinate = [
                 (pixelOffset[0] + e.clientX - lastDragPoint[0] + cellWidth) % cellWidth,
@@ -276,7 +280,7 @@ const Index: React.FC<ViewportProps> = (
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleMouseUp = (_e: React.MouseEvent) => {
+    const handleMouseUp = (e: React.MouseEvent) => {
         // const rect = e.currentTarget.getBoundingClientRect();
         // const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
         //
@@ -288,9 +292,11 @@ const Index: React.FC<ViewportProps> = (
         //     "world:",
         //     worldCell
         // )
+        if(e.type !== "mouseleave"){
+            setWorldView(getWorldViewBounds())
+            pixelStore.loadPixels(worldView)
 
-        setWorldView(getWorldViewBounds())
-        pixelStore.loadPixels(worldView)
+        }
 
         setIsDragging(false);
     };
