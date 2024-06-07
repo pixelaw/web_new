@@ -221,7 +221,7 @@ const Index: React.FC<ViewportProps> = (
 
             const pixelDelta = [
                 pixelOffset[0] + e.clientX - lastDragPoint[0],
-                pixelOffset[1] + e.clientY - lastDragPoint[1]
+                pixelOffset[1] //+ e.clientY - lastDragPoint[1]
             ]
 
             // Difference in cells, negative or positive
@@ -246,7 +246,8 @@ const Index: React.FC<ViewportProps> = (
 
             const newOffset: Coordinate = [
                 (pixelOffset[0] + e.clientX - lastDragPoint[0] + cellWidth) % cellWidth,
-                (pixelOffset[1] + e.clientY - lastDragPoint[1] + cellWidth) % cellWidth
+                // (pixelOffset[1] + e.clientY - lastDragPoint[1] + cellWidth) % cellWidth
+                pixelOffset[1]
             ];
 
             setPixelOffset(newOffset);
