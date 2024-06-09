@@ -1,5 +1,5 @@
 import {Coordinate, Dimension, Pixel} from "../../types.ts";
-import {getCellSize, numRGBAToHex, viewToWorld} from "../../utils.ts";
+import {getCellSize, numRGBAToHex, applyWorldOffset} from "../../utils.ts";
 import {ZOOM_TILEMODE} from "./constants.ts";
 
 export function drawPixels(
@@ -24,7 +24,7 @@ export function drawPixels(
 
     const drawPixel = (cellX: number, cellY: number, sizeAdjustment: number = 0) => {
 
-        const worldCoords = viewToWorld(worldTranslation, [cellX, cellY])
+        const worldCoords = applyWorldOffset(worldTranslation, [cellX, cellY])
 
         const pixel = getPixel(worldCoords);
         if (!pixel) return;

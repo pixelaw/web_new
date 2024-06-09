@@ -3,6 +3,7 @@ import {useState, useEffect, useRef} from 'react';
 import {Bounds, MAX_UINT32, Tile, Tileset, TileStore} from "../types.ts";
 import {set as setIdb, get as getIdb, keys} from 'idb-keyval';
 import {useWs} from "./websocket.ts";
+import {getWrappedTileCoordinate} from "../utils.ts";
 
 type State = { [key: string]: HTMLImageElement | undefined | "" };
 
@@ -28,12 +29,12 @@ export function useSimpleTileStore(): TileStore {
             fetchCounter.current--
             console.log("setState to img")
 
-        }).catch(_e => {
+        }).catch(e => {
             setIdb(key, "").then(() => {
                 setState(produce(draftState => {
                     draftState[key] = "";
                 }));
-                console.log("setState to ''")
+                // console.log("setState to ''")
                 fetchCounter.current--
 
             });
@@ -130,15 +131,7 @@ export function useSimpleTileStore(): TileStore {
 
         let tileRows = []
 
-        // TODO check if this works with negative change
-        function changeWrapped(nr: number, change: number){
-            nr >>>= 0;
-            let result=((nr >>> 0) + change) >>> 0
-            if(nr > result){
-                result -= result % tileWorldSize
-            }
-            return result
-        }
+
 
         function distance(begin: number, end: number): number{
             return end >= begin
@@ -153,8 +146,8 @@ export function useSimpleTileStore(): TileStore {
             let tileRow: (Tile | undefined | "")[] = []
             for (let y = 0; y <= height; y+=tileWorldSize) {
 
-                const tileX = changeWrapped(leftTileCoord , x);
-                const tileY = changeWrapped(topTileCoord, y);
+                const tileX = getWrappedTileCoordinate(leftTileCoord , x, tileWorldSize);
+                const tileY = getWrappedTileCoordinate(topTileCoord, y, tileWorldSize);
                 tileRow.push(
                     getTile(`${tileScaleFactor}_${TILESIZE}_${tileX}_${tileY}`)
                 )

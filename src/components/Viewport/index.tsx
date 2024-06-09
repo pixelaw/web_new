@@ -1,6 +1,6 @@
 import React, {useRef, useEffect, useState} from 'react';
 import {Bounds, Coordinate, Dimension, PixelStore, TileStore} from "../../types.ts";
-import {cellForPosition, getCellSize, updateWorldTranslation, viewToWorld} from "../../utils.ts";
+import {cellForPosition, getCellSize, updateWorldTranslation, applyWorldOffset} from "../../utils.ts";
 import {ZOOM_MAX, ZOOM_STEP, ZOOM_TILEMODE} from "./constants.ts";
 import {drawPixels} from "./drawPixels.ts";
 import {drawOutline} from "./drawOutline.ts";
@@ -275,9 +275,9 @@ const Index: React.FC<ViewportProps> = (
 
     const getWorldViewBounds = () : Bounds => {
         const [width, height] = dimensions
-        const topLeft = viewToWorld(worldTranslation, [0, 0])
+        const topLeft = applyWorldOffset(worldTranslation, [0, 0])
         const bottomRightCell = cellForPosition(zoom, pixelOffset, [width, height])
-        const bottomRight = viewToWorld(worldTranslation, bottomRightCell)
+        const bottomRight = applyWorldOffset(worldTranslation, bottomRightCell)
         return [topLeft, bottomRight]
     }
 

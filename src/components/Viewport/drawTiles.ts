@@ -1,165 +1,107 @@
 import {Coordinate, Dimension, MAX_UINT32, TileStore} from "../../types.ts";
-import {cellForPosition, viewToWorld} from "../../utils.ts";
+import {cellForPosition, applyWorldOffset, getWrappedTileCoordinate, worldToView} from "../../utils.ts";
 import {ZOOM_FACTOR} from "./constants.ts";
 
-export function worldToView(
-    worldTranslation: Coordinate,
-    worldCoord: Coordinate,
-    scaleFactor: number,
-    tileSize: number
-): Coordinate {
-    const MAX_VIEW_SIZE = 1_000_000
-    const tileRenderSize = tileSize * scaleFactor
-    const [worldX, worldY] = worldCoord
-    const [transX, transY] = worldTranslation
-    // console.log(worldX, transX)
-
-    // Apply the transform (without scaling yet)
-    let x = (worldX + transX) >>> 0
-    let y = (worldY + transY) >>> 0
-    // console.log(x)
-
-    // We're expecting x to be related to viewport pixels now, which definitely
-    // won't be any more than 100k (8k display is ~8k pixels)
-    // If the x value is higher than 100k, we need to wrap it around uint32
-    if (x > MAX_VIEW_SIZE) x = 0 - MAX_UINT32 % x
-    if (y > MAX_VIEW_SIZE) y = 0 - MAX_UINT32 % y
-
-    // Adjust in case the tile is on the border
-    // Because tiles that cross the border are not rendered tileSize, but actually a bit shorter
-    // This is because MAX_UINT32 ends in 295 and our tilesizes are typically multiples of 100
-    // So in case of a zoom = 100 (1 to 1)
-    //      if tileserver gives MAX_UINT32-95 = 4294967200 for the tile coord
-    //      then we want to translate that to -95 in the viewport, because the tile should start 5 pixels offscreen only
-    //      It will be drawn, but the last 5 pixels (if tilesize 100) will be overwritten by the next iteration
-    // if (worldX + tileSize >= MAX_UINT32) {
-    //     console.log("a", worldX, (tileSize - MAX_UINT32 % tileSize))
-    // }
-    // x = (worldX + tileSize >= MAX_UINT32) ? x - (tileSize - MAX_UINT32 % tileSize) : x
-    // y = (worldY + tileSize >= MAX_UINT32) ? y - (tileSize - MAX_UINT32 % tileSize) : y
-
-    // Scale
-    x = (x * scaleFactor) % tileRenderSize;
-    y = (y * scaleFactor) % tileRenderSize;
-    // console.log(x)
-    return [x, y];
-}
 
 export function drawTiles(
     context: CanvasRenderingContext2D,
     zoom: number,
-    pixelOffset: Coordinate,
+    cellOffset: Coordinate,
     dimensions: Dimension,
-    worldTranslation: Coordinate,
+    worldOffset: Coordinate,
     tileStore: TileStore
 ) {
 
-    const topleft = viewToWorld(worldTranslation, [0, 0])
-    const br = cellForPosition(zoom, pixelOffset, [dimensions[0], dimensions[1]])
-    const bottomright = viewToWorld(worldTranslation, br)
+    // We're showing a little bit of the boundary left tile on the left
+    worldOffset = [110, 0]
+    // console.log("worldOffset",worldOffset[0])
+    // Cells are not offset
+    // cellOffset = [5, 0]
+
+    const topleftWorld = applyWorldOffset(worldOffset, [0, 0])
+    const bottomrightView = cellForPosition(zoom, cellOffset, [dimensions[0], dimensions[1]])
+    const bottomrightWorld = applyWorldOffset(worldOffset, bottomrightView)
 
     const scaleFactor = zoom / ZOOM_FACTOR
+    const [cellOffsetX, cellOffsetY] = cellOffset
 
     const tileset = tileStore.getTileset(
         zoom / ZOOM_FACTOR,
-        [topleft, bottomright]
+        [topleftWorld, bottomrightWorld]
     )
     if (!tileset) return
 
+    // tileTopLeft is the world position of the topleft tile returned
+    // for the given world coord (which is not "snapped" to a tile yet)
     const {tileRows, tileSize, bounds: [tileTopLeft]} = tileset
-
-
+    const tileRenderSize = tileSize * scaleFactor
 
     // TODO deal with tileScaleFactor other than 1 (when zoomed out very far)
 
-    const tileRenderSize = tileSize * scaleFactor
+    const rawTileCoordinates: Coordinate = [
+        getWrappedTileCoordinate(tileTopLeft[0], 0, tileRenderSize),
+        getWrappedTileCoordinate(tileTopLeft[1], 0, tileRenderSize)
+    ]
 
+    const viewCoord = [
+        worldToView(worldOffset[0], rawTileCoordinates[0], scaleFactor, tileSize),
+        worldToView(worldOffset[1], rawTileCoordinates[1], scaleFactor, tileSize)
+        ]
 
-    /*
-     Bouncing problem:
-        LeftOffset stays at 0 while viewX makes another cycle
-        So worldToView gets "stuck" in one cycle it seems
-
-
-     Also,
-        The rightmost tile needs an offset  (uint-tilesize .. ) to the left, so its cut of the remainder
-        right now the tile is not cut properly
-     */
-    function getBorderAdjustment(tileCoord: number) {
-        let result = (tileCoord + tileSize >= MAX_UINT32) ? 0 - (tileSize - MAX_UINT32 % tileSize) : 0
-        // result = (result * scaleFactor) % tileRenderSize
-        return result
-    }
-
-    const [cellOffsetX, cellOffsetY] = pixelOffset
-
-    //
-    function getViewCoords(startingAt: number, tileIndex: number): number {
-        let tileOffset = (tileIndex * tileSize)
-
-        tileOffset = startingAt + tileOffset
-
-        if (tileOffset > MAX_UINT32) {
-            tileOffset = ((tileIndex -1) * tileSize)
+    function getBorderAdjustment(tileCoord: number): number {
+        const isTileLeftOfBorder = (tileCoord + tileSize >= MAX_UINT32)
+        if(isTileLeftOfBorder){
+            const gap = 0 - (tileSize - MAX_UINT32 % tileSize)
+            return gap
+        }else{
+            return 0
         }
-
-        return tileOffset
     }
+
+    let borderAdjustments: Coordinate = [
+        getBorderAdjustment(tileTopLeft[0]),
+        getBorderAdjustment(tileTopLeft[0])
+    ]
+
+    let destWidth = tileRenderSize + (borderAdjustments[0] * scaleFactor)
+    let destHeight = tileRenderSize + (borderAdjustments[1] * scaleFactor)
+
+    let destY = cellOffsetY + viewCoord[1]
 
     // Draw
     for (let y = 0; y < tileRows[0].length; y++) {
+
+        let destX = cellOffsetX  + viewCoord[0]// - (borderAdjustments[0] * scaleFactor)
+
         for (let x = 0; x < tileRows.length; x++) {
 
-            console.log("tileTopLeft", tileTopLeft[0])
 
-            /*
-                x goes from 0 (leftmost tile) to tileRows
-                we need to translate x to viewport pixels
-                if no tiles are on the boundary, it's simple, tiles are tileWidth
-                if any tiles are on the boundary, the tile left of the boundary has to be cut and the offset of the following tiles adjusted
-
-                we start with 2 values the leftmost tile
-                    - x: 0
-                    - cellOffset: what fraction of a cell is currently sticking over the edge
-            */
-            const viewCoords: Coordinate = [
-                getViewCoords(tileTopLeft[0], x),
-                getViewCoords(tileTopLeft[1], y),
-            ]
-            const [tileOffsetX, tileOffsetY] = worldToView(worldTranslation, viewCoords, scaleFactor, tileSize);
-            console.log("x", x, "viewCoords", viewCoords[0], "offX", tileOffsetX)
-
-            const borderAdjustmentX = 0 // getBorderAdjustment(tileTopLeft[0])
-            const borderAdjustmentY = 0 // getBorderAdjustment(tileTopLeft[1])
-
+            // if(x==1) break
             const tile = tileRows[x][y]
-
-
-            // tile can be null (still loading) or undefined (never loaded)
-            // if(x==0) console.log(viewX , leftOffset , (x * tileRenderSize))
             if (!tile) continue
+
+            // the coords the tiles are at, from the tileserver
+            const rawTileCoordinates: Coordinate = [
+                getWrappedTileCoordinate(tileTopLeft[0], x * tileRenderSize, tileRenderSize),
+                getWrappedTileCoordinate(tileTopLeft[0], x * tileRenderSize, tileRenderSize)
+                ]
+
+
+            borderAdjustments = [
+                getBorderAdjustment(rawTileCoordinates[0]),
+                getBorderAdjustment(rawTileCoordinates[0])
+            ]
 
 
             // sources are tileSize unless we're at the left/topmost border tile (negative from 0)
-            let sourceWidth = tileSize
-            if (x === 0) sourceWidth += borderAdjustmentX
+            const sourceWidth = tileSize + borderAdjustments[0]
+            const sourceHeight = tileSize + borderAdjustments[1]
 
-            let sourceHeight = tileSize
-            if (y === 0) sourceHeight += borderAdjustmentY
 
-            let destX = cellOffsetX + tileOffsetX + (x * tileRenderSize)
-            if (x === 1) destX -= (borderAdjustmentX * scaleFactor) % tileRenderSize
+            destWidth = tileRenderSize + (borderAdjustments[0] * scaleFactor)
+            destHeight = tileRenderSize + (borderAdjustments[1] * scaleFactor)
 
-            let destY = cellOffsetY + tileOffsetY + (y * tileRenderSize)
-            if (y === 1) destY -= (borderAdjustmentY * scaleFactor) % tileRenderSize
 
-            let destWidth = tileRenderSize
-            if (x === 0) destWidth += (borderAdjustmentX * scaleFactor) % tileRenderSize
-
-            let destHeight = tileRenderSize
-            if (y === 0) destHeight += (borderAdjustmentY * scaleFactor) % tileRenderSize
-
-            // console.log("sourceWidth", sourceWidth)
             context.drawImage(
                 tile,       // source image
                 0,      // source x
@@ -171,7 +113,12 @@ export function drawTiles(
                 destWidth,
                 destHeight
             )
+
+            // Set the next destX and destY based on the current tile widths
+            destX += destWidth
+
         }
+        destY += destHeight
     }
     console.groupEnd()
 }

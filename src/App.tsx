@@ -2,17 +2,19 @@ import UPNG from 'upng-js';
 import './App.css'
 import Index from "./components/Viewport";
 import {useEffect, useRef, useState} from "react";
-import {Coordinate, Pixel} from "./types.ts";
+import {Coordinate, Dimension, Pixel} from "./types.ts";
 import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 import {useToriiPixelStore} from "./hooks/ToriiPixelStore.ts";
 
-const ZOOM_TILEMODE = 1000
+const ZOOM_TILEMODE = 800
+
 const ZOOM_PIXELMODE = 20000
 
 const DEFAULT_ZOOM = ZOOM_TILEMODE
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
+const DEFAULT_DIMENSIONS: Dimension =  [1600, 400]
 
 async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
     // Fetch PNG file
@@ -87,7 +89,7 @@ function App() {
             <Index
                 tileStore={tileStore}
                 pixelStore={pixelStore}
-                dimensions={[1600, 400]}
+                dimensions={DEFAULT_DIMENSIONS}
                 zoom={zoom}
                 center={center}
                 onWorldviewChange={onWorldviewChange}
