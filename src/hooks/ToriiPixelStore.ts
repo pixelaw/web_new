@@ -1,8 +1,9 @@
 import {useState} from 'react';
-import {Bounds, Coordinate, Pixel, PixelStore} from "../types.ts";
+import {Bounds, Coordinate, MAX_UINT32, Pixel, PixelStore} from "../types.ts";
 import {produce} from 'immer';
 import GET_PIXELS_QUERY from "../../graphql/GetPixels.graphql";
 import {ApolloClient, InMemoryCache} from "@apollo/client";
+import {MAX_VIEW_SIZE} from "../utils.ts";
 
 
 type State = { [key: string]: Pixel | undefined };
@@ -21,8 +22,13 @@ export function useToriiPixelStore(): PixelStore {
 
     // Kick off data fetching. It will write the retrieved Pixel data to the state by itself, and report errors in console.
     function fetchData(bounds: Bounds) : void {
-        const [[left, top], [right, bottom]] = bounds
+        let [[left, top], [right, bottom]] = bounds
+
+        // Adjust to wrapping
+        if(left > MAX_VIEW_SIZE && left > right) right = MAX_UINT32
+        if(top > MAX_VIEW_SIZE && top > bottom) bottom = MAX_UINT32
         // console.log("fetchData", left,top,right,bottom )
+
         gqlClient.query({
             query: GET_PIXELS_QUERY,
             variables: {

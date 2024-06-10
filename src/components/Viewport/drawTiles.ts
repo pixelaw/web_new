@@ -3,28 +3,31 @@ import {cellForPosition, applyWorldOffset, getWrappedTileCoordinate, worldToView
 import {ZOOM_FACTOR} from "./constants.ts";
 
 
+
 export function drawTiles(
     context: CanvasRenderingContext2D,
     zoom: number,
-    cellOffset: Coordinate,
+    pixelOffset: Coordinate,
     dimensions: Dimension,
     worldOffset: Coordinate,
     tileStore: TileStore
 ) {
 
     // moved one tile and 5 pixels to the right
-    worldOffset = [105, 0]
+    // worldOffset = [4294967295, 0]
+    // worldOffset = [5, 0]
 
     // console.log("worldOffset",worldOffset[0])
     // Cells are not offset
-    // cellOffset = [5, 0]
+    // cellOffset = [0, 0]
+
 
     const topleftWorld = applyWorldOffset(worldOffset, [0, 0])
-    const bottomrightView = cellForPosition(zoom, cellOffset, [dimensions[0], dimensions[1]])
+    const bottomrightView = cellForPosition(zoom, pixelOffset, [dimensions[0], dimensions[1]])
     const bottomrightWorld = applyWorldOffset(worldOffset, bottomrightView)
 
     const scaleFactor = zoom / ZOOM_FACTOR
-    const [cellOffsetX, cellOffsetY] = cellOffset
+    const [cellOffsetX, cellOffsetY] = pixelOffset
 
     const tileset = tileStore.getTileset(
         zoom / ZOOM_FACTOR,
@@ -69,6 +72,10 @@ export function drawTiles(
 
     let destY = cellOffsetY + viewCoord[1]
 
+    if(!tileRows.length) {
+        console.log("norows");
+        return
+    }
     // Draw
     for (let y = 0; y < tileRows[0].length; y++) {
 
@@ -83,8 +90,8 @@ export function drawTiles(
 
             // the coords the tiles are at, from the tileserver
             const rawTileCoordinates: Coordinate = [
-                getWrappedTileCoordinate(tileTopLeft[0], x * tileRenderSize, tileRenderSize),
-                getWrappedTileCoordinate(tileTopLeft[0], x * tileRenderSize, tileRenderSize)
+                getWrappedTileCoordinate(tileTopLeft[0], x * tileSize, tileRenderSize),
+                getWrappedTileCoordinate(tileTopLeft[0], x * tileSize, tileRenderSize)
                 ]
 
 
@@ -101,7 +108,6 @@ export function drawTiles(
 
             destWidth = tileRenderSize + (borderAdjustments[0] * scaleFactor)
             destHeight = tileRenderSize + (borderAdjustments[1] * scaleFactor)
-
 
             context.drawImage(
                 tile,       // source image

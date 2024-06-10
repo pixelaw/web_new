@@ -39,7 +39,7 @@ const Index: React.FC<ViewportProps> = (
     const [lastDragPoint, setLastDragPoint] = useState<Coordinate>([0, 0]);
     const [zoom, setZoom] = useState<number>(initialZoom);
     const [center, setCenter] = useState<Coordinate>(initialCenter);
-    const [worldTranslation, setWorldTranslation] = useState<Coordinate>([0, 0]);
+    const [worldOffset, setWorldOffset] = useState<Coordinate>([0, 0]);
     const [hoveredCell, setHoveredCell] = useState<Coordinate | undefined>(undefined);
     const [worldView, setWorldView] = useState<Bounds>([[0,0], [0,0]]);
     const isLoaded = useRef<boolean>(false);
@@ -99,7 +99,7 @@ const Index: React.FC<ViewportProps> = (
 
             drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, hoveredCell, pixelStore.getPixel)
+            drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldOffset, hoveredCell, pixelStore.getPixel)
 
             // drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
 
@@ -131,7 +131,7 @@ const Index: React.FC<ViewportProps> = (
             // bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
             drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
             drawOutline(bufferContext, dimensions)
 
             context.drawImage(bufferCanvas, 0, 0);
@@ -168,11 +168,11 @@ const Index: React.FC<ViewportProps> = (
                     ]
                     console.log(mouse, center)
                     const worldTranslate: Coordinate = [
-                        worldTranslation[0] + (center[0] - mouse[0]),
-                        worldTranslation[1] + (center[1] - mouse[1]),
+                        worldOffset[0] + (center[0] - mouse[0]),
+                        worldOffset[1] + (center[1] - mouse[1]),
                     ]
                     console.log(worldTranslate)
-                    setWorldTranslation(worldTranslate)
+                    setWorldOffset(worldTranslate)
                 }
             } else {
                 // TODO deal with minimum zoom and scalefactor
@@ -229,20 +229,22 @@ const Index: React.FC<ViewportProps> = (
                 Math.floor(pixelDelta[0] / cellWidth),
                 Math.floor(pixelDelta[1] / cellWidth)
             ]
-            // if(cellDelta[0] !==0) console.log(cellDelta[0])
+            if(cellDelta[0] !==0) console.log(cellDelta[0])
 
-            const newWorldTranslation = [
-                (cellDelta[0] + worldTranslation[0]) >>> 0,
-                (cellDelta[1] + worldTranslation[1]) >>> 0,
+            //
+            const newWorldOffset: Coordinate = [
+                (worldOffset[0] + cellDelta[0] ) >>> 0,
+                (worldOffset[1] + cellDelta[1]) >>> 0,
             ]
 
-            // if(
-            //     worldTranslation[0] == 0
-            //     && newWorldTranslation[0] > worldTranslation[0]
-            //
-            // ){
-            //     console.log("hee", worldTranslation)
-            // }
+            if(
+                worldOffset[0] == 0
+                && newWorldOffset[0] > worldOffset[0]
+
+            ){
+                console.log("hee", worldOffset)
+            }
+
 
             const newOffset: Coordinate = [
                 (pixelOffset[0] + e.clientX - lastDragPoint[0] + cellWidth) % cellWidth,
@@ -250,8 +252,15 @@ const Index: React.FC<ViewportProps> = (
                 pixelOffset[1]
             ];
 
+            // Log when we "roll over"
+            if(pixelOffset[0]==0 && newOffset[0]==9){
+                console.log("newWorldOffset", newWorldOffset[0])
+
+            }
+
+            // console.log("newOffset",newOffset)
             setPixelOffset(newOffset);
-            setWorldTranslation(newWorldTranslation)
+            setWorldOffset(newWorldOffset)
             setLastDragPoint([e.clientX, e.clientY]);
             onWorldviewChange([[0, 0], [0, 0]])//TODO
             onCenterChange(center)
@@ -275,9 +284,9 @@ const Index: React.FC<ViewportProps> = (
 
     const getWorldViewBounds = () : Bounds => {
         const [width, height] = dimensions
-        const topLeft = applyWorldOffset(worldTranslation, [0, 0])
+        const topLeft = applyWorldOffset(worldOffset, [0, 0])
         const bottomRightCell = cellForPosition(zoom, pixelOffset, [width, height])
-        const bottomRight = applyWorldOffset(worldTranslation, bottomRightCell)
+        const bottomRight = applyWorldOffset(worldOffset, bottomRightCell)
         return [topLeft, bottomRight]
     }
 

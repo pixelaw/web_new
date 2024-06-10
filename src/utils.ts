@@ -1,5 +1,6 @@
 import {Coordinate, MAX_UINT32} from "./types.ts";
 import {ZOOM_FACTOR} from "./components/Viewport/constants.ts";
+export const MAX_VIEW_SIZE = 1_000_000
 
 export function randomColor(): number {
     // Generate random RGB color
@@ -78,13 +79,46 @@ export function getCellSize(zoom: number) {
     return zoom / ZOOM_FACTOR
 }
 
+export function uint2relative(nr: number): number {
+    if (
+        nr > MAX_UINT32
+        || nr / MAX_UINT32 > 0.5
+    ) {
+        return nr - MAX_UINT32 - 1;
+    }
+    return nr;
+}
+
+
+export function relative2uint(nr: number): number {
+    if (nr < 0) {
+        return MAX_UINT32 + nr + 1;
+    }
+    return nr;
+}
+
+
 // Apply worldTranslation to viewport coordinates
 // Worldtranslation means "number to add to world to get view"
-export function applyWorldOffset(worldTranslation: Coordinate, viewportCoord: Coordinate): Coordinate {
+export function applyWorldOffset(worldOffset: Coordinate, viewportCoord: Coordinate): Coordinate {
 
+    function fn(viewport: number, world: number): number{
+
+        // Convert world to a relative value
+        const rel = uint2relative(world)
+        const raw  = viewport - rel
+        const uint = relative2uint(raw)
+
+        return uint
+    }
+    // Convert 4294967295 to -1
+    // maxuint - 4294967295 -1
+
+    // TODO properly handle input 4294967295
+    /// 1 - raw - MAX_UINT32
     return [
-        (viewportCoord[0] - worldTranslation[0]) >>> 0,
-        (viewportCoord[1] - worldTranslation[1]) >>> 0
+        fn(viewportCoord[0] , worldOffset[0]) ,
+        fn(viewportCoord[1] , worldOffset[1])
     ];
 }
 
@@ -94,7 +128,6 @@ export function worldToView(
     scaleFactor: number,
     tileSize: number
 ): number {
-    const MAX_VIEW_SIZE = 1_000_000
     const tileRenderSize = tileSize * scaleFactor
 
     const tileWrapDiff = (MAX_UINT32 % tileSize)
@@ -103,7 +136,7 @@ export function worldToView(
 
     const isBorder = worldCoord >= startOfBorderTile
 
-    const raw = worldCoord + worldOffset
+    const raw = worldCoord + uint2relative( worldOffset)
 
     const didCrossBorder = raw > MAX_UINT32
 
@@ -231,6 +264,39 @@ if (import.meta.vitest) {
         );
     });
 
+    describe("applyWorldOffset should return correct cell coordinates", () => {
+
+        it('zeroes', () =>
+            expect(applyWorldOffset([0,0], [0, 0]))
+                .toEqual([0, 0])
+        );
+
+        it('0 minus one', () =>
+            expect(applyWorldOffset([4294967295,0], [0, 0]))
+                .toEqual([4294967295, 0])
+        );
+
+        it('160 minus 1', () =>
+            expect(applyWorldOffset([4294967295,0], [160, 0]))
+                .toEqual([159, 0])
+        );
+    })
+
+    describe("uint2relative", () => {
+
+        it('1', () => {
+                expect(uint2relative(4294967200))
+                    .toEqual(-96)
+                expect(uint2relative(4294967295))
+                    .toEqual(-1)
+                expect(uint2relative(500))
+                    .toEqual(500)
+                expect(uint2relative(0))
+                    .toEqual(0)
+
+        }
+        );
+    })
     describe("cellForPosition should return correct cell coordinates", () => {
 
         it('should return [0, 0] for 1 pixel onscreen is 1 in the world, and pos is topleft', () =>
