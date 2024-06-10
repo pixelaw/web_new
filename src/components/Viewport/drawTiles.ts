@@ -12,8 +12,9 @@ export function drawTiles(
     tileStore: TileStore
 ) {
 
-    // We're showing a little bit of the boundary left tile on the left
-    worldOffset = [110, 0]
+    // moved one tile and 5 pixels to the right
+    worldOffset = [105, 0]
+
     // console.log("worldOffset",worldOffset[0])
     // Cells are not offset
     // cellOffset = [5, 0]

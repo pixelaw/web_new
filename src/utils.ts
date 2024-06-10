@@ -97,82 +97,41 @@ export function worldToView(
     const MAX_VIEW_SIZE = 1_000_000
     const tileRenderSize = tileSize * scaleFactor
 
-    // Apply the transform (without scaling yet)
-    // It is possible the worldCoord overflows the uint32, and we wrap it around immediately
+    const tileWrapDiff = (MAX_UINT32 % tileSize)
 
-    const rawTranslation = worldCoord + worldOffset
+    const startOfBorderTile = MAX_UINT32 - tileWrapDiff
+
+    const isBorder = worldCoord >= startOfBorderTile
+
+    const raw = worldCoord + worldOffset
+
+    const didCrossBorder = raw > MAX_UINT32
 
     // So MAX_UINT +1 (4294967296) needs to become 0
-    const unwrappedTranslation = rawTranslation > MAX_UINT32
-        ? 1 - rawTranslation - MAX_UINT32
-        : rawTranslation
+    const unwrapped = didCrossBorder
+        ? 1 - raw - MAX_UINT32
+        : raw
 
 
-    // We're expecting x to be related to viewport pixels now, which definitely
-    // won't be any more than 100k (8k display is ~8k pixels)
-    //  The range should be -1000 to 1920 (full hd pixel width)
-    // If the x value is higher than 100k, we need to wrap it around uint32
-    // So for example, 4294967294 becomes -2
-    // So for example, 4294967201 becomes -94
-    const negativeTranslation = (unwrappedTranslation > MAX_VIEW_SIZE)
-        ? unwrappedTranslation - MAX_UINT32
-        : unwrappedTranslation;
+    let relative = unwrapped
 
+    if((unwrapped > MAX_VIEW_SIZE && isBorder)){
+        // example: 4294967294 (is -1)
+        relative = unwrapped - MAX_UINT32
 
-    // Scale
-    const scaledCoord = (negativeTranslation * scaleFactor) % tileRenderSize;
-
-
-    return scaledCoord;
-}
-
-export function worldToView2(
-    worldOffset: Coordinate,
-    worldCoord: Coordinate,
-    scaleFactor: number,
-    tileSize: number
-): Coordinate {
-    const MAX_VIEW_SIZE = 1_000_000
-    const tileRenderSize = tileSize * scaleFactor
-    const [worldX, worldY] = worldCoord
-    const [transX, transY] = worldOffset
-
-    // Apply the transform (without scaling yet)
-    const x = (worldX + transX) >>> 0
-    let y = (worldY + transY) >>> 0
-    // console.log(x)
-
-    // We're expecting x to be related to viewport pixels now, which definitely
-    // won't be any more than 100k (8k display is ~8k pixels)
-    // If the x value is higher than 100k, we need to wrap it around uint32
-    // So for example, 4294967294 becomes -2
-    if (x > MAX_VIEW_SIZE) {
-        x = -1 * (1 + (MAX_UINT32 % x))
+    }else if((unwrapped > MAX_VIEW_SIZE && !isBorder)){
+        // example: 4294967205 (is -95)
+        relative = unwrapped - MAX_UINT32 - (tileSize - tileWrapDiff)
     }
-    if (y > MAX_VIEW_SIZE) y = -1 * (1 + (MAX_UINT32 % y))
 
-    // Adjust in case the tile is on the border
-    // Because tiles that cross the border are not rendered tileSize, but actually a bit shorter
-    // This is because MAX_UINT32 ends in 295 and our tilesizes are typically multiples of 100
-    // So in case of a zoom = 100 (1 to 1)
-    //      if tileserver gives MAX_UINT32-95 = 4294967200 for the tile coord
-    //      then we want to translate that to -95 in the viewport, because the tile should start 5 pixels offscreen only
-    //      It will be drawn, but the last 5 pixels (if tilesize 100) will be overwritten by the next iteration
-
-    // if (worldX + tileSize >= MAX_UINT32) {
-    //     console.log("gapX", (tileSize - MAX_UINT32 % tileSize))
-    // }
-
-    // Apply the gap if this is a border coordinate (move left a little less)
-    x = (worldX + tileSize >= MAX_UINT32) ? x - (tileSize - MAX_UINT32 % tileSize) : x
-    y = (worldY + tileSize >= MAX_UINT32) ? y - (tileSize - MAX_UINT32 % tileSize) : y
 
     // Scale
-    x = (x * scaleFactor) % tileRenderSize;
-    y = (y * scaleFactor) % tileRenderSize;
-    // console.log(x)
-    return [x, y];
+    const scaled = (relative * scaleFactor) % tileRenderSize;
+
+
+    return scaled;
 }
+
 
 if (import.meta.vitest) {
     const {it, expect, describe} = import.meta.vitest
@@ -203,9 +162,16 @@ if (import.meta.vitest) {
                 .toEqual(-10)
         );
 
-        it('all 0, should return all 0 too', () =>
+        it('crossing boundary: all 0, should return all 0 too', () =>
             expect(worldToView(1, 4294967200, 10, 100))
                 .toEqual(-940)
+        );
+
+        it('not crossing boundary: 105 left of 4294967100', () =>
+            // raw: 4294967205
+            //
+            expect(worldToView(105, 4294967100, 10, 100))
+                .toEqual(-950)
         );
     })
 
