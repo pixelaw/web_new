@@ -22,6 +22,20 @@ export function getWrappedTileCoordinate(startingWorldCoordinate: number, index:
     return result
 }
 
+export function getInitialOffset( tileCoord: number,worldCoord: number, offset: number) {
+    offset = uint2relative(offset)
+    let result = worldCoord - tileCoord
+
+    if(result > 0 && offset < 0) result -= 1
+    return result
+}
+
+export function nextTileCoord(tileCoord: number, tileSize: number) {
+    let result = tileCoord + tileSize
+    if(result > MAX_UINT32) result = 0
+    return result
+}
+
 export const numRGBAToHex = (rgba: number | undefined) => {
     if (rgba == undefined) return "#0000EE"    // TODO Maybe return default color?
     const color = rgba >>> 8
@@ -98,12 +112,15 @@ export function relative2uint(nr: number): number {
 }
 
 
-// Apply worldTranslation to viewport coordinates
-// Worldtranslation means "number to add to world to get view"
+// Apply WorldOffset to viewport coordinates
+// WorldOffset means "number to add to world to get view"
+// So it returns "viewport - WorldOffset"
+// Negative WO means the result increases
 export function applyWorldOffset(worldOffset: Coordinate, viewportCoord: Coordinate): Coordinate {
 
     function fn(viewport: number, world: number): number{
 
+        // const nor = world % 4294967295
         // Convert world to a relative value
         const rel = uint2relative(world)
         const raw  = viewport - rel
@@ -273,12 +290,26 @@ if (import.meta.vitest) {
 
         it('0 minus one', () =>
             expect(applyWorldOffset([4294967295,0], [0, 0]))
-                .toEqual([4294967295, 0])
+                .toEqual([1, 0])
         );
 
         it('160 minus 1', () =>
             expect(applyWorldOffset([4294967295,0], [160, 0]))
-                .toEqual([159, 0])
+                .toEqual([161, 0])
+        );
+
+        it('-1 plus 1', () =>
+            expect(applyWorldOffset([-1,0], [-1, 0]))
+                .toEqual([0, 0])
+        );
+
+        it('plus 1', () =>
+            expect(applyWorldOffset([1,0], [0, 0]))
+                .toEqual([4294967295, 0])
+        );
+        it('plus 95', () =>
+            expect(applyWorldOffset([95,0], [0, 0]))
+                .toEqual([4294967201, 0])
         );
     })
 

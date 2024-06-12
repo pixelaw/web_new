@@ -229,9 +229,9 @@ const Index: React.FC<ViewportProps> = (
                 Math.floor(pixelDelta[0] / cellWidth),
                 Math.floor(pixelDelta[1] / cellWidth)
             ]
-            if(cellDelta[0] !==0) console.log(cellDelta[0])
+            // if(cellDelta[0] !==0) console.log(cellDelta[0])
 
-            //
+            // TODO wrapping is not good here?
             const newWorldOffset: Coordinate = [
                 (worldOffset[0] + cellDelta[0] ) >>> 0,
                 (worldOffset[1] + cellDelta[1]) >>> 0,
