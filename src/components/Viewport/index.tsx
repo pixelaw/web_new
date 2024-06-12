@@ -67,7 +67,7 @@ const Index: React.FC<ViewportProps> = (
         pixelStore.loadPixels(wv)
         isLoaded.current = true
 
-        drag(lastDragPoint, [lastDragPoint[0] - 25, lastDragPoint[1]])
+        drag(lastDragPoint, [lastDragPoint[0] - 10, lastDragPoint[1]])
     }, [])
 
     // Render when in pixel mode

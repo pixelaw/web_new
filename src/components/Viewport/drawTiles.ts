@@ -98,8 +98,6 @@ export function drawTiles(
                 destHeight
             )
 
-            // Set the next destX and destY based on the current tile widths
-            destX += tileSizes[0] * scaleFactor
 
             // Next TileCoords
             tileCoords = [
@@ -112,6 +110,8 @@ export function drawTiles(
                 (tileCoords[0] + tileSize > MAX_UINT32)?MAX_UINT32 % tileSize:tileSize,
                 (tileCoords[1] + tileSize > MAX_UINT32)?MAX_UINT32 % tileSize:tileSize
             ]
+            // Set the next destX and destY based on the current tile widths
+            destX += tileSizes[0] * scaleFactor
 
 
         }
