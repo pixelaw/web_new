@@ -21,6 +21,61 @@ export function getWrappedTileCoordinate(startingWorldCoordinate: number, index:
     }
     return result
 }
+// Change positive means panning right (moving mouse right)
+// So more becomes visible on the left side
+function handlePixelChange(pixelOffset: number, worldOffset: number, change: number, cellWidth:number)
+    : number[] {
+    pixelOffset += change
+
+    if(pixelOffset > cellWidth-1){
+
+        worldOffset = worldOffset += Math.floor(pixelOffset / cellWidth)
+        pixelOffset = (pixelOffset  + cellWidth) % cellWidth;
+
+    }else if (pixelOffset < 0){
+
+        worldOffset = worldOffset - 1 - Math.ceil(pixelOffset / cellWidth)
+        pixelOffset = ((pixelOffset % cellWidth) + cellWidth) % cellWidth;
+
+    }
+
+    console.log("change",change)
+    console.log("pixelOffset",pixelOffset, "worldOffset", worldOffset)
+
+    return [pixelOffset, worldOffset]
+}
+
+export function handlePixelChanges(
+    pixelOffset: Coordinate,
+    worldOffset: Coordinate,
+    change: Coordinate,
+    cellWidth: number
+)
+    : Coordinate[]
+{
+
+
+    const [newPixelOffsetX, newWorldOffsetX] = handlePixelChange(pixelOffset[0], worldOffset[0], change[0], cellWidth);
+    const [newPixelOffsetY, newWorldOffsetY] = [pixelOffset[1], worldOffset[1]] //handlePixelChange(pixelOffset[1], worldOffset[1], change[1], cellWidth);
+
+    return [
+        [newPixelOffsetX, newPixelOffsetY],
+        [newWorldOffsetX, newWorldOffsetY]
+    ]
+}
+
+export function changePixelOffset(offset: number, change: number, cellWidth: number): number {
+    // (pixelOffset[0] + e.clientX - lastDragPoint[0] + cellWidth) % cellWidth
+    console.log("offset", offset, "change", change)
+    let result = (offset+change+cellWidth) % cellWidth
+    return result
+}
+
+export function wrapOffsetChange(offset: number, change: number): number {
+    let result = offset+change
+    if(result > MAX_UINT32) result = result % (MAX_UINT32+1)
+    return result
+}
 
 export function getInitialOffset( tileCoord: number,worldCoord: number, offset: number) {
     // offset = uint2relative(offset)
@@ -328,6 +383,7 @@ if (import.meta.vitest) {
         }
         );
     })
+
     describe("cellForPosition should return correct cell coordinates", () => {
 
         it('should return [0, 0] for 1 pixel onscreen is 1 in the world, and pos is topleft', () =>
@@ -361,4 +417,15 @@ if (import.meta.vitest) {
         );
     });
 
-}
+
+    describe('handlePixelChange', () => {
+        it('should handle positive pixel change correctly', () => {
+            const result = handlePixelChange(0, 0, -1, 10);
+            expect(result).toEqual([9, -1]);
+        });
+        it('should handle positive pixel change correctly', () => {
+            const result = handlePixelChange(9, -1, 1, 10);
+            expect(result).toEqual([0, 0]);
+        });
+    })
+    }

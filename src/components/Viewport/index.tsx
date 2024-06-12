@@ -1,6 +1,13 @@
 import React, {useRef, useEffect, useState} from 'react';
 import {Bounds, Coordinate, Dimension, MAX_UINT32, PixelStore, TileStore} from "../../types.ts";
-import {cellForPosition, getCellSize, updateWorldTranslation, applyWorldOffset} from "../../utils.ts";
+import {
+    cellForPosition,
+    getCellSize,
+    updateWorldTranslation,
+    applyWorldOffset,
+    wrapOffsetChange,
+    changePixelOffset, handlePixelChanges
+} from "../../utils.ts";
 import {ZOOM_MAX, ZOOM_STEP, ZOOM_TILEMODE} from "./constants.ts";
 import {drawPixels} from "./drawPixels.ts";
 import {drawOutline} from "./drawOutline.ts";
@@ -41,11 +48,11 @@ const Index: React.FC<ViewportProps> = (
     const [center, setCenter] = useState<Coordinate>(initialCenter);
     const [worldOffset, setWorldOffset] = useState<Coordinate>([0, 0]);
     const [hoveredCell, setHoveredCell] = useState<Coordinate | undefined>(undefined);
-    const [worldView, setWorldView] = useState<Bounds>([[0,0], [0,0]]);
+    const [worldView, setWorldView] = useState<Bounds>([[0, 0], [0, 0]]);
     const isLoaded = useRef<boolean>(false);
 
     useEffect(() => {
-        if(isLoaded.current) return
+        if (isLoaded.current) return
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -59,6 +66,8 @@ const Index: React.FC<ViewportProps> = (
 
         pixelStore.loadPixels(wv)
         isLoaded.current = true
+
+        drag(lastDragPoint, [lastDragPoint[0] - 25, lastDragPoint[1]])
     }, [])
 
     // Render when in pixel mode
@@ -215,60 +224,36 @@ const Index: React.FC<ViewportProps> = (
         setLastDragPoint([e.clientX, e.clientY]);
     };
 
+    function drag(lastDragPoint: Coordinate, mouse: Coordinate) {
+        console.log("draggging")
+        const cellWidth = getCellSize(zoom)
+
+        const [newPixelOffset, newWorldOffset] = handlePixelChanges(
+            [...pixelOffset],
+            [...worldOffset],
+            [
+                // mouse[0] - lastDragPoint[0],
+                // mouse[1] - lastDragPoint[1]
+                 lastDragPoint[0] - mouse[0] ,
+                lastDragPoint[1] - mouse[1]
+            ],
+            cellWidth
+        )
+        console.log("newPixelOffset", newPixelOffset[0], "newWorldOffset", newWorldOffset[0])
+
+        // console.log("newOffset",newOffset)
+        setPixelOffset(newPixelOffset);
+        setWorldOffset(newWorldOffset)
+        onWorldviewChange([[0, 0], [0, 0]])//TODO
+        onCenterChange(center)
+    }
+
     const handleMouseMove = (e: React.MouseEvent) => {
         if (isDragging) {
-            const cellWidth = getCellSize(zoom)
+            const mouse: Coordinate = [e.clientX, e.clientY]
+            drag(lastDragPoint, mouse)
 
-            const pixelDelta = [
-                pixelOffset[0] + e.clientX - lastDragPoint[0],
-                pixelOffset[1] //+ e.clientY - lastDragPoint[1]
-            ]
-
-            // Difference in cells, negative or positive
-            const cellDelta: Coordinate = [
-                Math.floor(pixelDelta[0] / cellWidth),
-                Math.floor(pixelDelta[1] / cellWidth)
-            ]
-            // if(cellDelta[0] !==0) console.log(cellDelta[0])
-
-            // TODO wrapping is not good here?
-            function wrapOffsetChange(offset: number, change: number): number {
-                let result = offset+change
-                if(result > MAX_UINT32) result = result % (MAX_UINT32+1)
-                return result
-            }
-            const newWorldOffset: Coordinate = [
-                wrapOffsetChange(worldOffset[0] , cellDelta[0] ),
-                wrapOffsetChange(worldOffset[1] , cellDelta[1] ),
-            ]
-
-            if(
-                worldOffset[0] == 0
-                && newWorldOffset[0] > worldOffset[0]
-
-            ){
-                console.log("hee", worldOffset)
-            }
-
-
-            const newOffset: Coordinate = [
-                (pixelOffset[0] + e.clientX - lastDragPoint[0] + cellWidth) % cellWidth,
-                // (pixelOffset[1] + e.clientY - lastDragPoint[1] + cellWidth) % cellWidth
-                pixelOffset[1]
-            ];
-
-            // Log when we "roll over"
-            if(pixelOffset[0]==0 && newOffset[0]==9){
-                console.log("newWorldOffset", newWorldOffset[0])
-
-            }
-
-            // console.log("newOffset",newOffset)
-            setPixelOffset(newOffset);
-            setWorldOffset(newWorldOffset)
-            setLastDragPoint([e.clientX, e.clientY]);
-            onWorldviewChange([[0, 0], [0, 0]])//TODO
-            onCenterChange(center)
+            setLastDragPoint(mouse);
         } else {
             if (zoom > ZOOM_TILEMODE) {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -287,7 +272,7 @@ const Index: React.FC<ViewportProps> = (
 
     };
 
-    const getWorldViewBounds = () : Bounds => {
+    const getWorldViewBounds = (): Bounds => {
         const [width, height] = dimensions
         const topLeft = applyWorldOffset(worldOffset, [0, 0])
         const bottomRightCell = cellForPosition(zoom, pixelOffset, [width, height])
@@ -308,7 +293,7 @@ const Index: React.FC<ViewportProps> = (
         //     "world:",
         //     worldCell
         // )
-        if(e.type !== "mouseleave"){
+        if (e.type !== "mouseleave") {
             setWorldView(getWorldViewBounds())
             pixelStore.loadPixels(worldView)
 

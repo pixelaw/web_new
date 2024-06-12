@@ -23,10 +23,9 @@ export function drawTiles(
     // moved one tile and 5 pixels to the right
     // worldOffset = [4294967295, 0]
     // worldOffset = [0, 0]
+    // pixelOffset = [1, 0]
 
-    // Cells are not offset
-    // cellOffset = [0, 0]
-
+    // TODO handle pixelOffset so it's about STICKING INTO THE LEFT INVISIBLE
 
     const topleftWorld = applyWorldOffset(worldOffset, [0, 0])
     const bottomrightView = cellForPosition(zoom, pixelOffset, [dimensions[0], dimensions[1]])
@@ -63,10 +62,12 @@ export function drawTiles(
         getInitialOffset(tileTopLeft[1] , topleftWorld[1], worldOffset[1])
     ]
 
-    console.log("topleftWorld", topleftWorld[0], "tileTopLeft", tileTopLeft[0], "initialOffsets",initialOffsets[0])
+    // console.log("topleftWorld", topleftWorld[0], "tileTopLeft", tileTopLeft[0], "initialOffsets",initialOffsets[0])
 
-    let destX = cellOffsetX - (initialOffsets[0] * scaleFactor)
-    let destY = cellOffsetY + (initialOffsets[1] * scaleFactor)
+    console.log("worldOffset",worldOffset)
+
+    let destX = 0 - (initialOffsets[0] * scaleFactor) + cellOffsetX
+    let destY = 0 - (initialOffsets[1] * scaleFactor) + cellOffsetY
 
     // Draw
     for (let y = 0; y < tileRows[0].length; y++) {
