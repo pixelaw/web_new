@@ -25,6 +25,7 @@ export function getWrappedTileCoordinate(startingWorldCoordinate: number, index:
 // So more becomes visible on the left side
 function handlePixelChange(pixelOffset: number, worldOffset: number, change: number, cellWidth:number)
     : number[] {
+
     pixelOffset += change
 
 
@@ -36,13 +37,13 @@ function handlePixelChange(pixelOffset: number, worldOffset: number, change: num
 
     }else if (pixelOffset < 0){
         // Dropping below 0
-        worldOffset = worldOffset - 1 - Math.ceil(pixelOffset / cellWidth)
+        console.log("pixelOffset",pixelOffset, "worldOffset", worldOffset)
+        worldOffset = worldOffset + 1 + Math.abs(Math.ceil(pixelOffset / cellWidth))
         pixelOffset = ((pixelOffset % cellWidth) + cellWidth) % cellWidth;
 
     }
 
     console.log("change",change)
-    console.log("pixelOffset",pixelOffset, "worldOffset", worldOffset)
 
     return [pixelOffset, worldOffset]
 }
