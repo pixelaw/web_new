@@ -70,7 +70,7 @@ export function useSimpleTileStore(): TileStore {
             setIsLoading(true);
             const keysArray = await keys();
             const tilesObj: Record<string, Tile | undefined | ""> = {};
-            console.log("loading keys", keysArray.length)
+            // console.log("loading keys", keysArray.length)
             for (const key of keysArray) {
                 if (typeof key === 'string') {
                     try {

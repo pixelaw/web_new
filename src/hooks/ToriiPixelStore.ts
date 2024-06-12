@@ -80,6 +80,7 @@ export function useToriiPixelStore(): PixelStore {
 
     const getPixel = (coord: Coordinate): Pixel | undefined => {
         const key = `${coord[0]}_${coord[1]}`
+        // if(state[key]) console.log("getPixel", key, state[key])
         return state[key];
     };
 

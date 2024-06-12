@@ -20,7 +20,7 @@ export function drawPixels(
     const doBorder = zoom <= ZOOM_TILEMODE ? 1 : 0;
 
     // How many pixels a cell extends offscreen
-    const offsets = [
+    const offsets: Coordinate = [
         0 - pixelOffset[0],
         0 - pixelOffset[1]
     ]
@@ -41,12 +41,11 @@ export function drawPixels(
 
     // const worldCoords = viewToWorld(worldTranslation, [0, 0])
 
-    // console.log(
-    //     "worldCoords", worldCoords[0],
-    //     "offsets", offsets[0],
-    //     "pixelOffset", pixelOffset[0],
-    //     "wt", worldTranslation[0]
-    // )
+    console.log(
+        "offsets", offsets[0],
+        "pixelOffset", pixelOffset[0],
+        "wt", worldTranslation[0]
+    )
 
     for (let x = 0; x <= gridDimensions[0]; x++) {
         for (let y = 0; y <= gridDimensions[1]; y++) {
