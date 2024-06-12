@@ -23,10 +23,10 @@ export function getWrappedTileCoordinate(startingWorldCoordinate: number, index:
 }
 
 export function getInitialOffset( tileCoord: number,worldCoord: number, offset: number) {
-    offset = uint2relative(offset)
+    // offset = uint2relative(offset)
     let result = worldCoord - tileCoord
 
-    if(result > 0 && offset < 0) result -= 1
+    if(result > 0 && offset > 0) result -= 1
     return result
 }
 

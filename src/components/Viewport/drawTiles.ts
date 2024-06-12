@@ -24,7 +24,6 @@ export function drawTiles(
     // worldOffset = [4294967295, 0]
     // worldOffset = [0, 0]
 
-    console.log("worldOffset",worldOffset[0])
     // Cells are not offset
     // cellOffset = [0, 0]
 
@@ -33,7 +32,6 @@ export function drawTiles(
     const bottomrightView = cellForPosition(zoom, pixelOffset, [dimensions[0], dimensions[1]])
     const bottomrightWorld = applyWorldOffset(worldOffset, bottomrightView)
 
-    console.log("topleftWorld", topleftWorld[0])
 
     const scaleFactor = zoom / ZOOM_FACTOR
     const [cellOffsetX, cellOffsetY] = pixelOffset
@@ -46,6 +44,10 @@ export function drawTiles(
 
     // tileTopLeft is the world position of the topleft tile returned for the given world coord (which is not "snapped" to a tile yet)
     const {tileRows, tileSize, bounds: [tileTopLeft]} = tileset
+    if(!tileRows.length) {
+        console.log("norows");
+        return
+    }
 
     // TODO deal with tileScaleFactor other than 1 (when zoomed out very far)
 
@@ -56,15 +58,12 @@ export function drawTiles(
         (tileTopLeft[1] + tileSize > MAX_UINT32)?MAX_UINT32 % tileSize:tileSize
     ]
 
-    if(!tileRows.length) {
-        console.log("norows");
-        return
-    }
-
     const initialOffsets: Coordinate = [
         getInitialOffset(tileTopLeft[0] , topleftWorld[0], worldOffset[0]),
-        getInitialOffset(tileTopLeft[1] , topleftWorld[1],worldOffset[1])
+        getInitialOffset(tileTopLeft[1] , topleftWorld[1], worldOffset[1])
     ]
+
+    console.log("topleftWorld", topleftWorld[0], "tileTopLeft", tileTopLeft[0], "initialOffsets",initialOffsets[0])
 
     let destX = cellOffsetX - (initialOffsets[0] * scaleFactor)
     let destY = cellOffsetY + (initialOffsets[1] * scaleFactor)

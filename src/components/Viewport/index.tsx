@@ -1,5 +1,5 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {Bounds, Coordinate, Dimension, PixelStore, TileStore} from "../../types.ts";
+import {Bounds, Coordinate, Dimension, MAX_UINT32, PixelStore, TileStore} from "../../types.ts";
 import {cellForPosition, getCellSize, updateWorldTranslation, applyWorldOffset} from "../../utils.ts";
 import {ZOOM_MAX, ZOOM_STEP, ZOOM_TILEMODE} from "./constants.ts";
 import {drawPixels} from "./drawPixels.ts";
@@ -232,9 +232,14 @@ const Index: React.FC<ViewportProps> = (
             // if(cellDelta[0] !==0) console.log(cellDelta[0])
 
             // TODO wrapping is not good here?
+            function wrapOffsetChange(offset: number, change: number): number {
+                let result = offset+change
+                if(result > MAX_UINT32) result = result % (MAX_UINT32+1)
+                return result
+            }
             const newWorldOffset: Coordinate = [
-                (worldOffset[0] + cellDelta[0] ) >>> 0,
-                (worldOffset[1] + cellDelta[1]) >>> 0,
+                wrapOffsetChange(worldOffset[0] , cellDelta[0] ),
+                wrapOffsetChange(worldOffset[1] , cellDelta[1] ),
             ]
 
             if(
