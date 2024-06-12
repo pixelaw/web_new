@@ -27,13 +27,15 @@ function handlePixelChange(pixelOffset: number, worldOffset: number, change: num
     : number[] {
     pixelOffset += change
 
-    if(pixelOffset > cellWidth-1){
 
+    if(pixelOffset > cellWidth-1){
+        // Going beyond 9
         worldOffset = worldOffset += Math.floor(pixelOffset / cellWidth)
         pixelOffset = (pixelOffset  + cellWidth) % cellWidth;
 
-    }else if (pixelOffset < 0){
 
+    }else if (pixelOffset < 0){
+        // Dropping below 0
         worldOffset = worldOffset - 1 - Math.ceil(pixelOffset / cellWidth)
         pixelOffset = ((pixelOffset % cellWidth) + cellWidth) % cellWidth;
 

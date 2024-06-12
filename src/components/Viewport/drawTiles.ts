@@ -66,8 +66,8 @@ export function drawTiles(
 
     console.log("worldOffset",worldOffset)
 
-    let destX = 0 - (initialOffsets[0] * scaleFactor) + cellOffsetX
-    let destY = 0 - (initialOffsets[1] * scaleFactor) + cellOffsetY
+    let destX = 0 - (initialOffsets[0] * scaleFactor) - cellOffsetX
+    let destY = 0 - (initialOffsets[1] * scaleFactor) - cellOffsetY
 
     // Draw
     for (let y = 0; y < tileRows[0].length; y++) {
