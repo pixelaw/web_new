@@ -6,7 +6,7 @@ export function drawGrid(context: CanvasRenderingContext2D, zoom: number, pixelO
     const [width, height] = dimensions
     const cellSize = getCellSize(zoom)
 
-    const startDrawingAtX = pixelOffset[0] - cellSize
+    const startDrawingAtX = 0 - pixelOffset[0]
     const endDrawingAtX = width + pixelOffset[0]
 
     const startDrawingAtY = pixelOffset[1] % cellSize

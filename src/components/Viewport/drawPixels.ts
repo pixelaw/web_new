@@ -20,7 +20,10 @@ export function drawPixels(
     const doBorder = zoom <= ZOOM_TILEMODE ? 1 : 0;
 
     // How many pixels a cell extends offscreen
-    const offsets = calculateOffsets(pixelOffset, cellSize);
+    const offsets = [
+        0 - pixelOffset[0],
+        0 - pixelOffset[1]
+    ]
 
     const drawPixel = (cellX: number, cellY: number, sizeAdjustment: number = 0) => {
 
@@ -91,8 +94,8 @@ function calculateOffsets([x,y]: Coordinate, cellSize: number): [number, number]
     But this starts to draw the cells fully offscreen
      */
 
-    const offsetX = /*x == 0 ? 0 :*/ x - cellSize;
-    const offsetY = /*y == 0 ? 0 :*/ y - cellSize;
+    const offsetX = /*x == 0 ? 0 :*/ 0 - x// - cellSize;
+    const offsetY = /*y == 0 ? 0 :*/ 0 - y //- cellSize;
     return [offsetX, offsetY];
 }
 

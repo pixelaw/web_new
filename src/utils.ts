@@ -37,13 +37,11 @@ function handlePixelChange(pixelOffset: number, worldOffset: number, change: num
 
     }else if (pixelOffset < 0){
         // Dropping below 0
-        console.log("pixelOffset",pixelOffset, "worldOffset", worldOffset)
         worldOffset = worldOffset + 1 + Math.abs(Math.ceil(pixelOffset / cellWidth))
         pixelOffset = ((pixelOffset % cellWidth) + cellWidth) % cellWidth;
 
     }
 
-    console.log("change",change)
 
     return [pixelOffset, worldOffset]
 }
@@ -59,7 +57,7 @@ export function handlePixelChanges(
 
 
     const [newPixelOffsetX, newWorldOffsetX] = handlePixelChange(pixelOffset[0], worldOffset[0], change[0], cellWidth);
-    const [newPixelOffsetY, newWorldOffsetY] = [pixelOffset[1], worldOffset[1]] //handlePixelChange(pixelOffset[1], worldOffset[1], change[1], cellWidth);
+    const [newPixelOffsetY, newWorldOffsetY] = handlePixelChange(pixelOffset[1], worldOffset[1], change[1], cellWidth);
 
     return [
         [newPixelOffsetX, newPixelOffsetY],

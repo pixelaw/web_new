@@ -67,7 +67,7 @@ const Index: React.FC<ViewportProps> = (
         pixelStore.loadPixels(wv)
         isLoaded.current = true
 
-        drag(lastDragPoint, [lastDragPoint[0] -0, lastDragPoint[1]])
+        drag(lastDragPoint, [lastDragPoint[0] -3, lastDragPoint[1]])
     }, [])
 
     // Render when in pixel mode
@@ -110,7 +110,7 @@ const Index: React.FC<ViewportProps> = (
 
             drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldOffset, hoveredCell, pixelStore.getPixel)
 
-            // drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldTranslation, tileStore)
+            // drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
 
             drawOutline(bufferContext, dimensions)
 
