@@ -2,8 +2,6 @@ import {Coordinate, Dimension, MAX_UINT32, TileStore} from "../../types.ts";
 import {
     cellForPosition,
     applyWorldOffset,
-    getWrappedTileCoordinate,
-    worldToView,
     nextTileCoord,
     getInitialOffset
 } from "../../utils.ts";
@@ -22,15 +20,13 @@ export function drawTiles(
 
     // moved one tile and 5 pixels to the right
     // worldOffset = [4294967295, 0]
-    // worldOffset = [0, 0]
+    // worldOffset = [150, 50]
     // pixelOffset = [1, 0]
 
-    // TODO handle pixelOffset so it's about STICKING INTO THE LEFT INVISIBLE
 
     const topleftWorld = applyWorldOffset(worldOffset, [0, 0])
     const bottomrightView = cellForPosition(zoom, pixelOffset, [dimensions[0], dimensions[1]])
     const bottomrightWorld = applyWorldOffset(worldOffset, bottomrightView)
-
 
     const scaleFactor = zoom / ZOOM_FACTOR
     const [cellOffsetX, cellOffsetY] = pixelOffset
@@ -50,9 +46,9 @@ export function drawTiles(
 
     // TODO deal with tileScaleFactor other than 1 (when zoomed out very far)
 
-    let tileCoords = tileTopLeft
+    const tileCoords = [...tileTopLeft]
 
-    let tileSizes = [
+    const tileSizes = [
         (tileTopLeft[0] + tileSize > MAX_UINT32)?MAX_UINT32 % tileSize:tileSize,
         (tileTopLeft[1] + tileSize > MAX_UINT32)?MAX_UINT32 % tileSize:tileSize
     ]
@@ -66,56 +62,56 @@ export function drawTiles(
 
     console.log("worldOffset",worldOffset)
 
-    let destX = 0 - (initialOffsets[0] * scaleFactor) - cellOffsetX
+
     let destY = 0 - (initialOffsets[1] * scaleFactor) - cellOffsetY
 
-    // Draw
+
     for (let y = 0; y < tileRows[0].length; y++) {
 
+
+        let destX = 0 - (initialOffsets[0] * scaleFactor) - cellOffsetX
+
+        tileCoords[0] = tileTopLeft[0]
+        tileSizes[0]  = (tileTopLeft[0] + tileSize > MAX_UINT32)?MAX_UINT32 % tileSize:tileSize
 
         for (let x = 0; x < tileRows.length; x++) {
 
 
             const tile = tileRows[x][y]
-            if (!tile) continue
+            if (tile) {
 
+                const sourceWidth = tileSizes[0]
+                const sourceHeight = tileSizes[1]
 
-            const sourceWidth = tileSizes[0]
-            const sourceHeight = tileSizes[1]
+                const destWidth = tileSizes[0] * scaleFactor
+                const destHeight = tileSizes[1] * scaleFactor
 
-            const destWidth = tileSizes[0] * scaleFactor
-            const destHeight = tileSizes[1] * scaleFactor
+                context.drawImage(
+                    tile,       // source image
+                    0,      // source x
+                    0,      // source y
+                    sourceWidth,
+                    sourceHeight,
+                    destX,
+                    destY,
+                    destWidth,
+                    destHeight
+                )
+            }
 
-            context.drawImage(
-                tile,       // source image
-                0,      // source x
-                0,      // source y
-                sourceWidth,
-                sourceHeight,
-                destX,
-                destY,
-                destWidth,
-                destHeight
-            )
-
-
-            // Next TileCoords
-            tileCoords = [
-                nextTileCoord(tileCoords[0], tileSizes[0]),
-                nextTileCoord(tileCoords[1], tileSizes[1])
-            ]
-
-            // Next tilesize
-            tileSizes = [
-                (tileCoords[0] + tileSize > MAX_UINT32)?MAX_UINT32 % tileSize:tileSize,
-                (tileCoords[1] + tileSize > MAX_UINT32)?MAX_UINT32 % tileSize:tileSize
-            ]
-            // Set the next destX and destY based on the current tile widths
             destX += tileSizes[0] * scaleFactor
 
+            tileCoords[0] = nextTileCoord(tileCoords[0], tileSizes[0])
+
+            tileSizes[0] = (tileCoords[0] + tileSize >= MAX_UINT32)?MAX_UINT32 % tileSize:tileSize
 
         }
+
+        tileCoords[1] = nextTileCoord(tileCoords[1], tileSizes[1])
+
         destY += tileSizes[1] * scaleFactor
+
+        tileSizes[1] = (tileCoords[1] + tileSize >= MAX_UINT32)?MAX_UINT32 % tileSize:tileSize
     }
     console.groupEnd()
 }

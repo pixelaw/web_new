@@ -88,7 +88,7 @@ export function getInitialOffset( tileCoord: number,worldCoord: number, offset: 
 
 export function nextTileCoord(tileCoord: number, tileSize: number) {
     let result = tileCoord + tileSize
-    if(result > MAX_UINT32) result = 0
+    if(result >= MAX_UINT32) result = 0
     return result
 }
 

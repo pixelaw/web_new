@@ -8,13 +8,13 @@ import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 import {useToriiPixelStore} from "./hooks/ToriiPixelStore.ts";
 
-const ZOOM_TILEMODE = 1000
+const ZOOM_TILEMODE = 100
 
 const ZOOM_PIXELMODE = 5000
 
-const DEFAULT_ZOOM = ZOOM_PIXELMODE
+const DEFAULT_ZOOM = ZOOM_TILEMODE
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
-const DEFAULT_DIMENSIONS: Dimension =  [1600, 400]
+const DEFAULT_DIMENSIONS: Dimension =  [500, 200]
 
 async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
     // Fetch PNG file

@@ -67,7 +67,9 @@ const Index: React.FC<ViewportProps> = (
         pixelStore.loadPixels(wv)
         isLoaded.current = true
 
-        drag(lastDragPoint, [lastDragPoint[0] -3, lastDragPoint[1]])
+
+        // TODO remove drag for testing
+        // drag(lastDragPoint, [lastDragPoint[0] + 460, lastDragPoint[1]])
     }, [])
 
     // Render when in pixel mode
@@ -138,7 +140,7 @@ const Index: React.FC<ViewportProps> = (
             bufferContext.imageSmoothingEnabled = false
 
             // bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
-            drawGrid(bufferContext, zoom, pixelOffset, dimensions)
+            // drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
             drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
             drawOutline(bufferContext, dimensions)
@@ -225,7 +227,6 @@ const Index: React.FC<ViewportProps> = (
     };
 
     function drag(lastDragPoint: Coordinate, mouse: Coordinate) {
-        console.log("draggging")
         const cellWidth = getCellSize(zoom)
 
         const [newPixelOffset, newWorldOffset] = handlePixelChanges(
@@ -239,7 +240,7 @@ const Index: React.FC<ViewportProps> = (
             ],
             cellWidth
         )
-        console.log("newPixelOffset", newPixelOffset[0], "newWorldOffset", newWorldOffset[0])
+        // console.log("newPixelOffset", newPixelOffset[0], "newWorldOffset", newWorldOffset[0])
 
         // console.log("newOffset",newOffset)
         setPixelOffset(newPixelOffset);
