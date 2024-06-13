@@ -110,9 +110,9 @@ const Index: React.FC<ViewportProps> = (
 
             drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldOffset, hoveredCell, pixelStore.getPixel)
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
 
-            // drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
+            drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldOffset, hoveredCell, pixelStore.getPixel)
 
             drawOutline(bufferContext, dimensions)
 
@@ -177,12 +177,11 @@ const Index: React.FC<ViewportProps> = (
                         Math.floor(gridDimensions[0] / 2),
                         Math.floor(gridDimensions[1] / 2)
                     ]
-                    console.log(mouse, center)
+
                     const worldTranslate: Coordinate = [
                         worldOffset[0] + (center[0] - mouse[0]),
                         worldOffset[1] + (center[1] - mouse[1]),
                     ]
-                    console.log(worldTranslate)
                     setWorldOffset(worldTranslate)
                 }
             } else {

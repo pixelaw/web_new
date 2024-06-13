@@ -41,11 +41,11 @@ export function drawPixels(
 
     // const worldCoords = viewToWorld(worldTranslation, [0, 0])
 
-    console.log(
-        "offsets", offsets[0],
-        "pixelOffset", pixelOffset[0],
-        "wt", worldTranslation[0]
-    )
+    // console.log(
+    //     "offsets", offsets[0],
+    //     "pixelOffset", pixelOffset[0],
+    //     "wt", worldTranslation[0]
+    // )
 
     for (let x = 0; x <= gridDimensions[0]; x++) {
         for (let y = 0; y <= gridDimensions[1]; y++) {
@@ -78,47 +78,11 @@ function getRect(
 
 }
 
-// Given a pixelOffset, how much of a tile extends beyond the left/top viewport border?
-// Tricky: 0 should yield 0
-function calculateOffsets([x,y]: Coordinate, cellSize: number): [number, number] {
-    /*
-    PROBLEM: viewport changes to "1" and worldcoord changes, without changing offset!
-
-    true viewport 0 worldcoord 0 offset 0 pixeloffset 0 wt 0
-    true viewport 1 worldcoord 1 offset 0 pixeloffset 0 wt 0
-
-    Only solution i can think of now is to simply always do
-        offset = pos - cellsize
-
-    But this starts to draw the cells fully offscreen
-     */
-
-    const offsetX = /*x == 0 ? 0 :*/ 0 - x// - cellSize;
-    const offsetY = /*y == 0 ? 0 :*/ 0 - y //- cellSize;
-    return [offsetX, offsetY];
-}
 
 
 if (import.meta.vitest) {
     const {it, expect, describe} = import.meta.vitest
 
-
-    describe('calculateOffsets', () => {
-        it('should return [0, 0] when pixelOffset is [0, 0]', () => {
-            const result = calculateOffsets([0, 0], 10);
-            expect(result).toEqual([0, 0]);
-        });
-
-        it('should return correct offsets when pixelOffset is not [0, 0]', () => {
-            const result = calculateOffsets([20, 30], 10);
-            expect(result).toEqual([10, 20]);
-        });
-
-        it('should handle negative offsets correctly', () => {
-            const result = calculateOffsets([-10, -20], 10);
-            expect(result).toEqual([-20, -30]);
-        });
-    });
 
     describe('getRect', () => {
         it('should return correct rectangle dimensions without border and size adjustment', () => {

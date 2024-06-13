@@ -39,6 +39,7 @@ export function drawTiles(
 
     // tileTopLeft is the world position of the topleft tile returned for the given world coord (which is not "snapped" to a tile yet)
     const {tileRows, tileSize, bounds: [tileTopLeft]} = tileset
+
     if(!tileRows.length) {
         console.log("norows");
         return
@@ -58,13 +59,8 @@ export function drawTiles(
         getInitialOffset(tileTopLeft[1] , topleftWorld[1], worldOffset[1])
     ]
 
-    // console.log("topleftWorld", topleftWorld[0], "tileTopLeft", tileTopLeft[0], "initialOffsets",initialOffsets[0])
-
-    console.log("worldOffset",worldOffset)
-
 
     let destY = 0 - (initialOffsets[1] * scaleFactor) - cellOffsetY
-
 
     for (let y = 0; y < tileRows[0].length; y++) {
 
