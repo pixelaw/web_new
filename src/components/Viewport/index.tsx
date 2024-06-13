@@ -28,7 +28,7 @@ interface ViewportProps {
     onCellClick: (coordinate: Coordinate) => void;
 }
 
-const Index: React.FC<ViewportProps> = (
+const Viewport: React.FC<ViewportProps> = (
     {
         dimensions,
         zoom: initialZoom,
@@ -326,5 +326,4 @@ const Index: React.FC<ViewportProps> = (
     );
 };
 
-export default Index;
-
+export default Viewport

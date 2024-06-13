@@ -19,6 +19,7 @@ export function useToriiPixelStore(baseUrl: string): PixelStore {
 
     // Kick off data fetching. It will write the retrieved Pixel data to the state by itself, and report errors in console.
     function fetchData(bounds: Bounds) : void {
+        // eslint-disable-next-line prefer-const
         let [[left, top], [right, bottom]] = bounds
 
         // Adjust to wrapping
