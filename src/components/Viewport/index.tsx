@@ -40,7 +40,7 @@ const Index: React.FC<ViewportProps> = (
     }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [pixelOffset, setPixelOffset] = useState<Coordinate>([0, 0]);
-    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [dragStart, setDragStart] = useState<number>(0);
     const [lastDragPoint, setLastDragPoint] = useState<Coordinate>([0, 0]);
     const [zoom, setZoom] = useState<number>(initialZoom);
     const [center, setCenter] = useState<Coordinate>(initialCenter);
@@ -62,7 +62,7 @@ const Index: React.FC<ViewportProps> = (
         setWorldView(wv)
         console.log("Initial Viewport render")
 
-        pixelStore.loadPixels(wv)
+        // pixelStore.loadPixels(wv)
         isLoaded.current = true
 
 
@@ -108,7 +108,7 @@ const Index: React.FC<ViewportProps> = (
 
             drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore, isDragging)
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore, dragStart)
 
             drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldOffset, hoveredCell, pixelStore.getPixel)
 
@@ -120,7 +120,6 @@ const Index: React.FC<ViewportProps> = (
 
 
     }, [dimensions, zoom, pixelOffset, hoveredCell, pixelStore.getPixel]);
-
 
     // Render when in Tile mode
     useEffect(() => {
@@ -140,7 +139,7 @@ const Index: React.FC<ViewportProps> = (
             // bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
             // drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore, isDragging)
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore, dragStart)
             drawOutline(bufferContext, dimensions)
 
             context.drawImage(bufferCanvas, 0, 0);
@@ -223,7 +222,7 @@ const Index: React.FC<ViewportProps> = (
     }, [hoveredCell]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
-        setIsDragging(true);
+        setDragStart(Date.now());
         setHoveredCell(undefined);
         setLastDragPoint([e.clientX, e.clientY]);
     };
@@ -240,16 +239,14 @@ const Index: React.FC<ViewportProps> = (
             ],
             cellWidth
         )
-        // console.log("newPixelOffset", newPixelOffset[0], "newWorldOffset", newWorldOffset[0])
 
-        // console.log("newOffset",newOffset)
         setPixelOffset(newPixelOffset);
         setWorldOffset(newWorldOffset)
         onCenterChange(center)
     }
 
     const handleMouseMove = (e: React.MouseEvent) => {
-        if (isDragging) {
+        if (dragStart) {
             const mouse: Coordinate = [e.clientX, e.clientY]
             drag(lastDragPoint, mouse)
 
@@ -282,19 +279,16 @@ const Index: React.FC<ViewportProps> = (
         return [topLeft, bottomRight]
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleMouseUp = (e: React.MouseEvent) => {
-        // const rect = e.currentTarget.getBoundingClientRect();
-        // const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
+        if(Date.now() - dragStart < 500){
+            const rect = e.currentTarget.getBoundingClientRect();
+            const viewportCell = cellForPosition(zoom, pixelOffset, [e.clientX - rect.left, e.clientY - rect.top])
+            const worldClicked = applyWorldOffset(worldOffset, viewportCell)
+            console.log(            "clicked cell: ",            worldClicked,        )
+        }
 
-        // console.log(
-        //     "clicked cell viewport: ",
-        //     viewportCell,
-        //     "world:",
-        //     worldCell
-        // )
         if (e.type !== "mouseleave") {
-            pixelStore.loadPixels(worldView)
+            // pixelStore.loadPixels(worldView)
         }
 
         const newWorldview = getWorldViewBounds()
@@ -303,7 +297,7 @@ const Index: React.FC<ViewportProps> = (
             onWorldviewChange(newWorldview)
         }
 
-        setIsDragging(false);
+        setDragStart(0);
     };
 
     return (
