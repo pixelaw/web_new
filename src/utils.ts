@@ -1,6 +1,7 @@
 import {Bounds, Coordinate, MAX_UINT32, Pixel} from "./types.ts";
 import {ZOOM_FACTOR} from "./components/Viewport/constants.ts";
 import UPNG from "upng-js";
+
 export const MAX_VIEW_SIZE = 1_000_000
 
 export function randomColor(): number {
@@ -22,21 +23,22 @@ export function getWrappedTileCoordinate(startingWorldCoordinate: number, index:
     }
     return result
 }
+
 // Change positive means panning right (moving mouse right)
 // So more becomes visible on the left side
-function handlePixelChange(pixelOffset: number, worldOffset: number, change: number, cellWidth:number)
+function handlePixelChange(pixelOffset: number, worldOffset: number, change: number, cellWidth: number)
     : number[] {
 
     pixelOffset += change
 
 
-    if(pixelOffset > cellWidth-1){
+    if (pixelOffset > cellWidth - 1) {
         // Going beyond 9
         worldOffset = worldOffset -= Math.floor(pixelOffset / cellWidth)
-        pixelOffset = (pixelOffset  + cellWidth) % cellWidth;
+        pixelOffset = (pixelOffset + cellWidth) % cellWidth;
 
 
-    }else if (pixelOffset < 0){
+    } else if (pixelOffset < 0) {
         // Dropping below 0
         worldOffset = worldOffset + 1 + Math.abs(Math.ceil(pixelOffset / cellWidth))
         pixelOffset = ((pixelOffset % cellWidth) + cellWidth) % cellWidth;
@@ -53,8 +55,7 @@ export function handlePixelChanges(
     change: Coordinate,
     cellWidth: number
 )
-    : Coordinate[]
-{
+    : Coordinate[] {
 
 
     const [newPixelOffsetX, newWorldOffsetX] = handlePixelChange(pixelOffset[0], worldOffset[0], change[0], cellWidth);
@@ -69,27 +70,27 @@ export function handlePixelChanges(
 export function changePixelOffset(offset: number, change: number, cellWidth: number): number {
     // (pixelOffset[0] + e.clientX - lastDragPoint[0] + cellWidth) % cellWidth
     console.log("offset", offset, "change", change)
-    let result = (offset+change+cellWidth) % cellWidth
+    let result = (offset + change + cellWidth) % cellWidth
     return result
 }
 
 export function wrapOffsetChange(offset: number, change: number): number {
-    let result = offset+change
-    if(result > MAX_UINT32) result = result % (MAX_UINT32+1)
+    let result = offset + change
+    if (result > MAX_UINT32) result = result % (MAX_UINT32 + 1)
     return result
 }
 
-export function getInitialOffset( tileCoord: number,worldCoord: number, offset: number) {
+export function getInitialOffset(tileCoord: number, worldCoord: number, offset: number) {
     // offset = uint2relative(offset)
     let result = worldCoord - tileCoord
 
-    if(result > 0 && offset > 0) result -= 1
+    if (result > 0 && offset > 0) result -= 1
     return result
 }
 
 export function nextTileCoord(tileCoord: number, tileSize: number) {
     let result = tileCoord + tileSize
-    if(result >= MAX_UINT32) result = 0
+    if (result >= MAX_UINT32) result = 0
     return result
 }
 
@@ -153,7 +154,6 @@ export function updateWorldTranslation([worldX, worldY]: Coordinate, [cellX, cel
         (cellX + worldX) >>> 0,
         (cellY + worldY) >>> 0,
     ]
-
 }
 
 
@@ -170,8 +170,8 @@ export function cellForPosition(
     const [posX, posY] = position
 
     // Determine where the topleft cell would start drawing (offscreen because of the scrolling offset)
-    const startDrawingAtX = 0-offsetLeft // == 0 ? 0 : offsetLeft - cellSize
-    const startDrawingAtY = 0 - offsetTop //== 0 ? 0 : offsetTop - cellSize
+    const startDrawingAtX = 0 - offsetLeft
+    const startDrawingAtY = 0 - offsetTop
 
     const x = Math.floor((posX - startDrawingAtX) / cellSize)
     const y = Math.floor((posY - startDrawingAtY) / cellSize)
@@ -202,7 +202,7 @@ export function relative2uint(nr: number): number {
     return nr;
 }
 
-export function areBoundsEqual (boundsA: Bounds, boundsB: Bounds): boolean {
+export function areBoundsEqual(boundsA: Bounds, boundsB: Bounds): boolean {
     // Compare top-left coordinates
     if (boundsA[0][0] !== boundsB[0][0] || boundsA[0][1] !== boundsB[0][1]) {
         return false;
@@ -220,24 +220,25 @@ export function areBoundsEqual (boundsA: Bounds, boundsB: Bounds): boolean {
 // Negative WO means the result increases
 export function applyWorldOffset(worldOffset: Coordinate, viewportCoord: Coordinate): Coordinate {
 
-    function fn(viewport: number, world: number): number{
+    function fn(viewport: number, world: number): number {
 
         // const nor = world % 4294967295
         // Convert world to a relative value
         const rel = uint2relative(world)
-        const raw  = viewport - rel
+        const raw = viewport - rel
         const uint = relative2uint(raw)
 
         return uint
     }
+
     // Convert 4294967295 to -1
     // maxuint - 4294967295 -1
 
     // TODO properly handle input 4294967295
     /// 1 - raw - MAX_UINT32
     return [
-        fn(viewportCoord[0] , worldOffset[0]) ,
-        fn(viewportCoord[1] , worldOffset[1])
+        fn(viewportCoord[0], worldOffset[0]),
+        fn(viewportCoord[1], worldOffset[1])
     ];
 }
 
@@ -255,7 +256,7 @@ export function worldToView(
 
     const isBorder = worldCoord >= startOfBorderTile
 
-    const raw = worldCoord + uint2relative( worldOffset)
+    const raw = worldCoord + uint2relative(worldOffset)
 
     const didCrossBorder = raw > MAX_UINT32
 
@@ -267,11 +268,11 @@ export function worldToView(
 
     let relative = unwrapped
 
-    if((unwrapped > MAX_VIEW_SIZE && isBorder)){
+    if ((unwrapped > MAX_VIEW_SIZE && isBorder)) {
         // example: 4294967294 (is -1)
         relative = unwrapped - MAX_UINT32
 
-    }else if((unwrapped > MAX_VIEW_SIZE && !isBorder)){
+    } else if ((unwrapped > MAX_VIEW_SIZE && !isBorder)) {
         // example: 4294967205 (is -95)
         relative = unwrapped - MAX_UINT32 - (tileSize - tileWrapDiff)
     }
@@ -386,31 +387,31 @@ if (import.meta.vitest) {
     describe("applyWorldOffset should return correct cell coordinates", () => {
 
         it('zeroes', () =>
-            expect(applyWorldOffset([0,0], [0, 0]))
+            expect(applyWorldOffset([0, 0], [0, 0]))
                 .toEqual([0, 0])
         );
 
         it('0 minus one', () =>
-            expect(applyWorldOffset([4294967295,0], [0, 0]))
+            expect(applyWorldOffset([4294967295, 0], [0, 0]))
                 .toEqual([1, 0])
         );
 
         it('160 minus 1', () =>
-            expect(applyWorldOffset([4294967295,0], [160, 0]))
+            expect(applyWorldOffset([4294967295, 0], [160, 0]))
                 .toEqual([161, 0])
         );
 
         it('-1 plus 1', () =>
-            expect(applyWorldOffset([-1,0], [-1, 0]))
+            expect(applyWorldOffset([-1, 0], [-1, 0]))
                 .toEqual([0, 0])
         );
 
         it('plus 1', () =>
-            expect(applyWorldOffset([1,0], [0, 0]))
+            expect(applyWorldOffset([1, 0], [0, 0]))
                 .toEqual([4294967295, 0])
         );
         it('plus 95', () =>
-            expect(applyWorldOffset([95,0], [0, 0]))
+            expect(applyWorldOffset([95, 0], [0, 0]))
                 .toEqual([4294967201, 0])
         );
     })
@@ -427,7 +428,7 @@ if (import.meta.vitest) {
                 expect(uint2relative(0))
                     .toEqual(0)
 
-        }
+            }
         );
     })
 
@@ -480,4 +481,4 @@ if (import.meta.vitest) {
             expect(result).toEqual([0, 0]);
         });
     })
-    }
+}

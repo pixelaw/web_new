@@ -81,6 +81,7 @@ function App() {
     function onCellClick(coordinate: Coordinate) {
         console.log("onCellClick", coordinate)
     }
+
     return (
         <>
             <button onClick={centerUp}>centerUp</button>
