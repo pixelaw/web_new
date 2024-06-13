@@ -9,11 +9,10 @@ import {useToriiPixelStore} from "./hooks/ToriiPixelStore.ts";
 
 import {useUpdateService} from "./hooks/UpdateService.ts";
 
-const ZOOM_TILEMODE = 100
+const ZOOM_PRESETS = {tile: 100, pixel: 3000}
 
-const ZOOM_PIXELMODE = 3100
 
-const DEFAULT_ZOOM = ZOOM_TILEMODE
+const DEFAULT_ZOOM = ZOOM_PRESETS.tile
 
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
 const DEFAULT_DIMENSIONS: Dimension =  [300, 300]
