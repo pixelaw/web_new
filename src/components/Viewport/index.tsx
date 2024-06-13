@@ -181,8 +181,6 @@ const Index: React.FC<ViewportProps> = (
             const cellDiffX = mouseCellAfterZoom[0] - mouseCellBeforeZoom[0];
             const cellDiffY = mouseCellAfterZoom[1] - mouseCellBeforeZoom[1];
 
-            console.log(cellDiffX)
-
             // Adjust the worldOffset by the difference in cell positions
             // This keeps the content under the mouse stationary by adjusting the world offset
             const newWorldOffset: Coordinate = [
