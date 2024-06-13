@@ -1,14 +1,12 @@
 import React, {useRef, useEffect, useState} from 'react';
-import {Bounds, Coordinate, Dimension, MAX_UINT32, PixelStore, TileStore} from "../../types.ts";
+import {Bounds, Coordinate, Dimension, PixelStore, TileStore} from "../../types.ts";
 import {
     cellForPosition,
     getCellSize,
-    updateWorldTranslation,
     applyWorldOffset,
-    wrapOffsetChange,
-    changePixelOffset, handlePixelChanges
+    handlePixelChanges
 } from "../../utils.ts";
-import {ZOOM_MAX, ZOOM_STEP, ZOOM_TILEMODE} from "./constants.ts";
+import {ZOOM_MAX, ZOOM_MIN, ZOOM_SCALEFACTOR, ZOOM_TILEMODE} from "./constants.ts";
 import {drawPixels} from "./drawPixels.ts";
 import {drawOutline} from "./drawOutline.ts";
 import {drawTiles} from "./drawTiles.ts";
@@ -105,7 +103,7 @@ const Index: React.FC<ViewportProps> = (
             Math.floor(gridDimensions[0] / 2),
             Math.floor(gridDimensions[1] / 2)
         ])
-        // console.log("zoom", zoom)
+
         if (zoom > ZOOM_TILEMODE) {
 
             drawGrid(bufferContext, zoom, pixelOffset, dimensions)
@@ -152,49 +150,52 @@ const Index: React.FC<ViewportProps> = (
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
+
+
         const handleWheel = (e: WheelEvent) => {
             e.preventDefault();
 
             const rect = canvas.getBoundingClientRect();
+            let newZoom = zoom;
 
-
-            // adjust the world translate here?
-            let newZoom = zoom
-            if (e.deltaY <= 0) {
-                if (zoom < ZOOM_MAX) {
-                    newZoom += ZOOM_STEP
-
-                    // Adjust world transform
-                    const mouse = cellForPosition(zoom, pixelOffset, [e.clientX - rect.left, e.clientY - rect.top])
-                    const cellSize = getCellSize(zoom)
-
-                    const gridDimensions = [
-                        Math.ceil(dimensions[0] / cellSize),
-                        Math.ceil(dimensions[1] / cellSize)
-                    ]
-
-                    const center = [
-                        Math.floor(gridDimensions[0] / 2),
-                        Math.floor(gridDimensions[1] / 2)
-                    ]
-
-                    const worldTranslate: Coordinate = [
-                        worldOffset[0] + (center[0] - mouse[0]),
-                        worldOffset[1] + (center[1] - mouse[1]),
-                    ]
-                    setWorldOffset(worldTranslate)
-                }
-            } else {
-                // TODO deal with minimum zoom and scalefactor
-                if (zoom > 60) {
-                    newZoom -= ZOOM_STEP
-                } else if (zoom - 5 > 25) {
-                    newZoom -= 5
-                }
+            if (e.deltaY < 0 && zoom < ZOOM_MAX) { // Zoom in
+                newZoom *= ZOOM_SCALEFACTOR;
+            } else if (e.deltaY > 0 && zoom > ZOOM_MIN) { // Zoom out
+                newZoom /= ZOOM_SCALEFACTOR;
             }
 
+            // Ensure newZoom is within bounds
+            newZoom = Math.min(Math.max(newZoom, ZOOM_MIN), ZOOM_MAX);
 
+            // Calculate the mouse position relative to the canvas
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // Convert mouse position to cell coordinates at the current zoom level
+            const mouseCellBeforeZoom = cellForPosition(zoom, pixelOffset, [mouseX, mouseY]);
+
+            // Calculate expected mouse cell position after zoom to keep it under the same world point
+            const mouseCellAfterZoom = cellForPosition(newZoom, pixelOffset, [mouseX, mouseY]);
+
+            // Calculate the difference in cell positions due to zooming
+            const cellDiffX = mouseCellAfterZoom[0] - mouseCellBeforeZoom[0];
+            const cellDiffY = mouseCellAfterZoom[1] - mouseCellBeforeZoom[1];
+
+            console.log(cellDiffX)
+
+            // Adjust the worldOffset by the difference in cell positions
+            // This keeps the content under the mouse stationary by adjusting the world offset
+            const newWorldOffset: Coordinate = [
+                worldOffset[0] + cellDiffX,
+                worldOffset[1] + cellDiffY,
+            ];
+
+            // Update state with new zoom and world offset
             setZoom(newZoom);
+            setWorldOffset(newWorldOffset);
+
+            // Optionally, call your onZoomChange handler
+            onZoomChange(newZoom);
         };
 
         canvas.addEventListener('wheel', handleWheel, {passive: false});
@@ -234,7 +235,7 @@ const Index: React.FC<ViewportProps> = (
             [
                 // mouse[0] - lastDragPoint[0],
                 // mouse[1] - lastDragPoint[1]
-                 lastDragPoint[0] - mouse[0] ,
+                lastDragPoint[0] - mouse[0],
                 lastDragPoint[1] - mouse[1]
             ],
             cellWidth

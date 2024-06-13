@@ -122,27 +122,22 @@ export function updateWorldTranslation([worldX, worldY]: Coordinate, [cellX, cel
 }
 
 
-// Returns viewport cell for the given relative viewport position
 export function cellForPosition(
     zoom: number,
     pixelOffset: Coordinate,
     position: Coordinate
 ): Coordinate {
+    const cellSize = getCellSize(zoom);
+    const [offsetLeft, offsetTop] = pixelOffset;
+    const [posX, posY] = position;
 
-    const cellSize = getCellSize(zoom)
+    // Directly use the offsets to adjust the position
+    const x = Math.floor((posX - offsetLeft) / cellSize);
+    const y = Math.floor((posY - offsetTop) / cellSize);
 
-    const [offsetLeft, offsetTop] = pixelOffset
-    const [posX, posY] = position
-
-    // Determine where the topleft cell would start drawing (offscreen because of the scrolling offset)
-    const startDrawingAtX = offsetLeft == 0 ? 0 : offsetLeft - cellSize
-    const startDrawingAtY = offsetTop == 0 ? 0 : offsetTop - cellSize
-
-    const x = Math.floor((posX - startDrawingAtX) / cellSize)
-    const y = Math.floor((posY - startDrawingAtY) / cellSize)
-
-    return [x, y]
+    return [x, y];
 }
+
 
 
 export function getCellSize(zoom: number) {

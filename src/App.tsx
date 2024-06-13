@@ -14,7 +14,7 @@ const ZOOM_PIXELMODE = 10000
 
 const DEFAULT_ZOOM = ZOOM_PIXELMODE
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
-const DEFAULT_DIMENSIONS: Dimension =  [500, 200]
+const DEFAULT_DIMENSIONS: Dimension =  [300, 300]
 
 async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
     // Fetch PNG file
