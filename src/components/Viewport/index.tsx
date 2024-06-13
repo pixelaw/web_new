@@ -4,7 +4,7 @@ import {
     cellForPosition,
     getCellSize,
     applyWorldOffset,
-    handlePixelChanges
+    handlePixelChanges, areBoundsEqual
 } from "../../utils.ts";
 import {ZOOM_MAX, ZOOM_MIN, ZOOM_SCALEFACTOR, ZOOM_TILEMODE} from "./constants.ts";
 import {drawPixels} from "./drawPixels.ts";
@@ -214,11 +214,11 @@ const Index: React.FC<ViewportProps> = (
     useEffect(() => {
         if (!hoveredCell) return
 
-        console.log(
-            "hoveredCell ", hoveredCell,
-            "offset", pixelOffset,
-            "worldOffset", worldOffset
-        )
+        // console.log(
+        //     "hoveredCell ", hoveredCell,
+        //     "offset", pixelOffset,
+        //     "worldOffset", worldOffset
+        // )
 
     }, [hoveredCell]);
 
@@ -245,7 +245,6 @@ const Index: React.FC<ViewportProps> = (
         // console.log("newOffset",newOffset)
         setPixelOffset(newPixelOffset);
         setWorldOffset(newWorldOffset)
-        onWorldviewChange([[0, 0], [0, 0]])//TODO
         onCenterChange(center)
     }
 
@@ -295,8 +294,13 @@ const Index: React.FC<ViewportProps> = (
         //     worldCell
         // )
         if (e.type !== "mouseleave") {
-            setWorldView(getWorldViewBounds())
             pixelStore.loadPixels(worldView)
+        }
+
+        const newWorldview = getWorldViewBounds()
+        if(!areBoundsEqual(newWorldview, worldView)){
+            setWorldView(getWorldViewBounds())
+            onWorldviewChange(newWorldview)
         }
 
         setIsDragging(false);

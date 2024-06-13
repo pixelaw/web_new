@@ -2,25 +2,23 @@ import {produce} from 'immer';
 import {useState, useEffect, useRef} from 'react';
 import {Bounds, MAX_UINT32, Tile, Tileset, TileStore} from "../types.ts";
 import {set as setIdb, get as getIdb, keys} from 'idb-keyval';
-import {useWs} from "./websocket.ts";
 import {getWrappedTileCoordinate} from "../utils.ts";
 
 type State = { [key: string]: HTMLImageElement | undefined | "" };
 
 const TILESIZE = 100
 
-export function useSimpleTileStore(): TileStore {
+export function useSimpleTileStore(baseUrl: string): TileStore {
     const [state, setState] = useState<State>({});
     const tilesLoadedRef = useRef(false); // Add this line
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [baseURL, setBaseURL] = useState<string>('localhost:3001/tiles');
-    const [ready, val, send] = useWs(`ws://${baseURL}`)
     const fetchCounter = useRef(0);
 
 
     const getImage = (key: string) => {
         fetchCounter.current++
-        fetchImage(`${window.location.protocol}//${baseURL}/${key}.png`).then(async base64Img => {
+
+        fetchImage(`${window.location.protocol}//${baseUrl}/${key}.png`).then(async base64Img => {
             await setIdb(key, base64Img);
             const img = await loadImage(base64Img);
 
@@ -41,27 +39,6 @@ export function useSimpleTileStore(): TileStore {
             console.info('Error loading image:', key, e);
         });
     }
-
-    useEffect(() => {
-        if (ready) {
-            // console.log("ws ready")
-        }
-    }, [ready])
-
-    useEffect(() => {
-        if (val) {
-            console.log("from ws", val)
-            try{
-                const {cmd, data}= JSON.parse(val)
-                if(cmd==="tileChanged"){
-                    setTile(data.tileName, undefined)
-                    console.log(cmd,data)
-                }
-            }catch(e){
-                console.error("Error handling incoming websocket", val)
-            }
-        }
-    }, [val]);
 
     useEffect(() => {
         if (tilesLoadedRef.current  ) return
@@ -95,7 +72,7 @@ export function useSimpleTileStore(): TileStore {
 
     }, []);
 
-    const getTileset = (scaleFactor: number, bounds: Bounds, isDragging: boolean): Tileset | undefined => {
+    const getTileset = (scaleFactor: number, bounds: Bounds): Tileset | undefined => {
 
         const [topLeft, bottomRight] = bounds
         if(fetchCounter.current > 0) {
@@ -106,7 +83,6 @@ export function useSimpleTileStore(): TileStore {
         if(isLoading) return
 
 
-        if(ready && !isDragging) send(JSON.stringify({cmd: "subscribe", data: {boundingBox: bounds}}))
 
         // Choose the tileset Scalefactor based on what's requested
         // TODO handle scalefactor 10 later
@@ -130,8 +106,6 @@ export function useSimpleTileStore(): TileStore {
         const tileBounds: Bounds = [[leftTileCoord, topTileCoord], [rightTileCoord, bottomTileCoord]]
 
         const tileRows = []
-
-
 
         function distance(begin: number, end: number): number{
             return end >= begin
@@ -197,7 +171,7 @@ export function useSimpleTileStore(): TileStore {
         setState(newTiles);
     };
 
-    return {getTile, setTile, setTiles, getTileset, setBaseURL};
+    return {getTile, setTile, setTiles, getTileset};
 }
 
 

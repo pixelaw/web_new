@@ -1,5 +1,6 @@
-import {Coordinate, MAX_UINT32} from "./types.ts";
+import {Bounds, Coordinate, MAX_UINT32, Pixel} from "./types.ts";
 import {ZOOM_FACTOR} from "./components/Viewport/constants.ts";
+import UPNG from "upng-js";
 export const MAX_VIEW_SIZE = 1_000_000
 
 export function randomColor(): number {
@@ -98,6 +99,40 @@ export const numRGBAToHex = (rgba: number | undefined) => {
     return '#' + (color).toString(16).padStart(6, "0")
 }
 
+export async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
+    // Fetch PNG file
+    const response = await fetch(imageUrl);
+    const arrayBuffer = await response.arrayBuffer();
+
+    // Decode PNG file
+    const decodedImage = UPNG.decode(arrayBuffer);
+    const rgbaValues: Uint8Array = new Uint8Array(UPNG.toRGBA8(decodedImage)[0]);
+
+    const pixels = []
+
+    for (let y = 0; y < decodedImage.height; y++) {
+        for (let x = 0; x < decodedImage.width; x++) {
+            const idx = (decodedImage.width * y + x) << 2;
+
+            // Get RGB color from PNG
+            const r = rgbaValues[idx];
+            const g = rgbaValues[idx + 1];
+            const b = rgbaValues[idx + 2];
+            const a = rgbaValues[idx + 3];
+            // Encode RGB color to int
+            const color = (r << 24) | (g << 16) | (b << 8) | a;
+
+            pixels.push({
+                key: `${x},${y}`, pixel: {
+                    action: "", color, id: "", owner: "", text: ""
+                }
+            })
+        }
+    }
+    setPixels(pixels)
+}
+
+
 export async function clearIdb() {
     const DB_NAME = 'keyval-store'; // replace with your database name
     const DB_STORE_NAME = 'keyval'; // replace with your store name
@@ -167,6 +202,17 @@ export function relative2uint(nr: number): number {
     return nr;
 }
 
+export function areBoundsEqual (boundsA: Bounds, boundsB: Bounds): boolean {
+    // Compare top-left coordinates
+    if (boundsA[0][0] !== boundsB[0][0] || boundsA[0][1] !== boundsB[0][1]) {
+        return false;
+    }
+    // Compare bottom-right coordinates
+    if (boundsA[1][0] !== boundsB[1][0] || boundsA[1][1] !== boundsB[1][1]) {
+        return false;
+    }
+    return true;
+}
 
 // Apply WorldOffset to viewport coordinates
 // WorldOffset means "number to add to world to get view"

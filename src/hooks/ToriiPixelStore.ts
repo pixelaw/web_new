@@ -5,20 +5,17 @@ import GET_PIXELS_QUERY from "../../graphql/GetPixels.graphql";
 import {ApolloClient, InMemoryCache} from "@apollo/client";
 import {MAX_VIEW_SIZE} from "../utils.ts";
 
-
 type State = { [key: string]: Pixel | undefined };
 
-
-const gqlClient = new ApolloClient({
-    uri: 'http://localhost:8080/graphql',
-    cache: new InMemoryCache(),
-    connectToDevTools: false,
-});
-
-
-
-export function useToriiPixelStore(): PixelStore {
+export function useToriiPixelStore(baseUrl: string): PixelStore {
     const [state, setState] = useState<State>({});
+
+    // Initialize ApolloClient with dynamic baseUrl
+    const gqlClient = new ApolloClient({
+        uri: `${baseUrl}/graphql`,
+        cache: new InMemoryCache(),
+        connectToDevTools: false,
+    });
 
     // Kick off data fetching. It will write the retrieved Pixel data to the state by itself, and report errors in console.
     function fetchData(bounds: Bounds) : void {
@@ -56,7 +53,7 @@ export function useToriiPixelStore(): PixelStore {
 
     const loadPixels = ([[left, top], [right, bottom]]: Bounds): void => {
 
-        console.log("loadPixels")
+        // console.log("loadPixels")
         // Determine if the coords wrap
         const xWraps = right - left < 0
         const yWraps = bottom - top < 0

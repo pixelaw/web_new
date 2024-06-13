@@ -1,57 +1,31 @@
-import UPNG from 'upng-js';
+
 import './App.css'
 import Index from "./components/Viewport";
 import {useEffect, useRef, useState} from "react";
 import {Coordinate, Dimension, Pixel} from "./types.ts";
 import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
-import {clearIdb} from "./utils.ts";
+import {clearIdb, fillPixelData} from "./utils.ts";
 import {useToriiPixelStore} from "./hooks/ToriiPixelStore.ts";
+
+import {useUpdateService} from "./hooks/UpdateService.ts";
 
 const ZOOM_TILEMODE = 100
 
-const ZOOM_PIXELMODE = 10000
+const ZOOM_PIXELMODE = 3100
 
-const DEFAULT_ZOOM = ZOOM_PIXELMODE
+const DEFAULT_ZOOM = ZOOM_TILEMODE
+
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
 const DEFAULT_DIMENSIONS: Dimension =  [300, 300]
 
-async function fillPixelData(imageUrl: string, setPixels: (pixels: { key: string, pixel: Pixel }[]) => void) {
-    // Fetch PNG file
-    const response = await fetch(imageUrl);
-    const arrayBuffer = await response.arrayBuffer();
-
-    // Decode PNG file
-    const decodedImage = UPNG.decode(arrayBuffer);
-    const rgbaValues: Uint8Array = new Uint8Array(UPNG.toRGBA8(decodedImage)[0]);
-
-    const pixels = []
-
-    for (let y = 0; y < decodedImage.height; y++) {
-        for (let x = 0; x < decodedImage.width; x++) {
-            const idx = (decodedImage.width * y + x) << 2;
-
-            // Get RGB color from PNG
-            const r = rgbaValues[idx];
-            const g = rgbaValues[idx + 1];
-            const b = rgbaValues[idx + 2];
-            const a = rgbaValues[idx + 3];
-            // Encode RGB color to int
-            const color = (r << 24) | (g << 16) | (b << 8) | a;
-
-            pixels.push({
-                key: `${x},${y}`, pixel: {
-                    action: "", color, id: "", owner: "", text: ""
-                }
-            })
-        }
-    }
-    setPixels(pixels)
-}
 
 function App() {
     const [zoom, setZoom] = useState<number>(DEFAULT_ZOOM);
     const [center, setCenter] = useState<Coordinate>(DEFAULT_CENTER);
+    const updateService = useUpdateService(`ws://localhost:3001/tiles`)  // TODO url configurable
+    const pixelStore = useToriiPixelStore("http://localhost:8080");  // TODO url configurable
+    const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
 
     const resetViewport = () => {
         setZoom(DEFAULT_ZOOM);
@@ -64,13 +38,31 @@ function App() {
 
     const fetchedDemoPixels = useRef(false);
 
-    // const pixelStore = useSimplePixelStore();
-    const pixelStore = useToriiPixelStore();
-    const tileStore = useSimpleTileStore();
+
+/*    useEffect(() => {
+        if (ready) {
+            // console.log("ws ready")
+        }
+    }, [ready])
+
+
+    useEffect(() => {
+        if (val) {
+            console.log("from ws", val)
+            try{
+                const {cmd, data}= JSON.parse(val)
+                if(cmd==="tileChanged"){
+                    // setTile(data.tileName, undefined)
+                    console.log(cmd,data)
+                }
+            }catch(e){
+                console.error("Error handling incoming websocket", val)
+            }
+        }
+    }, [val]);*/
 
     useEffect(() => {
         console.log("App rerender")
-        tileStore.setBaseURL("localhost:3001/tiles")
         if (!fetchedDemoPixels.current) {
 
             const _fetchDemoPixels = async () => {
@@ -80,6 +72,11 @@ function App() {
             fetchedDemoPixels.current = true;
         }
     }, []);
+
+    function onWorldviewChange(newWorldview: number[][]) {
+        updateService.setBounds(newWorldview)
+        console.log("onWorldviewChange", newWorldview)
+    }
 
     return (
         <>
@@ -104,9 +101,7 @@ function onZoomChange(_newZoom: number) {
     // console.log("onZoomChange", _newZoom)
 }
 
-function onWorldviewChange(_newWorldview: number[][]) {
-    // console.log("onWorldviewChange", _newWorldview)
-}
+
 
 function onCenterChange(_newCenter: number[]) {
     // console.log("onCenterChange", _newCenter)

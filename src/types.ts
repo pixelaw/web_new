@@ -10,19 +10,29 @@ export type Pixel = {
 
 export type Tile = HTMLImageElement
 
+export type TileChangedMessage = {
+    tileName: string, timestamp: number
+}
+
+export interface UpdateService  {
+    isReady: boolean
+    tileChanged: TileChangedMessage | null
+    setBounds: (newBounds: Bounds) => void
+}
+
 export interface PixelStore  {
     getPixel: (coordinate: Coordinate) => Pixel | undefined;
-    loadPixels: (bounds: Bounds) => void;
+    preparePixels: (bounds: Bounds) => void;
     setPixel: (key: string, pixel: Pixel) => void;
     setPixels: (pixels: {key: string, pixel: Pixel}[]) => void;
 }
 
 export interface TileStore {
+    prepareTiles: (bounds: Bounds) => void;
     getTile: (key: string) => Tile | undefined | "";
     setTile: (key: string, tile: Tile) => Promise<void>;
-    setBaseURL: (value: string) => void;
     setTiles: (tiles: { key: string, tile: Tile }[]) => Promise<void>;
-    getTileset : (scaleFactor:number, bounds: Bounds, isDragging: boolean) => Tileset | undefined;
+    getTileset : (scaleFactor:number, bounds: Bounds) => Tileset | undefined;
 }
 
 export interface Tileset {
