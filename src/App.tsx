@@ -1,11 +1,10 @@
 
 import './App.css'
 import Index from "./components/Viewport";
-import {useEffect, useRef, useState} from "react";
-import {Bounds, Coordinate, Dimension, Pixel} from "./types.ts";
-import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
+import {useEffect, useState} from "react";
+import {Bounds, Coordinate, Dimension} from "./types.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
-import {clearIdb, fillPixelData} from "./utils.ts";
+import {clearIdb} from "./utils.ts";
 import {useToriiPixelStore} from "./hooks/ToriiPixelStore.ts";
 
 import {useUpdateService} from "./hooks/UpdateService.ts";
@@ -36,41 +35,10 @@ function App() {
         setCenter([center[0], center[1]+1000]);
     };
 
-    const fetchedDemoPixels = useRef(false);
-
-
-/*    useEffect(() => {
-        if (ready) {
-            // console.log("ws ready")
-        }
-    }, [ready])
-
-
-    useEffect(() => {
-        if (val) {
-            console.log("from ws", val)
-            try{
-                const {cmd, data}= JSON.parse(val)
-                if(cmd==="tileChanged"){
-                    // setTile(data.tileName, undefined)
-                    console.log(cmd,data)
-                }
-            }catch(e){
-                console.error("Error handling incoming websocket", val)
-            }
-        }
-    }, [val]);*/
-
     useEffect(() => {
         console.log("App rerender")
-        if (!fetchedDemoPixels.current) {
 
-            const _fetchDemoPixels = async () => {
-                await fillPixelData("/drawing.png", pixelStore.setPixels);
-            };
-            // _fetchDemoPixels();
-            fetchedDemoPixels.current = true;
-        }
+
     }, []);
 
     function onWorldviewChange(newWorldview: Bounds) {
