@@ -43,6 +43,8 @@ const Index: React.FC<ViewportProps> = (
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [pixelOffset, setPixelOffset] = useState<Coordinate>([0, 0]);
     const [dragStart, setDragStart] = useState<number>(0);
+    const dragStartPoint = useRef<Coordinate | null>(null);
+
     const [lastDragPoint, setLastDragPoint] = useState<Coordinate>([0, 0]);
     const [zoom, setZoom] = useState<number>(initialZoom);
     const [center, setCenter] = useState<Coordinate>(initialCenter);
@@ -110,7 +112,7 @@ const Index: React.FC<ViewportProps> = (
 
             drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore, dragStart)
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
 
             drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldOffset, hoveredCell, pixelStore.getPixel)
 
@@ -226,6 +228,7 @@ const Index: React.FC<ViewportProps> = (
     const handleMouseDown = (e: React.MouseEvent) => {
         setDragStart(Date.now());
         setHoveredCell(undefined);
+        dragStartPoint.current = [e.clientX, e.clientY] as Coordinate
         setLastDragPoint([e.clientX, e.clientY]);
     };
 
@@ -282,7 +285,16 @@ const Index: React.FC<ViewportProps> = (
     }
 
     const handleMouseUp = (e: React.MouseEvent) => {
-        if (Date.now() - dragStart < 500) {
+        let distance = 0
+        if (dragStartPoint.current !== null) {
+            const startPos = dragStartPoint.current;
+            const endPos: Coordinate = [e.clientX, e.clientY];
+            distance = Math.sqrt(Math.pow(endPos[0] - startPos[0], 2) + Math.pow(endPos[1] - startPos[1], 2));
+        }
+
+        const timeDiff =  Date.now() - dragStart;
+
+        if (timeDiff < 500 && distance < 10) {
             const rect = e.currentTarget.getBoundingClientRect();
             const viewportCell = cellForPosition(zoom, pixelOffset, [e.clientX - rect.left, e.clientY - rect.top])
             const worldClicked = applyWorldOffset(worldOffset, viewportCell)
@@ -300,6 +312,7 @@ const Index: React.FC<ViewportProps> = (
         }
 
         setDragStart(0);
+        dragStartPoint.current = null
     };
 
     return (

@@ -71,7 +71,7 @@ export function drawTiles(
         tileSizes[0]  = (tileTopLeft[0] + tileSize > MAX_UINT32)?MAX_UINT32 % tileSize:tileSize
 
         for (let x = 0; x < tileRows.length; x++) {
-            
+
             const tile = tileRows[x][y]
             if (tile) {
 

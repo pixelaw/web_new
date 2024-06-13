@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {Bounds, UpdateService} from "../types.ts";
 
 let socket: WebSocket | null = null;
