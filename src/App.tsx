@@ -11,7 +11,6 @@ import Viewport from "./components/Viewport";
 const ZOOM_PRESETS = {tile: 100, pixel: 3000}
 const DEFAULT_ZOOM = ZOOM_PRESETS.tile
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
-const DEFAULT_DIMENSIONS: Dimension =  [300, 300]
 
 
 function App() {
@@ -20,6 +19,7 @@ function App() {
     const updateService = useUpdateService(`ws://localhost:3001/tiles`)  // TODO url configurable
     const pixelStore = useToriiPixelStore("http://localhost:8080");  // TODO url configurable
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
+    const [dimensions, setDimensions] = useState<Dimension>([window.innerWidth, window.innerHeight]);
 
     const resetViewport = () => {
         setZoom(DEFAULT_ZOOM);
@@ -30,10 +30,16 @@ function App() {
         setCenter([center[0], center[1]+1000]);
     };
 
+    const updateDimensions = () => {
+        const width = window.innerWidth
+        const height = window.innerHeight
+        setDimensions([width, height]);
+    };
+
     useEffect(() => {
-        console.log("App rerender")
-
-
+        updateDimensions(); // Set initial dimensions
+        window.addEventListener('resize', updateDimensions); // Update dimensions on resize
+        return () => window.removeEventListener('resize', updateDimensions); // Cleanup listener
     }, []);
 
     function onWorldviewChange(newWorldview: Bounds) {
@@ -46,14 +52,15 @@ function App() {
     }
 
     return (
-        <>
-            <button onClick={centerUp}>centerUp</button>
-            <button onClick={resetViewport}>reset</button>
-            <button onClick={clearIdb}>Clear IndexedDB</button>
+        <div >
+
+            {/*<button onClick={centerUp}>centerUp</button>*/}
+            {/*<button onClick={resetViewport}>reset</button>*/}
+            {/*<button onClick={clearIdb}>Clear IndexedDB</button>*/}
             <Viewport
                 tileStore={tileStore}
                 pixelStore={pixelStore}
-                dimensions={DEFAULT_DIMENSIONS}
+                dimensions={dimensions}
                 zoom={zoom}
                 center={center}
                 onWorldviewChange={onWorldviewChange}
@@ -61,7 +68,7 @@ function App() {
                 onZoomChange={onZoomChange}
                 onCellClick={onCellClick}
             />
-        </>
+        </div>
     )
 }
 
