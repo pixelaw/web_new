@@ -6,14 +6,10 @@ import {Bounds, Coordinate, Dimension} from "./types.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb} from "./utils.ts";
 import {useToriiPixelStore} from "./hooks/ToriiPixelStore.ts";
-
 import {useUpdateService} from "./hooks/UpdateService.ts";
 
 const ZOOM_PRESETS = {tile: 100, pixel: 3000}
-
-
 const DEFAULT_ZOOM = ZOOM_PRESETS.tile
-
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
 const DEFAULT_DIMENSIONS: Dimension =  [300, 300]
 
@@ -69,17 +65,12 @@ function App() {
     )
 }
 
-
-
 function onZoomChange(_newZoom: number) {
     // console.log("onZoomChange", _newZoom)
 }
 
-
-
 function onCenterChange(_newCenter: number[]) {
     // console.log("onCenterChange", _newCenter)
-
 }
 
 export default App
