@@ -2,7 +2,7 @@
 import './App.css'
 import Index from "./components/Viewport";
 import {useEffect, useRef, useState} from "react";
-import {Coordinate, Dimension, Pixel} from "./types.ts";
+import {Bounds, Coordinate, Dimension, Pixel} from "./types.ts";
 import {useSimplePixelStore} from "./hooks/SimplePixelStore.ts";
 import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
 import {clearIdb, fillPixelData} from "./utils.ts";
@@ -73,11 +73,14 @@ function App() {
         }
     }, []);
 
-    function onWorldviewChange(newWorldview: number[][]) {
+    function onWorldviewChange(newWorldview: Bounds) {
         updateService.setBounds(newWorldview)
-        console.log("onWorldviewChange", newWorldview)
+        // console.log("onWorldviewChange", newWorldview)
     }
 
+    function onCellClick(coordinate: Coordinate) {
+        console.log("onCellClick", coordinate)
+    }
     return (
         <>
             <button onClick={centerUp}>centerUp</button>
@@ -92,10 +95,13 @@ function App() {
                 onWorldviewChange={onWorldviewChange}
                 onCenterChange={onCenterChange}
                 onZoomChange={onZoomChange}
+                onCellClick={onCellClick}
             />
         </>
     )
 }
+
+
 
 function onZoomChange(_newZoom: number) {
     // console.log("onZoomChange", _newZoom)

@@ -25,6 +25,7 @@ interface ViewportProps {
     onZoomChange: (newZoom: number) => void;
     onCenterChange: (newCenter: Coordinate) => void;
     onWorldviewChange: (newWorldview: Bounds) => void;
+    onCellClick: (coordinate: Coordinate) => void;
 }
 
 const Index: React.FC<ViewportProps> = (
@@ -36,7 +37,8 @@ const Index: React.FC<ViewportProps> = (
         onWorldviewChange,
         onZoomChange,
         pixelStore,
-        tileStore
+        tileStore,
+        onCellClick
     }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [pixelOffset, setPixelOffset] = useState<Coordinate>([0, 0]);
@@ -67,7 +69,7 @@ const Index: React.FC<ViewportProps> = (
 
 
         // TODO remove drag for testing
-        drag(lastDragPoint, [lastDragPoint[0] , lastDragPoint[1] + 75])
+        drag(lastDragPoint, [lastDragPoint[0], lastDragPoint[1] + 75])
     }, [])
 
     // Render when in pixel mode
@@ -139,7 +141,7 @@ const Index: React.FC<ViewportProps> = (
             // bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
             // drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore, dragStart)
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
             drawOutline(bufferContext, dimensions)
 
             context.drawImage(bufferCanvas, 0, 0);
@@ -280,11 +282,11 @@ const Index: React.FC<ViewportProps> = (
     }
 
     const handleMouseUp = (e: React.MouseEvent) => {
-        if(Date.now() - dragStart < 500){
+        if (Date.now() - dragStart < 500) {
             const rect = e.currentTarget.getBoundingClientRect();
             const viewportCell = cellForPosition(zoom, pixelOffset, [e.clientX - rect.left, e.clientY - rect.top])
             const worldClicked = applyWorldOffset(worldOffset, viewportCell)
-            console.log(            "clicked cell: ",            worldClicked,        )
+            onCellClick(worldClicked)
         }
 
         if (e.type !== "mouseleave") {
@@ -292,7 +294,7 @@ const Index: React.FC<ViewportProps> = (
         }
 
         const newWorldview = getWorldViewBounds()
-        if(!areBoundsEqual(newWorldview, worldView)){
+        if (!areBoundsEqual(newWorldview, worldView)) {
             setWorldView(getWorldViewBounds())
             onWorldviewChange(newWorldview)
         }
