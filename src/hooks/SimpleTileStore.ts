@@ -95,7 +95,7 @@ export function useSimpleTileStore(): TileStore {
 
     }, []);
 
-    const getTileset = (scaleFactor: number, bounds: Bounds): Tileset | undefined => {
+    const getTileset = (scaleFactor: number, bounds: Bounds, isDragging: boolean): Tileset | undefined => {
 
         const [topLeft, bottomRight] = bounds
         if(fetchCounter.current > 0) {
@@ -106,11 +106,11 @@ export function useSimpleTileStore(): TileStore {
         if(isLoading) return
 
 
-        if(ready) send(JSON.stringify({cmd: "subscribe", data: {boundingBox: bounds}}))
+        if(ready && !isDragging) send(JSON.stringify({cmd: "subscribe", data: {boundingBox: bounds}}))
 
         // Choose the tileset Scalefactor based on what's requested
         // TODO handle scalefactor 10 later
-        let tileScaleFactor = 1 //scaleFactor <= 10 ? 1 : 10
+        const tileScaleFactor = 1 //scaleFactor <= 10 ? 1 : 10
 
         // Determine the world coordinate size of each tile
         // Example, when tilesize is 100 and tileScaleFactor is 10, there will be 1000 world coordinates in one tile's width/height
@@ -129,7 +129,7 @@ export function useSimpleTileStore(): TileStore {
 
         const tileBounds: Bounds = [[leftTileCoord, topTileCoord], [rightTileCoord, bottomTileCoord]]
 
-        let tileRows = []
+        const tileRows = []
 
 
 
@@ -143,7 +143,7 @@ export function useSimpleTileStore(): TileStore {
         const height = distance(topTileCoord, bottomTileCoord)
 
         for (let x = 0; x <= width; x += tileWorldSize) {
-            let tileRow: (Tile | undefined | "")[] = []
+            const tileRow: (Tile | undefined | "")[] = []
             for (let y = 0; y <= height; y+=tileWorldSize) {
 
                 const tileX = getWrappedTileCoordinate(leftTileCoord , x, tileWorldSize);
@@ -205,7 +205,7 @@ export function useSimpleTileStore(): TileStore {
 const loadImage = (base64: string): Promise<HTMLImageElement> => {
 
     return new Promise((resolve, reject) => {
-        let img = new Image();
+        const img = new Image();
         img.onload = () => resolve(img);
         img.onerror = reject;
         img.src = base64;

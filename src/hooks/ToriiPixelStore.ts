@@ -56,7 +56,7 @@ export function useToriiPixelStore(): PixelStore {
 
     const loadPixels = ([[left, top], [right, bottom]]: Bounds): void => {
 
-        // console.log("loadPixels")
+        console.log("loadPixels")
         // Determine if the coords wrap
         const xWraps = right - left < 0
         const yWraps = bottom - top < 0

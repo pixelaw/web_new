@@ -15,7 +15,8 @@ export function drawTiles(
     pixelOffset: Coordinate,
     dimensions: Dimension,
     worldOffset: Coordinate,
-    tileStore: TileStore
+    tileStore: TileStore,
+    isDragging: boolean
 ) {
 
     // moved one tile and 5 pixels to the right
@@ -33,7 +34,8 @@ export function drawTiles(
 
     const tileset = tileStore.getTileset(
         zoom / ZOOM_FACTOR,
-        [topleftWorld, bottomrightWorld]
+        [topleftWorld, bottomrightWorld],
+        isDragging
     )
     if (!tileset) return
 

@@ -108,7 +108,7 @@ const Index: React.FC<ViewportProps> = (
 
             drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore, isDragging)
 
             drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldOffset, hoveredCell, pixelStore.getPixel)
 
@@ -140,7 +140,7 @@ const Index: React.FC<ViewportProps> = (
             // bufferContext!.clearRect(0, 0, bufferCanvas.width, bufferCanvas.height);
             // drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
+            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore, isDragging)
             drawOutline(bufferContext, dimensions)
 
             context.drawImage(bufferCanvas, 0, 0);
@@ -293,6 +293,8 @@ const Index: React.FC<ViewportProps> = (
         //     worldCell
         // )
         if (e.type !== "mouseleave") {
+
+
             setWorldView(getWorldViewBounds())
             pixelStore.loadPixels(worldView)
 

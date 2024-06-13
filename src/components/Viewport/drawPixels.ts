@@ -34,7 +34,7 @@ export function drawPixels(
 
         context.fillStyle = numRGBAToHex(pixel.color);
 
-        const [x, y, w, h] = getRect(offsets, cellX,cellY,cellSize,doBorder,sizeAdjustment)
+        const [x, y, w, h] = getRect(offsets, cellX, cellY, cellSize, doBorder, sizeAdjustment)
 
         context.fillRect(x, y, w, h);
     };
@@ -77,7 +77,6 @@ function getRect(
     ]
 
 }
-
 
 
 if (import.meta.vitest) {

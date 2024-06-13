@@ -15,14 +15,14 @@ export interface PixelStore  {
     loadPixels: (bounds: Bounds) => void;
     setPixel: (key: string, pixel: Pixel) => void;
     setPixels: (pixels: {key: string, pixel: Pixel}[]) => void;
-};
+}
 
 export interface TileStore {
     getTile: (key: string) => Tile | undefined | "";
     setTile: (key: string, tile: Tile) => Promise<void>;
     setBaseURL: (value: string) => void;
     setTiles: (tiles: { key: string, tile: Tile }[]) => Promise<void>;
-    getTileset : (scaleFactor:number, bounds: Bounds) => Tileset | undefined;
+    getTileset : (scaleFactor:number, bounds: Bounds, isDragging: boolean) => Tileset | undefined;
 }
 
 export interface Tileset {
