@@ -67,7 +67,7 @@ const Index: React.FC<ViewportProps> = (
 
 
         // TODO remove drag for testing
-        // drag(lastDragPoint, [lastDragPoint[0] + 460, lastDragPoint[1]])
+        drag(lastDragPoint, [lastDragPoint[0] , lastDragPoint[1] + 75])
     }, [])
 
     // Render when in pixel mode
@@ -183,14 +183,13 @@ const Index: React.FC<ViewportProps> = (
 
             // Adjust the worldOffset by the difference in cell positions
             // This keeps the content under the mouse stationary by adjusting the world offset
-            const newWorldOffset: Coordinate = [
-                worldOffset[0] + cellDiffX,
-                worldOffset[1] + cellDiffY,
-            ];
+            setWorldOffset((currentWorldOffset) => [
+                currentWorldOffset[0] + cellDiffX,
+                currentWorldOffset[1] + cellDiffY,
+            ]);
 
             // Update state with new zoom and world offset
             setZoom(newZoom);
-            setWorldOffset(newWorldOffset);
 
             // Optionally, call your onZoomChange handler
             onZoomChange(newZoom);
@@ -214,7 +213,12 @@ const Index: React.FC<ViewportProps> = (
     // TODO
     useEffect(() => {
         if (!hoveredCell) return
-        // console.log("hoveredCell changed to ", hoveredCell, pixelStore.getPixel(hoveredCell))
+
+        console.log(
+            "hoveredCell ", hoveredCell,
+            "offset", pixelOffset,
+            "worldOffset", worldOffset
+        )
 
     }, [hoveredCell]);
 
@@ -231,8 +235,6 @@ const Index: React.FC<ViewportProps> = (
             [...pixelOffset],
             [...worldOffset],
             [
-                // mouse[0] - lastDragPoint[0],
-                // mouse[1] - lastDragPoint[1]
                 lastDragPoint[0] - mouse[0],
                 lastDragPoint[1] - mouse[1]
             ],
@@ -257,8 +259,10 @@ const Index: React.FC<ViewportProps> = (
             if (zoom > ZOOM_TILEMODE) {
                 const rect = e.currentTarget.getBoundingClientRect();
 
-                const viewportCell = cellForPosition(zoom, pixelOffset, [e.clientX - rect.left, e.clientY - rect.top])
-
+                const viewportCell = cellForPosition(zoom, pixelOffset, [
+                    e.clientX - rect.left,
+                    e.clientY - rect.top
+                ])
                 if (
                     (!hoveredCell && viewportCell) ||
                     hoveredCell && (hoveredCell[0] !== viewportCell[0] || hoveredCell[1] !== viewportCell[1])
@@ -283,9 +287,7 @@ const Index: React.FC<ViewportProps> = (
     const handleMouseUp = (e: React.MouseEvent) => {
         // const rect = e.currentTarget.getBoundingClientRect();
         // const viewportCell = cellForPosition(zoom, pixelOffset, dimensions, [e.clientX - rect.left, e.clientY - rect.top])
-        //
 
-        //
         // console.log(
         //     "clicked cell viewport: ",
         //     viewportCell,
@@ -293,11 +295,8 @@ const Index: React.FC<ViewportProps> = (
         //     worldCell
         // )
         if (e.type !== "mouseleave") {
-
-
             setWorldView(getWorldViewBounds())
             pixelStore.loadPixels(worldView)
-
         }
 
         setIsDragging(false);
