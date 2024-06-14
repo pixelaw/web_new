@@ -1,4 +1,3 @@
-
 import './App.css'
 import {useEffect, useState} from "react";
 import {Bounds, Coordinate, Dimension} from "./webtools/types.ts";
@@ -8,11 +7,11 @@ import {useToriiPixelStore} from "./webtools/hooks/ToriiPixelStore.ts";
 import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
 import Viewport from "./webtools/components/Viewport";
 import { WalletAddress } from './components/WalletAddress';
+import ColorPlaette from './components/ColorPalette';
 
-const ZOOM_PRESETS = {tile: 100, pixel: 3000}
+const ZOOM_PRESETS = { tile: 100, pixel: 3000 }
 const DEFAULT_ZOOM = ZOOM_PRESETS.tile
-const DEFAULT_CENTER: Coordinate = [4294967294,0]
-
+const DEFAULT_CENTER: Coordinate = [4294967294, 0]
 
 function App() {
     const [zoom, setZoom] = useState<number>(DEFAULT_ZOOM);
@@ -28,7 +27,7 @@ function App() {
     };
 
     const centerUp = () => {
-        setCenter([center[0], center[1]+1000]);
+        setCenter([center[0], center[1] + 1000]);
     };
 
     const updateDimensions = () => {
@@ -52,20 +51,30 @@ function App() {
         console.log("onCellClick", coordinate)
     }
 
+    const colors = [
+        "#FF0000",
+        "#FF7F00",
+        "#FFFF00",
+        "#00FF00",
+        "#0000FF",
+        "#4B0082",
+        "#9400D3",
+        "#FFFFFF", // white
+        "#000000"  // black
+    ];
+
     return (
-        <div className='bg-bg-primary min-h-screen flex flex-col'>
+        <div className='App bg-bg-primary'>
             <div className='w-full h-12 bg-header-primary flex items-center justify-between px-4'>
-                <div className='w-[139px] h-[46px] cursor-pointer'>
-                    <img src="/src/assets/logo/pixeLaw-logo.png" />
+                <div className='text-white text-lg font-bold'>
+                    p/war
                 </div>
 
-                
-                
+                <div className='text-white text-lg font-bold'>
+                    Governance page
+                </div>
             </div>
 
-            {/*<button onClick={centerUp}>centerUp</button>*/}
-            {/*<button onClick={resetViewport}>reset</button>*/}
-            {/*<button onClick={clearIdb}>Clear IndexedDB</button>*/}
             <div className='flex-grow'>
                 <Viewport
                     tileStore={tileStore}
@@ -79,6 +88,9 @@ function App() {
                     onCellClick={onCellClick}
                 />
             </div>
+
+            <ColorPlaette />
+            
         </div>
     )
 }
