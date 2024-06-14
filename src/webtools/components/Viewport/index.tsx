@@ -11,6 +11,7 @@ import {drawPixels} from "./drawPixels.ts";
 import {drawOutline} from "./drawOutline.ts";
 import {drawTiles} from "./drawTiles.ts";
 import {drawGrid} from "./drawGrid.ts";
+import useDimensions from "../../hooks/useDimensions.ts";
 
 const bufferCanvas = document.createElement('canvas');
 const bufferContext = bufferCanvas.getContext('2d');
@@ -19,7 +20,6 @@ const bufferContext = bufferCanvas.getContext('2d');
 interface ViewportProps {
     pixelStore: PixelStore;
     tileStore: TileStore;
-    dimensions: Dimension;
     zoom: number;
     center: Coordinate;
     onZoomChange: (newZoom: number) => void;
@@ -30,7 +30,6 @@ interface ViewportProps {
 
 const Viewport: React.FC<ViewportProps> = (
     {
-        dimensions,
         zoom: initialZoom,
         center: initialCenter,
         onCenterChange,
@@ -40,6 +39,9 @@ const Viewport: React.FC<ViewportProps> = (
         tileStore,
         onCellClick
     }) => {
+    const wrapperRef = useRef(null);
+    const dimensions = useDimensions(wrapperRef);
+
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [pixelOffset, setPixelOffset] = useState<Coordinate>([0, 0]);
     const [dragStart, setDragStart] = useState<number>(0);
@@ -71,7 +73,8 @@ const Viewport: React.FC<ViewportProps> = (
 
 
         // TODO remove drag for testing
-        drag(lastDragPoint, [lastDragPoint[0], lastDragPoint[1] + 75])
+        // drag(lastDragPoint, [lastDragPoint[0], lastDragPoint[1] + 75])
+
     }, [])
 
     // Render when in pixel mode
@@ -296,7 +299,7 @@ const Viewport: React.FC<ViewportProps> = (
             distance = Math.sqrt(Math.pow(endPos[0] - startPos[0], 2) + Math.pow(endPos[1] - startPos[1], 2));
         }
 
-        const timeDiff =  Date.now() - dragStart;
+        const timeDiff = Date.now() - dragStart;
 
         if (timeDiff < 500 && distance < 10) {
             const rect = e.currentTarget.getBoundingClientRect();
@@ -320,13 +323,15 @@ const Viewport: React.FC<ViewportProps> = (
     };
 
     return (
-        <canvas
-            ref={canvasRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-        />
+        <div ref={wrapperRef} style={{width: '100%', height: '100%'}}>
+            <canvas width={dimensions[0]} height={dimensions[1]}
+                    ref={canvasRef}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+            />
+        </div>
     );
 };
 
