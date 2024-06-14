@@ -22,7 +22,7 @@ export function drawGrid(context: CanvasRenderingContext2D, zoom: number, pixelO
         context.moveTo(0, j);
         context.lineTo(width, j);
     }
-    context.strokeStyle = "#ddd";
+    context.strokeStyle = "#4B2A5E";
     context.stroke();
 
 
