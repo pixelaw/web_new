@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Bounds, Coordinate, MAX_UINT32, Pixel, PixelStore} from "../types.ts";
 import {produce} from 'immer';
-import GET_PIXELS_QUERY from "../../graphql/GetPixels.graphql";
+import GET_PIXELS_QUERY from "../../../graphql/GetPixels.graphql";
 import {ApolloClient, InMemoryCache} from "@apollo/client";
 import {MAX_VIEW_SIZE} from "../utils.ts";
 
