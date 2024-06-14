@@ -1,13 +1,13 @@
 
 import './App.css'
 import {useEffect, useState} from "react";
-import {Bounds, Coordinate, Dimension} from "./webtools/types.ts";
-import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
-import {clearIdb} from "./webtools/utils.ts";
-import {useToriiPixelStore} from "./webtools/hooks/ToriiPixelStore.ts";
-import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
-import Viewport from "./webtools/components/Viewport";
-import TopBar from "./components/TopBar.tsx";
+import {Bounds, Coordinate, Dimension} from "./types.ts";
+import {useSimpleTileStore} from "./hooks/SimpleTileStore.ts";
+import {clearIdb} from "./utils.ts";
+import {useToriiPixelStore} from "./hooks/ToriiPixelStore.ts";
+import {useUpdateService} from "./hooks/UpdateService.ts";
+import Viewport from "./components/Viewport";
+import { WalletAddress } from './components/WalletAddress';
 
 const ZOOM_PRESETS = {tile: 100, pixel: 3000}
 const DEFAULT_ZOOM = ZOOM_PRESETS.tile
@@ -45,7 +45,7 @@ function App() {
 
     function onWorldviewChange(newWorldview: Bounds) {
         updateService.setBounds(newWorldview)
-        console.log("onWorldviewChange", newWorldview)
+        // console.log("onWorldviewChange", newWorldview)
     }
 
     function onCellClick(coordinate: Coordinate) {
@@ -53,29 +53,38 @@ function App() {
     }
 
     return (
-        <div >
+        <div className='bg-bg-primary min-h-screen flex flex-col'>
+            <div className='w-full h-12 bg-header-primary flex items-center justify-between px-4'>
+                <div className='w-[139px] h-[46px] cursor-pointer'>
+                    <img src="/src/assets/logo/pixeLaw-logo.png" />
+                </div>
+
+                
+                
+            </div>
 
             {/*<button onClick={centerUp}>centerUp</button>*/}
             {/*<button onClick={resetViewport}>reset</button>*/}
             {/*<button onClick={clearIdb}>Clear IndexedDB</button>*/}
-            <TopBar />
-            <Viewport
-                tileStore={tileStore}
-                pixelStore={pixelStore}
-                dimensions={dimensions}
-                zoom={zoom}
-                center={center}
-                onWorldviewChange={onWorldviewChange}
-                onCenterChange={onCenterChange}
-                onZoomChange={onZoomChange}
-                onCellClick={onCellClick}
-            />
+            <div className='flex-grow'>
+                <Viewport
+                    tileStore={tileStore}
+                    pixelStore={pixelStore}
+                    dimensions={dimensions}
+                    zoom={zoom}
+                    center={center}
+                    onWorldviewChange={onWorldviewChange}
+                    onCenterChange={onCenterChange}
+                    onZoomChange={onZoomChange}
+                    onCellClick={onCellClick}
+                />
+            </div>
         </div>
     )
 }
 
-function onZoomChange(newZoom: number) {
-    console.log("onZoomChange", newZoom)
+function onZoomChange(_newZoom: number) {
+    // console.log("onZoomChange", _newZoom)
 }
 
 function onCenterChange(_newCenter: number[]) {

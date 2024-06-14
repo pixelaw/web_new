@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -27,10 +26,18 @@ a:hover {
   color: #535bf2;
 }
 
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+body {
   display: flex;
-  place-items: center;
+  flex-direction: column;
+  /* place-items: center;  削除 */
   min-width: 320px;
   min-height: 100vh;
 }
