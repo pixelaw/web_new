@@ -1,5 +1,6 @@
 import './App.css'
 import {useEffect, useState} from "react";
+import { Link } from 'react-router-dom';
 import {Bounds, Coordinate, Dimension} from "./webtools/types.ts";
 import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
 import {clearIdb} from "./webtools/utils.ts";
@@ -8,6 +9,7 @@ import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
 import Viewport from "./webtools/components/Viewport";
 import { WalletAddress } from './components/WalletAddress';
 import ColorPlaette from './components/ColorPalette';
+
 
 const ZOOM_PRESETS = { tile: 100, pixel: 3000 }
 const DEFAULT_ZOOM = ZOOM_PRESETS.tile
@@ -58,9 +60,9 @@ function App() {
                     p/war
                 </div>
 
-                <div className='text-white text-lg font-bold'>
+                <Link to="/governance" className='text-white text-lg font-bold'>
                     Governance page
-                </div>
+                </Link>
             </div>
 
             <div className='flex-grow'>
