@@ -1,12 +1,12 @@
 import './App.css'
-import { useEffect, useState } from "react";
-import { Bounds, Coordinate, Dimension } from "./types.ts";
-import { useSimpleTileStore } from "./hooks/SimpleTileStore.ts";
-import { clearIdb } from "./utils.ts";
-import { useToriiPixelStore } from "./hooks/ToriiPixelStore.ts";
-import { useUpdateService } from "./hooks/UpdateService.ts";
-import Viewport from "./components/Viewport";
-import WalletAddress from './components/WalletAddress'; 
+import {useEffect, useState} from "react";
+import {Bounds, Coordinate, Dimension} from "./webtools/types.ts";
+import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
+import {clearIdb} from "./webtools/utils.ts";
+import {useToriiPixelStore} from "./webtools/hooks/ToriiPixelStore.ts";
+import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
+import Viewport from "./webtools/components/Viewport";
+import { WalletAddress } from './components/WalletAddress';
 import ColorPlaette from './components/ColorPalette';
 
 const ZOOM_PRESETS = { tile: 100, pixel: 3000 }

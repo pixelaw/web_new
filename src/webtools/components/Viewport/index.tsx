@@ -168,7 +168,7 @@ const Viewport: React.FC<ViewportProps> = (
             }
 
             // Ensure newZoom is within bounds
-            newZoom = Math.min(Math.max(newZoom, ZOOM_MIN), ZOOM_MAX);
+            newZoom = Math.round(Math.min(Math.max(newZoom, ZOOM_MIN), ZOOM_MAX))
 
             // Calculate the mouse position relative to the canvas
             const mouseX = e.clientX - rect.left;
@@ -201,7 +201,11 @@ const Viewport: React.FC<ViewportProps> = (
         canvas.addEventListener('wheel', handleWheel, {passive: false});
 
         onCenterChange(center)
-        onWorldviewChange([[0, 0], [0, 0]])//TODO
+        const newWorldview = getWorldViewBounds()
+        if (!areBoundsEqual(newWorldview, worldView)) {
+            setWorldView(getWorldViewBounds())
+            onWorldviewChange(newWorldview)
+        }
         onZoomChange(zoom)
         return () => {
             canvas.removeEventListener('wheel', handleWheel);
