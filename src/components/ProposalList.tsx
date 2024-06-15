@@ -90,7 +90,7 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
           </Link>
         </div>
       </div>
-      <div className='overflow-y-auto pr-6 pl-6' style={{ height: `calc(100vh - ${headerHeight}px - 112px)` }}>
+      <div className='overflow-y-auto px-6' style={{ height: `calc(100vh - ${headerHeight}px - 112px)` }}>
         <div className='space-y-4'>
           {filteredProposals.map((proposal, index) => (
             <Link key={index} to={`/proposal/${proposal.id}`} className='block'>
