@@ -46,3 +46,13 @@ body {
   height: 100vh; /* Fill the full viewport height */
   width: 100vw; /* Fill the full viewport height */
 }
+
+.colorpicker {
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background-color: transparent; /* Background for entire container is transparent */
+  z-index: 10; /* Ensure it is on top */
+}
+

@@ -1,6 +1,6 @@
 
 import './App.css'
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {Bounds, Coordinate} from "./webtools/types.ts";
 import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
 import {clearIdb} from "./webtools/utils.ts";
@@ -16,7 +16,7 @@ const DEFAULT_CENTER: Coordinate = [4294967294,0]
 
 
 function App() {
-    const [zoom, setZoom] = useState<number>(DEFAULT_ZOOM);
+    const [viewportZoom, setViewportZoom] = useState<number>(DEFAULT_ZOOM);
     const [center, setCenter] = useState<Coordinate>(DEFAULT_CENTER);
     const updateService = useUpdateService(`ws://localhost:3001/tiles`)  // TODO url configurable
     const pixelStore = useToriiPixelStore("http://localhost:8080");  // TODO url configurable
@@ -42,6 +42,18 @@ function App() {
     function onColorSelect(color: string) {
         console.log("onColorSelect", color)
     }
+    function onZoomChange(newZoom: number) {
+        console.log("onZoomChange", newZoom)
+        setViewportZoom(newZoom)
+    }
+
+    // TODO "slide up" the bottom as the zoomlevel increases
+    const colorPickerBottom = useMemo(() => {
+        if (viewportZoom > 3000) {
+            return '1rem';
+        }
+        return '-100%';
+    }, [viewportZoom]);
 
     return (
         <div className='bg-bg-primary min-h-screen flex flex-col'>
@@ -51,7 +63,7 @@ function App() {
                 <Viewport
                     tileStore={tileStore}
                     pixelStore={pixelStore}
-                    zoom={zoom}
+                    zoom={viewportZoom}
                     center={center}
                     onWorldviewChange={onWorldviewChange}
                     onCenterChange={onCenterChange}
@@ -60,15 +72,14 @@ function App() {
                 />
             </div>
 
-            <SimpleColorPicker onColorSelect={onColorSelect}/>
+            <div className="colorpicker" style={{bottom: colorPickerBottom}}>
+                <SimpleColorPicker onColorSelect={onColorSelect}/>
+            </div>
 
         </div>
     )
 }
 
-function onZoomChange(_newZoom: number) {
-    // console.log("onZoomChange", _newZoom)
-}
 
 function onCenterChange(_newCenter: number[]) {
     // console.log("onCenterChange", _newCenter)

@@ -13,21 +13,21 @@ const colors = [
     "#000000"  // black
 ];
 
-const SimpleColorPicker: React.FC<ColorPickerProps> = ({ onColorSelect }) => {
+const SimpleColorPicker: React.FC<ColorPickerProps> = ({onColorSelect}) => {
     return (
-        <div className="palette-container">
-            <div className="palette-inner">
-                {colors.map((color, index) => (
-                    <button
-                        key={index}
-                        style={{ backgroundColor: color }}
-                        className={`palette-button ${color === '#FFFFFF' ? 'palette-button-white' : ''}`}
-                        aria-label={`Color ${color}`}
-                        onClick={() => onColorSelect(color)}
-                    ></button>
-                ))}
-            </div>
+
+        <div className="palette-inner">
+            {colors.map((color, index) => (
+                <button
+                    key={index}
+                    style={{backgroundColor: color}}
+                    className={`palette-button ${color === '#FFFFFF' ? 'palette-button-white' : ''}`}
+                    aria-label={`Color ${color}`}
+                    onClick={() => onColorSelect(color)}
+                ></button>
+            ))}
         </div>
+
     );
 };
 

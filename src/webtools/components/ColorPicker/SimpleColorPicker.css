@@ -1,12 +1,4 @@
-.palette-container {
-    position: absolute;
-    bottom: 1rem; /* Add some space from the bottom */
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    background-color: transparent; /* Background for entire container is transparent */
-    z-index: 10; /* Ensure it is on top */
-  }
+
   
   .palette-inner {
     background-color: white;
