@@ -7,12 +7,12 @@ const Governance: React.FC = () => {
 
   return (
     <div className='min-h-screen bg-gray-900 text-white flex flex-col'>
-      <div className='flex items-center justify-between p-4 bg-gray-800 relative' style={{ height: `${headerHeight}px` }}>
+      <div className='flex items-center justify-between p-4 bg-gray-800 relative'>
         <Link to="/" className='text-2xl font-bold'>
           p/war
         </Link>
-        <div className='text-2xl font-bold'>
-          Proposals
+        <div className='text-2xl font-bold absolute left-1/2 transform -translate-x-1/2'>
+          Governance
         </div>
         <div className='flex items-center space-x-2'>
           <button className='bg-gray-700 text-white px-4 py-2 rounded-md'>

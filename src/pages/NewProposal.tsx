@@ -4,18 +4,18 @@ import { Link } from 'react-router-dom';
 const NewProposal: React.FC = () => {
   const [proposalType, setProposalType] = useState('Add Color');
   const [maxPXProposalType, setMaxPXProposalType] = useState('Change Constant');
-  const [color, setColor] = useState('');
+  const [color, setColor] = useState('#FFFFFF');
   const [comments, setComments] = useState('');
-  const [width, setWidth] = useState('');
-  const [height, setHeight] = useState('');
-  const [constant, setConstant] = useState('');
-  const [coefficient1, setCoefficient1] = useState('');
-  const [coefficient2, setCoefficient2] = useState('');
-  const [pxRecoverySpeed, setPxRecoverySpeed] = useState('');
-  const [baseCost, setBaseCost] = useState('');
-  const [victoryCondition, setVictoryCondition] = useState('');
-  const [winnerAddress, setWinnerAddress] = useState('');
-  const [banPlayerAddress, setBanPlayerAddress] = useState('');
+  const [width, setWidth] = useState('0');
+  const [height, setHeight] = useState('0');
+  const [constant, setConstant] = useState('10');
+  const [coefficient1, setCoefficient1] = useState('0');
+  const [coefficient2, setCoefficient2] = useState('0');
+  const [pxRecoverySpeed, setPxRecoverySpeed] = useState('0');
+  const [baseCost, setBaseCost] = useState('1');
+  const [victoryCondition, setVictoryCondition] = useState('0');
+  const [winnerAddress, setWinnerAddress] = useState('0x0');
+  const [banPlayerAddress, setBanPlayerAddress] = useState('0x0');
 
   const handleSubmit = () => {
     const proposalData = {
@@ -43,9 +43,9 @@ const NewProposal: React.FC = () => {
         <Link to="/" className='text-2xl font-bold'>
           p/war
         </Link>
-        <div className='text-2xl font-bold'>
+        <Link to="/governance" className='text-2xl text-white font-bold absolute left-1/2 transform -translate-x-1/2'>
           Governance
-        </div>
+        </Link>
         <div className='flex items-center space-x-2'>
           <button className='bg-gray-700 text-white px-4 py-2 rounded-md'>
             Connect Wallet
@@ -79,7 +79,7 @@ const NewProposal: React.FC = () => {
           {proposalType === 'Add Color' && (
             <>
               <div className='mb-4'>
-                <label className='block text-lg mb-2'>Color</label>
+                <label className='block text-lg mb-2'>Color(i.e. #00FFAA)</label>
                 <input 
                   type="text" 
                   value={color} 
@@ -228,7 +228,7 @@ const NewProposal: React.FC = () => {
           )}
 
           <div className='mb-4'>
-            <label className='block text-lg mb-2'>Comments</label>
+            <label className='block text-lg mb-2'>Comments (Option)</label>
             <textarea 
               value={comments} 
               onChange={(e) => setComments(e.target.value)} 

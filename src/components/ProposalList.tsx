@@ -75,21 +75,21 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
           )}
         </div>
         <div className='ml-auto'>
-          <Link to="/new-proposal" className='bg-gray-700 text-white px-4 py-2 rounded-md whitespace-nowrap'>
-            New Proposal
+          <Link to="/new-proposal" className='bg-blue-600 text-white px-6 py-3 rounded-md text-lg font-semibold shadow-lg hover:bg-blue-500 transition duration-300'>
+            Create A New Proposal
           </Link>
         </div>
       </div>
       <div className='overflow-y-auto pr-6 pl-6' style={{ height: `calc(100vh - ${headerHeight}px - 112px)` }}>
         <div className='space-y-4'>
           {filteredProposals.map((proposal, index) => (
-            // <Link key={index} to={`/proposal/${proposal.id}`}>
-              <div key={index} className='bg-gray-800 p-4 rounded-md'>
+            <Link key={index} to={`/proposal/${proposal.id}`} className='block'>
+              <div key={index} className='bg-gray-800 p-4 rounded-md border border-gray-700 hover:border-gray-600 transition-colors duration-300'>
                 <div className='flex justify-between items-center mb-1'>
-                  <div className='text-xl font-bold'>
+                  <div className='text-xl font-bold text-white'>
                     {proposal.title}
                   </div>
-                  <div className={`px-2 py-1 rounded-md text-sm ${proposal.statusColor}`}>
+                  <div className={`px-2 py-1 rounded-md text-white text-sm ${proposal.statusColor}`}>
                     {proposal.status.startsWith('end in') ? proposal.status : 'closed'}
                   </div>
                 </div>
@@ -106,7 +106,7 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
                     style={{ width: `${(proposal.againstPoints / (proposal.forPoints + proposal.againstPoints)) * 100}%` }}
                   ></div>
                 </div>
-                <div className='flex justify-between text-sm'>
+                <div className='flex justify-between text-sm text-gray-300'>
                   <div>
                     For {proposal.forPoints} points
                   </div>
@@ -115,7 +115,7 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
                   </div>
                 </div>
               </div>
-            // </Link>
+            </Link>
           ))}
         </div>
       </div>
