@@ -52,6 +52,11 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
     }
   };
 
+  const extractHexColor = (title: string) => {
+    const match = title.match(/#[0-9A-Fa-f]{6}/);
+    return match ? match[0].toUpperCase() : null;
+  };
+
   return (
     <div>
       <div className='flex items-center justify-between mb-4'>
@@ -92,41 +97,50 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
       </div>
       <div className='overflow-y-auto px-6' style={{ height: `calc(100vh - ${headerHeight}px - 112px)` }}>
         <div className='space-y-4'>
-          {filteredProposals.map((proposal, index) => (
-            <Link key={index} to={`/proposal/${proposal.id}`} className='block'>
-              <div key={index} className='bg-gray-800 p-4 rounded-md border border-gray-700 hover:border-gray-600 transition-colors duration-300'>
-                <div className='flex justify-between items-center mb-1'>
-                  <div className='text-xl font-bold text-white'>
-                    {proposal.title}
+          {filteredProposals.map((proposal, index) => {
+            const hexColor = extractHexColor(proposal.title);
+            return (
+              <Link key={index} to={`/proposal/${proposal.id}`} className='block'>
+                <div key={index} className='bg-gray-800 p-4 rounded-md border border-gray-700 hover:border-gray-600 transition-colors duration-300'>
+                  <div className='flex justify-between items-center mb-1'>
+                    <div className='text-xl font-bold text-white flex items-center'>
+                      {proposal.title}
+                      {hexColor && (
+                        <div 
+                          className='w-6 h-6 rounded-md ml-2' 
+                          style={{ backgroundColor: hexColor }}
+                        ></div>
+                      )}
+                    </div>
+                    <div className={`px-2 py-1 rounded-md text-white text-sm ${getStatusColor(proposal.status)}`}>
+                      {proposal.status.startsWith('end in') ? proposal.status : 'closed'}
+                    </div>
                   </div>
-                  <div className={`px-2 py-1 rounded-md text-white text-sm ${getStatusColor(proposal.status)}`}>
-                    {proposal.status.startsWith('end in') ? proposal.status : 'closed'}
+                  <div className='text-gray-400 text-sm mb-2'>
+                    proposed by {proposal.proposer}
+                  </div>
+                  <div className='bg-gray-700 rounded-full h-2 relative flex mb-1'>
+                    <div 
+                      className='bg-green-500 h-full rounded-l-full'
+                      style={{ width: `${(proposal.forPoints / (proposal.forPoints + proposal.againstPoints)) * 100}%` }}
+                    ></div>
+                    <div 
+                      className='bg-red-500 h-full rounded-r-full'
+                      style={{ width: `${(proposal.againstPoints / (proposal.forPoints + proposal.againstPoints)) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className='flex justify-between text-sm text-gray-300'>
+                    <div>
+                      For {proposal.forPoints} points
+                    </div>
+                    <div>
+                      Against {proposal.againstPoints} points
+                    </div>
                   </div>
                 </div>
-                <div className='text-gray-400 text-sm mb-2'>
-                  proposed by {proposal.proposer}
-                </div>
-                <div className='bg-gray-700 rounded-full h-2 relative flex mb-1'>
-                  <div 
-                    className='bg-green-500 h-full rounded-l-full'
-                    style={{ width: `${(proposal.forPoints / (proposal.forPoints + proposal.againstPoints)) * 100}%` }}
-                  ></div>
-                  <div 
-                    className='bg-red-500 h-full rounded-r-full'
-                    style={{ width: `${(proposal.againstPoints / (proposal.forPoints + proposal.againstPoints)) * 100}%` }}
-                  ></div>
-                </div>
-                <div className='flex justify-between text-sm text-gray-300'>
-                  <div>
-                    For {proposal.forPoints} points
-                  </div>
-                  <div>
-                    Against {proposal.againstPoints} points
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </div>

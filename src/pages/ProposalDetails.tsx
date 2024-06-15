@@ -32,9 +32,16 @@ const ProposalDetails: React.FC = () => {
     setAgainstVotes(value === '' ? '' : Number(value));
   };
 
+  const extractHexColor = (title: string) => {
+    const match = title.match(/#[0-9A-Fa-f]{6}/);
+    return match ? match[0].toUpperCase() : null;
+  };
+
   if (!proposal) {
     return <div>Proposal not found</div>;
   }
+
+  const hexColor = extractHexColor(proposal.title);
 
   // Calculate the width percentages for the results bar
   const totalPoints = proposal.forPoints + proposal.againstPoints;
@@ -62,7 +69,15 @@ const ProposalDetails: React.FC = () => {
       <div className="p-4 flex-grow overflow-auto" style={{ height: `calc(100vh - ${headerHeight}px - 112px)` }}>
         <div className="max-w-3xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
           <div className="flex justify-between items-center mb-2">
-            <h2 className="text-3xl font-bold">{proposal.title}</h2>
+            <div className="flex items-center">
+              <h2 className="text-3xl font-bold">{proposal.title}</h2>
+              {hexColor && (
+                <div
+                  className="w-6 h-6 rounded-md ml-2"
+                  style={{ backgroundColor: hexColor }}
+                ></div>
+              )}
+            </div>
             <div className={`text-white px-4 py-2 rounded-md ${getStatusColor(proposal.status)}`}>
               {proposal.status}
             </div>
