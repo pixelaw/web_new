@@ -83,37 +83,39 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
       <div className='overflow-y-auto pr-6 pl-6' style={{ height: `calc(100vh - ${headerHeight}px - 112px)` }}>
         <div className='space-y-4'>
           {filteredProposals.map((proposal, index) => (
-            <div key={index} className='bg-gray-800 p-4 rounded-md'>
-              <div className='flex justify-between items-center mb-1'>
-                <div className='text-xl font-bold'>
-                  {proposal.title}
+            // <Link key={index} to={`/proposal/${proposal.id}`}>
+              <div key={index} className='bg-gray-800 p-4 rounded-md'>
+                <div className='flex justify-between items-center mb-1'>
+                  <div className='text-xl font-bold'>
+                    {proposal.title}
+                  </div>
+                  <div className={`px-2 py-1 rounded-md text-sm ${proposal.statusColor}`}>
+                    {proposal.status.startsWith('end in') ? proposal.status : 'closed'}
+                  </div>
                 </div>
-                <div className={`px-2 py-1 rounded-md text-sm ${proposal.statusColor}`}>
-                  {proposal.status.startsWith('end in') ? proposal.status : 'closed'}
+                <div className='text-gray-400 text-sm mb-2'>
+                  proposed by {proposal.proposer}
+                </div>
+                <div className='bg-gray-700 rounded-full h-2 relative flex mb-1'>
+                  <div 
+                    className='bg-green-500 h-full rounded-l-full'
+                    style={{ width: `${(proposal.forPoints / (proposal.forPoints + proposal.againstPoints)) * 100}%` }}
+                  ></div>
+                  <div 
+                    className='bg-red-500 h-full rounded-r-full'
+                    style={{ width: `${(proposal.againstPoints / (proposal.forPoints + proposal.againstPoints)) * 100}%` }}
+                  ></div>
+                </div>
+                <div className='flex justify-between text-sm'>
+                  <div>
+                    For {proposal.forPoints} points
+                  </div>
+                  <div>
+                    Against {proposal.againstPoints} points
+                  </div>
                 </div>
               </div>
-              <div className='text-gray-400 text-sm mb-2'>
-                proposed by {proposal.proposer}
-              </div>
-              <div className='bg-gray-700 rounded-full h-2 relative flex mb-1'>
-                <div 
-                  className='bg-green-500 h-full rounded-l-full'
-                  style={{ width: `${(proposal.forPoints / (proposal.forPoints + proposal.againstPoints)) * 100}%` }}
-                ></div>
-                <div 
-                  className='bg-red-500 h-full rounded-r-full'
-                  style={{ width: `${(proposal.againstPoints / (proposal.forPoints + proposal.againstPoints)) * 100}%` }}
-                ></div>
-              </div>
-              <div className='flex justify-between text-sm'>
-                <div>
-                  For {proposal.forPoints} points
-                </div>
-                <div>
-                  Against {proposal.againstPoints} points
-                </div>
-              </div>
-            </div>
+            // </Link>
           ))}
         </div>
       </div>
