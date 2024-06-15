@@ -1,14 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SketchPicker } from 'react-color';
 
 const NewProposal: React.FC = () => {
   const [proposalType, setProposalType] = useState('Add Color');
   const [maxPXProposalType, setMaxPXProposalType] = useState('Change Constant');
   const [color, setColor] = useState('#FFFFFF');
   const [comments, setComments] = useState('');
-  const [disasterX, setDisasterX] = useState('0');
-  const [disasterY, setDisasterY] = useState('0');
   const [width, setWidth] = useState('0');
   const [height, setHeight] = useState('0');
   const [constant, setConstant] = useState('10');
@@ -19,26 +16,6 @@ const NewProposal: React.FC = () => {
   const [victoryCondition, setVictoryCondition] = useState('0');
   const [winnerAddress, setWinnerAddress] = useState('0x0');
   const [banPlayerAddress, setBanPlayerAddress] = useState('0x0');
-
-  const [showColorPicker, setShowColorPicker] = useState(false);
-  const colorPickerRef = useRef(null);
-
-  const handleColorChange = (color: any) => {
-    setColor(color.hex);
-  };
-
-  const handleClickOutside = (event) => {
-    if (colorPickerRef.current && !colorPickerRef.current.contains(event.target)) {
-      setShowColorPicker(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   const handleSubmit = () => {
     const proposalData = {
@@ -90,66 +67,30 @@ const NewProposal: React.FC = () => {
               className='w-full p-3 rounded-md bg-gray-700 text-white'
             >
               <option value="Add Color">Add Color</option>
-              <option value="Make A Disaster">Make A Disaster</option>
-              {/* <option value="Expand Area">Expand Area</option>
+              <option value="Expand Area">Expand Area</option>
               <option value="Change PX Limit">Change PX Limit</option>
               <option value="Change PX Recovery Speed">Change PX Recovery Speed</option>
               <option value="Change Base Cost">Change Base Cost</option>
               <option value="Change Victory Conditions">Change Victory Conditions</option>
-              <option value="Ban Player">Ban Player</option> */}
+              <option value="Ban Player">Ban Player</option>
             </select>
           </div>
 
           {proposalType === 'Add Color' && (
-            <div className='mb-4'>
-              <label className='block text-lg mb-2'>Color (i.e. #00FFAA)</label>
-              <div className='flex items-center relative'>
-                <input
-                  type="text"
-                  value={color.toUpperCase()}
-                  onChange={(e) => setColor(e.target.value.toUpperCase())}
-                  className='w-full p-2 rounded-md bg-gray-700 text-white'
-                />
-                <div
-                  className='w-11 h-10 rounded-md ml-4 cursor-pointer'
-                  style={{ backgroundColor: color }}
-                  onClick={() => setShowColorPicker(!showColorPicker)}
-                ></div>
-                {showColorPicker && (
-                  <div className='absolute z-10' style={{ right: '-250px' }} ref={colorPickerRef}>
-                    <SketchPicker color={color} onChange={handleColorChange} disableAlpha />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          
-
-          {proposalType === 'Make A Disaster' && (
             <>
               <div className='mb-4'>
-                <label className='block text-lg mb-2'>Left-top X coordinate</label>
+                <label className='block text-lg mb-2'>Color(i.e. #00FFAA)</label>
                 <input 
                   type="text" 
-                  value={disasterX} 
-                  onChange={(e) => setDisasterX(e.target.value)} 
-                  className='w-full p-2 rounded-md bg-gray-700 text-white'
-                />
-              </div>
-              <div className='mb-4'>
-                <label className='block text-lg mb-2'>Left-top Y coordinate</label>
-                <input 
-                  type="text" 
-                  value={disasterY} 
-                  onChange={(e) => setDisasterY(e.target.value)} 
+                  value={color} 
+                  onChange={(e) => setColor(e.target.value)} 
                   className='w-full p-2 rounded-md bg-gray-700 text-white'
                 />
               </div>
             </>
           )}
 
-          {/* {proposalType === 'Expand Area' && (
+          {proposalType === 'Expand Area' && (
             <>
               <div className='mb-4'>
                 <label className='block text-lg mb-2'>Width</label>
@@ -170,9 +111,9 @@ const NewProposal: React.FC = () => {
                 />
               </div>
             </>
-          )} */}
+          )}
 
-          {/* {proposalType === 'Change PX Limit' && (
+          {proposalType === 'Change PX Limit' && (
             <>
               <div className='mb-4'>
                 <label className='block text-lg mb-2'>Select Type</label>
@@ -220,9 +161,9 @@ const NewProposal: React.FC = () => {
                 </div>
               )}
             </>
-          )} */}
+          )}
 
-          {/* {proposalType === 'Change PX Recovery Speed' && (
+          {proposalType === 'Change PX Recovery Speed' && (
             <div className='mb-4'>
               <label className='block text-lg mb-2'>PX Recovery Speed</label>
               <input 
@@ -232,9 +173,9 @@ const NewProposal: React.FC = () => {
                 className='w-full p-2 rounded-md bg-gray-700 text-white'
               />
             </div>
-          )} */}
+          )}
 
-          {/* {proposalType === 'Change Base Cost' && (
+          {proposalType === 'Change Base Cost' && (
             <div className='mb-4'>
               <label className='block text-lg mb-2'>Base Cost</label>
               <input 
@@ -244,9 +185,9 @@ const NewProposal: React.FC = () => {
                 className='w-full p-2 rounded-md bg-gray-700 text-white'
               />
             </div>
-          )} */}
+          )}
 
-          {/* {proposalType === 'Change Victory Conditions' && (
+          {proposalType === 'Change Victory Conditions' && (
             <>
               <div className='mb-4'>
                 <label className='block text-lg mb-2'>Victory Condition Type</label>
@@ -272,9 +213,9 @@ const NewProposal: React.FC = () => {
                 </div>
               )}
             </>
-          )} */}
+          )}
 
-          {/* {proposalType === 'Ban Player' && (
+          {proposalType === 'Ban Player' && (
             <div className='mb-4'>
               <label className='block text-lg mb-2'>Player Address</label>
               <input 
@@ -284,7 +225,7 @@ const NewProposal: React.FC = () => {
                 className='w-full p-2 rounded-md bg-gray-700 text-white'
               />
             </div>
-          )} */}
+          )}
 
           <div className='mb-4'>
             <label className='block text-lg mb-2'>Comments (Option)</label>
