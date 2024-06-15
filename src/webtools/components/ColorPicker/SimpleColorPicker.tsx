@@ -1,5 +1,6 @@
 import {ColorPickerProps} from "../../types.ts";
-import './SimpleColorPicker.css';
+
+import styles from './SimpleColorPicker.module.css';
 
 const colors = [
     "#FF0000",
@@ -15,19 +16,17 @@ const colors = [
 
 const SimpleColorPicker: React.FC<ColorPickerProps> = ({onColorSelect}) => {
     return (
-
-        <div className="palette-inner">
+        <div className={styles.inner}>
             {colors.map((color, index) => (
                 <button
                     key={index}
                     style={{backgroundColor: color}}
-                    className={`palette-button ${color === '#FFFFFF' ? 'palette-button-white' : ''}`}
+                    className={`${styles.button} ${color === '#FFFFFF' ? styles['button-white'] : ''}`}
                     aria-label={`Color ${color}`}
                     onClick={() => onColorSelect(color)}
                 ></button>
             ))}
         </div>
-
     );
 };
 
