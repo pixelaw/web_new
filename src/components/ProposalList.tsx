@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FaSearch, FaFilter } from 'react-icons/fa';
 import { proposals } from '../data/proposals';
 import FilterMenu from './FilterMenu';
+import { Link } from 'react-router-dom';
 
 interface ProposalListProps {
   headerHeight: number;
@@ -67,16 +68,16 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
             <div 
               className='absolute mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-10' 
               ref={filterRef}
-              style={{ top: '100%', right: 0 }} // ポップアップをアイコンのすぐ下に配置
+              style={{ top: '100%', right: 0 }}
             >
               <FilterMenu statusFilter={statusFilter} setStatusFilter={setStatusFilter} />
             </div>
           )}
         </div>
         <div className='ml-auto'>
-          <button className='bg-gray-700 text-white px-4 py-2 rounded-md whitespace-nowrap'>
+          <Link to="/new-proposal" className='bg-gray-700 text-white px-4 py-2 rounded-md whitespace-nowrap'>
             New Proposal
-          </button>
+          </Link>
         </div>
       </div>
       <div className='overflow-y-auto pr-6 pl-6' style={{ height: `calc(100vh - ${headerHeight}px - 112px)` }}>

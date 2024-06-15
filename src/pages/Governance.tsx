@@ -23,7 +23,7 @@ const Governance: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className='p-4 flex-grow overflow-hidden'>
+      <div className='py-4 px-40 flex-grow overflow-hidden'>
         <ProposalList headerHeight={headerHeight} />
       </div>
     </div>
