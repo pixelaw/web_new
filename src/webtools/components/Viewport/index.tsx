@@ -26,6 +26,7 @@ interface ViewportProps {
     onCenterChange: (newCenter: Coordinate) => void;
     onWorldviewChange: (newWorldview: Bounds) => void;
     onCellClick: (coordinate: Coordinate) => void;
+    onCellHover: (coordinate: Coordinate) => void;
 }
 
 const Viewport: React.FC<ViewportProps> = (
@@ -37,7 +38,8 @@ const Viewport: React.FC<ViewportProps> = (
         onZoomChange,
         pixelStore,
         tileStore,
-        onCellClick
+        onCellClick,
+        onCellHover
     }) => {
     const wrapperRef = useRef(null);
     const dimensions = useDimensions(wrapperRef);
@@ -276,6 +278,7 @@ const Viewport: React.FC<ViewportProps> = (
                     hoveredCell && (hoveredCell[0] !== viewportCell[0] || hoveredCell[1] !== viewportCell[1])
                 ) {
                     setHoveredCell(viewportCell);
+                    onCellHover(viewportCell)
                 }
 
             }

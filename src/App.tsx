@@ -36,6 +36,10 @@ function App() {
         // console.log("onWorldviewChange", newWorldview)
     }
 
+    function onCellHover(coordinate: Coordinate) {
+        console.log("onCellHover", coordinate)
+    }
+
     function onCellClick(coordinate: Coordinate) {
         console.log("onCellClick", coordinate)
     }
@@ -48,7 +52,7 @@ function App() {
     }
 
     // TODO "slide up" the bottom as the zoomlevel increases
-    const colorPickerBottom = useMemo(() => {
+    const zoombasedAdjustment = useMemo(() => {
         if (viewportZoom > 3000) {
             return '1rem';
         }
@@ -69,14 +73,15 @@ function App() {
                     onCenterChange={onCenterChange}
                     onZoomChange={onZoomChange}
                     onCellClick={onCellClick}
+                    onCellHover={onCellHover}
                 />
             </div>
 
-            <div className={styles.colorpicker} style={{bottom: colorPickerBottom}}>
+            <div className={styles.colorpicker} style={{bottom: zoombasedAdjustment}}>
                 <SimpleColorPicker onColorSelect={onColorSelect}/>
             </div>
 
-            <div className={styles.apps} style={{right: colorPickerBottom}}>
+            <div className={styles.apps} style={{right: zoombasedAdjustment}}>
                 <AppsContainer/>
             </div>
 
