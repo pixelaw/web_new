@@ -63,7 +63,7 @@ function App() {
         <div className='bg-bg-primary min-h-screen flex flex-col'>
             <MenuBar/>
 
-            <div className={styles.viewport}>
+            <div className={styles.main}>
                 <Viewport
                     tileStore={tileStore}
                     pixelStore={pixelStore}

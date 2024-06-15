@@ -37,7 +37,7 @@ body {
   z-index: 1000; /* Ensure it's above other content */
 }
 /* Ensure the viewport container expands to fill available space */
-.viewport {
+.main {
   flex-grow: 1;
   display: flex; /* Make this a flex container */
   height: 100vh; /* Fill the full viewport height */
