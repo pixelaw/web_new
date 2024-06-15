@@ -38,6 +38,9 @@ function App() {
     function onCellClick(coordinate: Coordinate) {
         console.log("onCellClick", coordinate)
     }
+    function onColorSelect(color: string) {
+        console.log("onColorSelect", color)
+    }
 
     return (
         <div className='bg-bg-primary min-h-screen flex flex-col'>
@@ -64,7 +67,7 @@ function App() {
                 />
             </div>
 
-            <SimpleColorPicker />
+            <SimpleColorPicker onColorSelect={onColorSelect}/>
 
         </div>
     )
