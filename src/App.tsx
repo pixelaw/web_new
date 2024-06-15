@@ -8,6 +8,7 @@ import {useToriiPixelStore} from "./webtools/hooks/ToriiPixelStore.ts";
 import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
 import Viewport from "./webtools/components/Viewport";
 import SimpleColorPicker from "./webtools/components/ColorPicker/SimpleColorPicker.tsx";
+import MenuBar from "./components/MenuBar.tsx";
 
 const ZOOM_PRESETS = {tile: 100, pixel: 3000}
 const DEFAULT_ZOOM = ZOOM_PRESETS.tile
@@ -21,7 +22,7 @@ function App() {
     const pixelStore = useToriiPixelStore("http://localhost:8080");  // TODO url configurable
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
 
-    const topBarRef = useRef<HTMLDivElement>(null);
+    const menuBarRef = useRef<HTMLDivElement>(null);
 
 
     useEffect(() => {
@@ -44,15 +45,7 @@ function App() {
 
     return (
         <div className='bg-bg-primary min-h-screen flex flex-col'>
-            <div ref={topBarRef} className='w-full h-12 bg-header-primary flex items-center justify-between px-4'>
-
-                <div className='w-[139px] h-[46px] cursor-pointer'>
-                    <img src="/src/assets/logo/pixeLaw-logo.png"/>
-                </div>
-
-
-            </div>
-
+            <MenuBar/>
 
             <div className='viewport'>
                 <Viewport
