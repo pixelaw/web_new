@@ -7,6 +7,7 @@ import {clearIdb} from "./webtools/utils.ts";
 import {useToriiPixelStore} from "./webtools/hooks/ToriiPixelStore.ts";
 import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
 import Viewport from "./webtools/components/Viewport";
+import ColorPalette from './components/ColorPalette';
 
 const ZOOM_PRESETS = {tile: 100, pixel: 3000}
 const DEFAULT_ZOOM = ZOOM_PRESETS.tile
@@ -62,6 +63,9 @@ function App() {
                     onCellClick={onCellClick}
                 />
             </div>
+
+            <ColorPalette />
+
         </div>
     )
 }
