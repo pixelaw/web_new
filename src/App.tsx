@@ -1,5 +1,6 @@
 
-import './App.css'
+import styles from './App.module.css';
+
 import React, {useEffect, useMemo, useRef, useState} from "react";
 import {Bounds, Coordinate} from "./webtools/types.ts";
 import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
@@ -9,9 +10,10 @@ import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
 import Viewport from "./webtools/components/Viewport";
 import SimpleColorPicker from "./webtools/components/ColorPicker/SimpleColorPicker.tsx";
 import MenuBar from "./components/MenuBar.tsx";
+import AppsContainer from "./components/AppsContainer.tsx";
 
-const ZOOM_PRESETS = {tile: 100, pixel: 3000}
-const DEFAULT_ZOOM = ZOOM_PRESETS.tile
+const ZOOM_PRESETS = {tile: 100, pixel: 3100}
+const DEFAULT_ZOOM = ZOOM_PRESETS.pixel
 const DEFAULT_CENTER: Coordinate = [4294967294,0]
 
 
@@ -21,8 +23,6 @@ function App() {
     const updateService = useUpdateService(`ws://localhost:3001/tiles`)  // TODO url configurable
     const pixelStore = useToriiPixelStore("http://localhost:8080");  // TODO url configurable
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
-
-    const menuBarRef = useRef<HTMLDivElement>(null);
 
 
     useEffect(() => {
@@ -59,7 +59,7 @@ function App() {
         <div className='bg-bg-primary min-h-screen flex flex-col'>
             <MenuBar/>
 
-            <div className='viewport'>
+            <div className={styles.viewport}>
                 <Viewport
                     tileStore={tileStore}
                     pixelStore={pixelStore}
@@ -72,8 +72,12 @@ function App() {
                 />
             </div>
 
-            <div className="colorpicker" style={{bottom: colorPickerBottom}}>
+            <div className={styles.colorpicker} style={{bottom: colorPickerBottom}}>
                 <SimpleColorPicker onColorSelect={onColorSelect}/>
+            </div>
+
+            <div className={styles.apps} style={{right: colorPickerBottom}}>
+                <AppsContainer/>
             </div>
 
         </div>

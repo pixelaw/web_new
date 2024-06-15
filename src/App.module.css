@@ -21,10 +21,7 @@ body {
 
 .App {
   width: 100%;
-  /* Additional styles to ensure App fills the window */
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column; /* Stack children vertically */
   height: 100vh; /* Fill the full viewport height */
 }
@@ -54,5 +51,17 @@ body {
   justify-content: center;
   background-color: transparent; /* Background for entire container is transparent */
   z-index: 10; /* Ensure it is on top */
+}
+
+.apps {
+  position: absolute;
+  top: calc(50px + 1rem);
+  right: 1rem;
+  width: 300px;
+  display: flex;
+  justify-content: center;
+  background-color: transparent; /* Background for entire container is transparent */
+  z-index: 10; /* Ensure it is on top */
+  height: calc(100vh - 50px - 2rem); /* Adjusted height */
 }
 
