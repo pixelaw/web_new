@@ -42,6 +42,16 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
     return true;
   });
 
+  const getStatusColor = (status: string) => {
+    if (status.startsWith('end in')) {
+      return 'bg-green-500';
+    } else if (status === 'closed') {
+      return 'bg-purple-500';
+    } else {
+      return 'bg-gray-500';
+    }
+  };
+
   return (
     <div>
       <div className='flex items-center justify-between mb-4'>
@@ -89,7 +99,7 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
                   <div className='text-xl font-bold text-white'>
                     {proposal.title}
                   </div>
-                  <div className={`px-2 py-1 rounded-md text-white text-sm ${proposal.statusColor}`}>
+                  <div className={`px-2 py-1 rounded-md text-white text-sm ${getStatusColor(proposal.status)}`}>
                     {proposal.status.startsWith('end in') ? proposal.status : 'closed'}
                   </div>
                 </div>

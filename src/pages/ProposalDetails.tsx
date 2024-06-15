@@ -8,6 +8,16 @@ const ProposalDetails: React.FC = () => {
   const proposal = proposals.find((p) => p.id === Number(id));
   const headerHeight = 64;
 
+  const getStatusColor = (status: string) => {
+    if (status.startsWith('end in')) {
+      return 'bg-green-500';
+    } else if (status === 'closed') {
+      return 'bg-purple-500';
+    } else {
+      return 'bg-gray-500';
+    }
+  };
+
   // State hooks for vote inputs
   const [forVotes, setForVotes] = useState<number | string>(0);
   const [againstVotes, setAgainstVotes] = useState<number | string>(0);
@@ -53,7 +63,7 @@ const ProposalDetails: React.FC = () => {
         <div className="max-w-3xl mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-3xl font-bold">{proposal.title}</h2>
-            <div className="bg-green-500 text-black px-4 py-2 rounded-md">
+            <div className={`text-white px-4 py-2 rounded-md ${getStatusColor(proposal.status)}`}>
               {proposal.status}
             </div>
           </div>
