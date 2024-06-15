@@ -10,7 +10,7 @@ import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
 import Viewport from "./webtools/components/Viewport";
 import SimpleColorPicker from "./webtools/components/ColorPicker/SimpleColorPicker.tsx";
 import MenuBar from "./components/MenuBar.tsx";
-import AppsContainer from "./components/AppsContainer.tsx";
+import Apps from "./components/Apps.tsx";
 
 const ZOOM_PRESETS = {tile: 100, pixel: 3100}
 const DEFAULT_ZOOM = ZOOM_PRESETS.pixel
@@ -82,7 +82,7 @@ function App() {
             </div>
 
             <div className={styles.apps} style={{right: zoombasedAdjustment}}>
-                <AppsContainer/>
+                <Apps/>
             </div>
 
         </div>
