@@ -147,7 +147,7 @@ const NewProposal: React.FC = () => {
 
           {proposalType === 'Make A Disaster' && (
             <div className='mb-4'>
-              <label className='block text-lg mb-2'>Choose a color to make white on canvas</label>
+              <label className='block text-lg mb-2'>Choose a color to turn white on the canvas.</label>
               <Select 
                 value={colorOptionsFormatted.find(option => option.value === disasterColor)}
                 onChange={handleDisasterColorChange}
