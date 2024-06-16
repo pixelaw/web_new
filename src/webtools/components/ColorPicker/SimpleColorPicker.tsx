@@ -1,5 +1,4 @@
-import {ColorPickerProps} from "../../types.ts";
-
+import { ColorPickerProps } from "../../types.ts";
 import styles from './SimpleColorPicker.module.css';
 
 const colors = [
@@ -14,17 +13,19 @@ const colors = [
     "#000000"  // black
 ];
 
-const SimpleColorPicker: React.FC<ColorPickerProps> = ({onColorSelect}) => {
+const SimpleColorPicker: React.FC<ColorPickerProps> = ({ onColorSelect }) => {
     return (
         <div className={styles.inner}>
             {colors.map((color, index) => (
                 <button
                     key={index}
-                    style={{backgroundColor: color}}
+                    style={{ backgroundColor: color }}
                     className={`${styles.button} ${color === '#FFFFFF' ? styles['button-white'] : ''}`}
                     aria-label={`Color ${color}`}
                     onClick={() => onColorSelect(color)}
-                ></button>
+                >
+                    <span className={styles.number}>{index + 1}</span>
+                </button>
             ))}
         </div>
     );
