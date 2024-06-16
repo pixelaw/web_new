@@ -191,7 +191,7 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
               {extractHexColor(selectedProposal.title) && (
                 <div 
                   className='w-6 h-6 rounded-md ml-2' 
-                  style={{ backgroundColor: extractHexColor(selectedProposal.title) }}
+                  style={{ backgroundColor: extractHexColor(selectedProposal.title) || undefined }}
                 ></div>
               )}
             </h2>
