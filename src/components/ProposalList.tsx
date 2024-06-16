@@ -200,7 +200,7 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
               </button>
             </div>
             <div className='mb-4'>
-              <label className='block mb-2'>Points</label>
+              <label className='block mb-2'>Voting Power(PX)</label>
               <input 
                 type='number' 
                 value={votePoints} 
