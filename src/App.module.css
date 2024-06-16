@@ -79,4 +79,6 @@ body {
   height: calc(100vh - 50px - 2rem); /* Adjusted height */
 }
 
-
+.blur-background {
+  filter: blur(5px);
+}

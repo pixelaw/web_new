@@ -13,6 +13,9 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Closed'>('All');
   const [searchTerm, setSearchTerm] = useState('');
   const filterRef = useRef<HTMLDivElement>(null);
+  const [selectedProposal, setSelectedProposal] = useState<any>(null);
+  const [voteType, setVoteType] = useState<'for' | 'against'>('for');
+  const [votePoints, setVotePoints] = useState<number | string>(0);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,9 +55,9 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
     }
   };
 
-  const handleVote = (id: number) => {
-    // TODO: add voting method
-    console.log(`Voted for proposal ${id}`);
+  const handleVote = (proposal: any) => {
+    setSelectedProposal(proposal);
+    setVotePoints(0);
   };
 
   const extractHexColor = (title: string) => {
@@ -62,9 +65,22 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
     return match ? match[0].toUpperCase() : null;
   };
 
+  const closeModal = () => {
+    setSelectedProposal(null);
+  };
+
+  const toggleVoteType = () => {
+    setVoteType(voteType === 'for' ? 'against' : 'for');
+  };
+
+  const handleVotePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setVotePoints(value === '' ? '' : Number(value));
+  };
+
   return (
-    <div>
-      <div className='flex items-center justify-between mb-4'>
+    <div className=''>
+      <div className={`flex items-center justify-between mb-4 ${selectedProposal ? 'blur' : ''}`}>
         <div className='relative w-1/3'>
           <input 
             type="text" 
@@ -100,7 +116,7 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
           </Link>
         </div>
       </div>
-      <div className='overflow-y-auto px-6' style={{ height: `calc(100vh - ${headerHeight}px - 112px)` }}>
+      <div className={`overflow-y-auto px-6 ${selectedProposal ? 'blur' : ''}`} style={{ height: `calc(100vh - ${headerHeight}px - 112px)` }}>
         <div className='space-y-4'>
           {filteredProposals.map((proposal, index) => {
             const hexColor = extractHexColor(proposal.title);
@@ -147,7 +163,7 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
                   className={`absolute bottom-4 right-4 px-4 py-2 rounded-md transition duration-300 ${
                     proposal.status === 'closed' ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500 text-white'
                   }`}
-                  onClick={() => handleVote(proposal.id)}
+                  onClick={() => handleVote(proposal)}
                   disabled={proposal.status === 'closed'}
                 >
                   Vote
@@ -157,6 +173,48 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
           })}
         </div>
       </div>
+      {selectedProposal && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20'>
+          <div className='bg-gray-800 text-white p-6 rounded-lg shadow-lg w-1/3'>
+            <h2 className='text-xl font-bold mb-4 flex items-center'>
+              {selectedProposal.title}
+              {extractHexColor(selectedProposal.title) && (
+                <div 
+                  className='w-6 h-6 rounded-md ml-2' 
+                  style={{ backgroundColor: extractHexColor(selectedProposal.title) }}
+                ></div>
+              )}
+            </h2>
+            <div className='flex justify-between items-center mb-4'>
+              <button 
+                className={`w-full p-2 rounded-md ${voteType === 'for' ? 'bg-blue-600' : 'bg-gray-600'}`} 
+                onClick={toggleVoteType}
+              >
+                For
+              </button>
+              <button 
+                className={`w-full p-2 rounded-md ml-4 ${voteType === 'against' ? 'bg-blue-600' : 'bg-gray-600'}`} 
+                onClick={toggleVoteType}
+              >
+                Against
+              </button>
+            </div>
+            <div className='mb-4'>
+              <label className='block mb-2'>Points</label>
+              <input 
+                type='number' 
+                value={votePoints} 
+                onChange={handleVotePointsChange} 
+                className='w-full p-2 border rounded-md bg-gray-700 text-white'
+              />
+            </div>
+            <div className='flex justify-end'>
+              <button className='bg-gray-600 text-white px-4 py-2 rounded-md mr-2' onClick={closeModal}>Cancel</button>
+              <button className='bg-blue-600 text-white px-4 py-2 rounded-md'>Submit</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
