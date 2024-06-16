@@ -53,8 +53,9 @@ export function drawPixels(
         }
     }
 
+    // FIXME it seems to be broken now
     if (hoveredCell && zoom > ZOOM_TILEMODE) {
-        drawPixel(hoveredCell[0], hoveredCell[1], 5);
+        drawPixel(hoveredCell[0], hoveredCell[1], 15);
     }
 }
 

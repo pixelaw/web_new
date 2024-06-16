@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.10.4",
+    "@react-hook/resize-observer": "^2.0.1",
     "@types/upng-js": "^2.1.5",
     "autoprefixer": "^10.4.19",
     "browserify-zlib": "^0.2.0",

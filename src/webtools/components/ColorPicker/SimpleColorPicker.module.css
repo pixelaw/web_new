@@ -1,14 +1,6 @@
-.palette-container {
-    position: absolute;
-    bottom: 1rem; /* Add some space from the bottom */
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    background-color: transparent; /* Background for entire container is transparent */
-    z-index: 10; /* Ensure it is on top */
-  }
+
   
-  .palette-inner {
+  .inner {
     background-color: white;
     padding: 0.5rem; /* Adjusted padding */
     border-radius: 1rem; /* More rounded corners */
@@ -19,7 +11,7 @@
     gap: 0.5rem; /* Gap between buttons */
   }
   
-  .palette-button {
+  .button {
     width: calc(2rem + 1vw);
     height: calc(2rem + 1vw);
     border-radius: 0.5rem; /* More rounded corners */
@@ -28,11 +20,11 @@
     border: 2px solid transparent; /* Default border */
   }
   
-  .palette-button-white {
+  .button-white {
     border: 2px solid #000000; /* Black border for white button */
   }
   
-  .palette-button:hover {
+  .button:hover {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
