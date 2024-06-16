@@ -13,6 +13,8 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Closed'>('All');
   const [searchTerm, setSearchTerm] = useState('');
   const filterRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+
   const [selectedProposal, setSelectedProposal] = useState<any>(null);
   const [voteType, setVoteType] = useState<'for' | 'against'>('for');
   const [votePoints, setVotePoints] = useState<number | string>(0);
@@ -23,9 +25,17 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
         setFilterOpen(false);
       }
     };
+    const handleClickOutsideModal = (event: MouseEvent) => { // Add this function
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        setSelectedProposal(null);
+      }
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutsideModal); // Add this line
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutsideModal); // Add this line
     };
   }, []);
 
@@ -175,7 +185,7 @@ const ProposalList: React.FC<ProposalListProps> = ({ headerHeight }) => {
       </div>
       {selectedProposal && (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-20'>
-          <div className='bg-gray-800 text-white p-6 rounded-lg shadow-lg w-1/3'>
+          <div ref={modalRef} className='bg-gray-800 text-white p-6 rounded-lg shadow-lg w-1/3'>
             <h2 className='text-xl font-bold mb-4 flex items-center'>
               {selectedProposal.title}
               {extractHexColor(selectedProposal.title) && (
