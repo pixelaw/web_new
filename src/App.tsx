@@ -10,6 +10,7 @@ import Viewport from "./webtools/components/Viewport";
 import SimpleColorPicker from "./webtools/components/ColorPicker/SimpleColorPicker.tsx";
 import MenuBar from "./components/MenuBar.tsx";
 import Apps from "./components/Apps.tsx";
+// import { Link } from "react-router-dom";
 
 const ZOOM_PRESETS = { tile: 100, pixel: 3100 };
 const DEFAULT_ZOOM = ZOOM_PRESETS.pixel;
@@ -106,14 +107,14 @@ function App() {
                 <Apps/>
             </div> */}
 
-            {/* <div className={styles.buttonContainer}> */}
-            <button className={styles.placePixelButton} onClick={toggleColorPicker} style={{ display: isColorPickerVisible ? 'none' : 'flex' }}>
-                Place a Pixel
-            </button>
-                {/* <button className={styles.governPixelsButton}>
+            <div className={styles.buttonContainer}>
+                <button className={styles.placePixelButton} onClick={toggleColorPicker} style={{ display: isColorPickerVisible ? 'none' : 'flex' }}>
+                    Place a Pixel
+                </button>
+                {/* <Link to="/governance" className={styles.governPixelsButton} onClick={toggleColorPicker} style={{ display: isColorPickerVisible ? 'none' : 'flex' }}>
                     Govern Pixels
-                </button> */}
-            {/* </div> */}
+                </Link> */}
+            </div>
 
         </div>
     )
