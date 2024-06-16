@@ -17,6 +17,19 @@ const colors = [
 const SimpleColorPicker: React.FC<ColorPickerProps> = ({ onColorSelect }) => {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
+//   useEffect(() => {
+//     const handleKeyDown = (event: KeyboardEvent) => {
+//       const key = event.key;
+//       if (key >= '1' && key <= '9') {
+//         const index = parseInt(key, 10) - 1;
+//         if (index < colors.length) {
+//           const color = colors[index];
+//           setSelectedColor(color);
+//           onColorSelect(color);
+//         }
+//       }
+//     };
+
   const handleColorSelect = (color: string) => {
     setSelectedColor(color);
     onColorSelect(color);
