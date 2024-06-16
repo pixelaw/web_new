@@ -23,12 +23,18 @@
 }
 
 .button-white {
-  border: 2px solid #000000; /* Black border for white button */
+  border: 2px solid #000000 !important; /* Black border for white button */
 }
 
 .button:hover {
   transform: scale(1.1);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.button.selected {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border: 2px solid #00BFFF; /* Light blue border to indicate selection */
 }
 
 .number {
@@ -44,7 +50,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* border: 1px solid #000000; */
+  border-radius: 0.25rem; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Light shadow */
+}
+
+.label {
+  position: absolute;
+  top: -0.3rem; /* Adjust as necessary */
+  left: -0.3rem; /* Adjust as necessary */
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  font-size: 0.75rem; /* Small font size */
+  padding: 0.1rem 0.2rem; /* Small label size */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 0.25rem; /* Rounded corners */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Light shadow */
 }
