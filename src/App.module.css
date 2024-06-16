@@ -53,6 +53,20 @@ body {
   z-index: 10; /* Ensure it is on top */
 }
 
+.placePixelButton {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  color: #000000;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 100; /* Ensure it's above other elements */
+}
+
 .apps {
   position: absolute;
   top: calc(50px + 1rem);
@@ -64,4 +78,5 @@ body {
   z-index: 10; /* Ensure it is on top */
   height: calc(100vh - 50px - 2rem); /* Adjusted height */
 }
+
 
