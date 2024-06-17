@@ -43,9 +43,6 @@ function App() {
         setSelectedApp(appName)
     };
 
-    // function onCenterChange(newCenter: Coordinate) {
-    //     setCenter(newCenter);
-    // }
 
     function onWorldviewChange(newWorldview: Bounds) {
         updateService.setBounds(newWorldview)
@@ -65,11 +62,6 @@ function App() {
         console.log("onColorSelect", color)
     }
 
-    //
-    // function onZoomChange(newZoom: number) {
-    //     console.log("setZoom", newZoom)
-    //     setZoom(newZoom);
-    // }
 
     //</editor-fold>
 

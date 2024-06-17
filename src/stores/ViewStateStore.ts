@@ -30,7 +30,7 @@ export const useViewStateStore = create<AppState>((set) => ({
 }));
 
 export function useSyncedViewStateStore() {
-    const navigate = useNavigate();
+
     const location = useLocation();
     const {
         selectedApp,
@@ -47,7 +47,6 @@ export function useSyncedViewStateStore() {
 
     useEffect(() => {
         if (initialLoad.current) {
-            console.log("ja", location.search)
             initialLoad.current = false;
             const queryParams = new URLSearchParams(location.search);
             const appInQuery = queryParams.get('app');
@@ -76,7 +75,7 @@ export function useSyncedViewStateStore() {
                 window.history.replaceState(null, '', newSearch);
             }
         };
-
+        console.log("u", center)
         updateURL();
     }, [selectedApp, center, zoom, selectedColor]);
 }

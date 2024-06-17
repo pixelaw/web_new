@@ -230,22 +230,6 @@ const Viewport: React.FC<ViewportProps> = (
         };
     }, [zoom]);
 
-    // // TODO
-    // useEffect(() => {
-    //     setCenter(initialCenter);
-    // }, [initialCenter]);
-
-    // TODO
-    useEffect(() => {
-        if (!hoveredCell) return
-
-        // console.log(
-        //     "hoveredCell ", hoveredCell,
-        //     "offset", pixelOffset,
-        //     "worldOffset", worldOffset
-        // )
-
-    }, [hoveredCell]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setDragStart(Date.now());
@@ -269,7 +253,6 @@ const Viewport: React.FC<ViewportProps> = (
 
         setPixelOffset(newPixelOffset);
         setWorldOffset(newWorldOffset)
-        setCenter(center)
     }
 
     const handleMouseMove = (e: React.MouseEvent) => {
@@ -279,9 +262,7 @@ const Viewport: React.FC<ViewportProps> = (
 
             setLastDragPoint(mouse);
         } else {
-            // TODO call setCenter with the center cell
-            const newCenterCell = calculateCenter();
-            setCenter(newCenterCell);
+
 
             if (zoom > ZOOM_TILEMODE) {
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -328,6 +309,7 @@ const Viewport: React.FC<ViewportProps> = (
             onCellClick(worldClicked)
         }
 
+        setCenter(calculateCenter())
         if (e.type !== "mouseleave") {
             // pixelStore.loadPixels(worldView)
         }
