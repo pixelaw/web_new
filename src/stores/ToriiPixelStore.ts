@@ -1,9 +1,10 @@
 import {useState} from 'react';
-import {Bounds, Coordinate, MAX_UINT32, Pixel, PixelStore} from "../types.ts";
+import {Bounds, Coordinate, MAX_UINT32, Pixel, PixelStore} from "@/webtools/types.ts";
 import {produce} from 'immer';
-import GET_PIXELS_QUERY from "../../../graphql/GetPixels.graphql";
+import GET_PIXELS_QUERY from "@/../graphql/GetPixels.graphql";
 import {ApolloClient, InMemoryCache} from "@apollo/client";
-import {MAX_VIEW_SIZE} from "../utils.ts";
+import {MAX_VIEW_SIZE} from "@/webtools/utils.ts";
+
 
 type State = { [key: string]: Pixel | undefined };
 
@@ -18,13 +19,13 @@ export function useToriiPixelStore(baseUrl: string): PixelStore {
     });
 
     // Kick off data fetching. It will write the retrieved Pixel data to the state by itself, and report errors in console.
-    function fetchData(bounds: Bounds) : void {
+    function fetchData(bounds: Bounds): void {
         // eslint-disable-next-line prefer-const
         let [[left, top], [right, bottom]] = bounds
 
         // Adjust to wrapping
-        if(left > MAX_VIEW_SIZE && left > right) right = MAX_UINT32
-        if(top > MAX_VIEW_SIZE && top > bottom) bottom = MAX_UINT32
+        if (left > MAX_VIEW_SIZE && left > right) right = MAX_UINT32
+        if (top > MAX_VIEW_SIZE && top > bottom) bottom = MAX_UINT32
         // console.log("fetchData", left,top,right,bottom )
 
         gqlClient.query({
@@ -38,8 +39,8 @@ export function useToriiPixelStore(baseUrl: string): PixelStore {
                     "yLTE": bottom
                 }
             }
-        }).then((data)=> {
-            data.data.pixelModels.edges.map(({node}: {node: Pixel}) => {
+        }).then((data) => {
+            data.data.pixelModels.edges.map(({node}: { node: Pixel }) => {
                 // Write the retrieved Pixel to state
                 // TODO, we may run out of memory in State if the user retrieves too many?
                 setState(produce(draftState => {
@@ -48,7 +49,7 @@ export function useToriiPixelStore(baseUrl: string): PixelStore {
             })
 
         }).catch((e) => {
-            console.error("Error retrieving pixels from torii for", bounds, e.message )
+            console.error("Error retrieving pixels from torii for", bounds, e.message)
         })
     }
 

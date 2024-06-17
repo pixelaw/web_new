@@ -3,13 +3,13 @@ import styles from './App.module.css';
 import React, {useEffect, useMemo, useState} from "react";
 import {Bounds, Coordinate} from "./webtools/types.ts";
 import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
-import {useToriiPixelStore} from "./webtools/hooks/ToriiPixelStore.ts";
+import {useToriiPixelStore} from "./stores/ToriiPixelStore.ts";
 import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
 import Viewport from "./webtools/components/Viewport";
 import SimpleColorPicker from "./webtools/components/ColorPicker/SimpleColorPicker.tsx";
 import MenuBar from "./components/MenuBar.tsx";
 import Apps from "./components/Apps.tsx";
-import {useToriiAppStore} from "./webtools/hooks/ToriiAppStore.ts";
+import {useDojoAppStore} from "./stores/DojoAppStore.ts";
 import {Route, Routes, useLocation} from "react-router-dom";
 import Loading from "./components/Loading.tsx";
 import {initializeApp} from "./components/App/setup.ts";
@@ -35,9 +35,9 @@ function App() {
     const pixelStore = useToriiPixelStore("http://localhost:8080");  // TODO url configurable
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
     const location = useLocation();
-    // const appStore = useToriiAppStore();
+    const appStore = useDojoAppStore();
 
-    const {clientState, error, gameData} = usePixelawProvider();
+    const {clientState, error} = usePixelawProvider();
 
     //</editor-fold>
 
@@ -135,9 +135,9 @@ function App() {
                                 <SimpleColorPicker onColorSelect={onColorSelect}/>
                             </div>
 
-                            {/*<div className={styles.apps} style={{right: zoombasedAdjustment}}>*/}
-                            {/*    <Apps appStore={appStore}/>*/}
-                            {/*</div>*/}
+                            <div className={styles.apps} style={{right: zoombasedAdjustment}}>
+                                <Apps appStore={appStore}/>
+                            </div>
                         </>
                     }/>
 

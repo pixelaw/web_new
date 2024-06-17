@@ -19,8 +19,8 @@ export type TPixelLawError = Error & {
 };
 
 export type SetupResult = {
+    apps: ReturnType<typeof getComponentValue>[];
     client: Awaited<ReturnType<typeof setupWorld>>;
-    clientComponents: ReturnType<typeof createClientComponents>;
     contractComponents: ReturnType<typeof defineContractComponents>;
     graphSdk: ReturnType<typeof getSdk>;
     systemCalls: ReturnType<typeof createSystemCalls>;
@@ -70,13 +70,14 @@ export async function setupPixelaw({
         relayUrl: "",
     });
     const contractComponents = defineContractComponents(world);
-    const clientComponents = createClientComponents({contractComponents});
+    // const clientComponents = createClientComponents({contractComponents});
+
     await getSyncEntities(toriiClient, contractComponents as any);
 
     // Get apps from the world
-    const entities = getComponentEntities(clientComponents.App);
+    const entities = getComponentEntities(contractComponents.App);
     const apps: ReturnType<typeof getComponentValue>[] = [...entities].map(
-        (entityId) => getComponentValue(clientComponents.App, entityId)
+        (entityId) => getComponentValue(contractComponents.App, entityId)
     );
     const contracts = await Promise.all(
         apps.map((address) =>
@@ -133,8 +134,8 @@ export async function setupPixelaw({
 
     // Create setup data
     const setupData = {
+        apps,
         client,
-        clientComponents,
         contractComponents,
         graphSdk: createGraphSdk(),
         systemCalls: createSystemCalls({client}),

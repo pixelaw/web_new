@@ -70,7 +70,7 @@ export const PixelawProvider = ({children}: { children: ReactNode }) => {
     return <PixelawContext.Provider value={contextValues}>{children}</PixelawContext.Provider>;
 };
 
-export const usePixelawProvider = () => {
+export const usePixelawProvider = (): IPixelLawContext => {
     const context = useContext(PixelawContext);
     if (!context) throw new Error("PixelLawProvider can only be used within a PixelLawProvider");
     return context;
