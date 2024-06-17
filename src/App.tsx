@@ -36,19 +36,16 @@ function App() {
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
     const location = useLocation();
     const appStore = useDojoAppStore();
-    const [searchParams, setSearchParams] = useSearchParams();
     useSyncedViewStateStore();
     const {clientState, error} = usePixelawProvider();
-    const {center, setCenter, zoom, setZoom} = useViewStateStore();
+    const {center, setCenter, zoom, setZoom, selectedApp, setSelectedApp} = useViewStateStore();
 
-
-    const selectedAppName = searchParams.get("app");
 
     //</editor-fold>
 
     //<editor-fold desc="Handlers">
     const onAppSelect = (appName: string) => {
-        setSearchParams({app: appName});
+        setSelectedApp(appName)
     };
 
     function onCenterChange(newCenter: Coordinate) {
@@ -62,6 +59,7 @@ function App() {
 
     function onCellHover(coordinate: Coordinate) {
         // console.log("onCellHover", coordinate)
+        // TODO this is where we'll do some p2p social stuff
     }
 
     function onCellClick(coordinate: Coordinate) {
@@ -86,10 +84,6 @@ function App() {
         return '-100%';
     }, [zoom]);
 
-    // // Loading
-    // useEffect(() => {
-    //     initializeApp(setIsLoading, createClient)
-    // }, [location.search]);
 
     //<editor-fold desc="Output">
     if (clientState === "loading") {
@@ -148,7 +142,7 @@ function App() {
 
                             <div className={styles.apps} style={{left: zoombasedAdjustment}}>
                                 <Apps
-                                    selectedAppName={selectedAppName}
+                                    selectedAppName={selectedApp}
                                     onSelect={onAppSelect}
                                     appStore={appStore}
                                 />
