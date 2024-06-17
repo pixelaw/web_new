@@ -22,8 +22,9 @@ interface ViewportProps {
     tileStore: TileStore;
     zoom: number;
     center: Coordinate;
-    onZoomChange: (newZoom: number) => void;
-    onCenterChange: (newCenter: Coordinate) => void;
+    setCenter: (newCenter: Coordinate) => void;
+    setZoom: (newZoom: number) => void;
+    // onCenterChange: (newCenter: Coordinate) => void;
     onWorldviewChange: (newWorldview: Bounds) => void;
     onCellClick: (coordinate: Coordinate) => void;
     onCellHover: (coordinate: Coordinate) => void;
@@ -31,11 +32,9 @@ interface ViewportProps {
 
 const Viewport: React.FC<ViewportProps> = (
     {
-        zoom: initialZoom,
-        center: initialCenter,
-        onCenterChange,
+        zoom, setZoom,
+        center, setCenter,
         onWorldviewChange,
-        onZoomChange,
         pixelStore,
         tileStore,
         onCellClick,
@@ -50,8 +49,8 @@ const Viewport: React.FC<ViewportProps> = (
     const dragStartPoint = useRef<Coordinate | null>(null);
 
     const [lastDragPoint, setLastDragPoint] = useState<Coordinate>([0, 0]);
-    const [zoom, setZoom] = useState<number>(initialZoom);
-    const [center, setCenter] = useState<Coordinate>(initialCenter);
+    // const [zoom, setZoom] = useState<number>(initialZoom);
+    // const [center, setCenter] = useState<Coordinate>(initialCenter);
     const [worldOffset, setWorldOffset] = useState<Coordinate>([0, 0]);
     const [hoveredCell, setHoveredCell] = useState<Coordinate | undefined>(undefined);
     const [worldView, setWorldView] = useState<Bounds>([[0, 0], [0, 0]]);
@@ -103,15 +102,15 @@ const Viewport: React.FC<ViewportProps> = (
 
         const cellSize = getCellSize(zoom)
 
-        const gridDimensions = [
-            Math.ceil(width / cellSize),
-            Math.ceil(height / cellSize)
-        ]
+        // const gridDimensions = [
+        //     Math.ceil(width / cellSize),
+        //     Math.ceil(height / cellSize)
+        // ]
 
-        setCenter([
-            Math.floor(gridDimensions[0] / 2),
-            Math.floor(gridDimensions[1] / 2)
-        ])
+        // setCenter([
+        //     Math.floor(gridDimensions[0] / 2),
+        //     Math.floor(gridDimensions[1] / 2)
+        // ])
 
         if (zoom > ZOOM_TILEMODE) {
 
@@ -147,7 +146,7 @@ const Viewport: React.FC<ViewportProps> = (
 
     // Render when in Tile mode
     useEffect(() => {
-        if (zoom <= ZOOM_TILEMODE) {
+        if (zoom <= ZOOM_TILEMODE && zoom > ZOOM_MIN) {
             const canvas = canvasRef.current;
             if (!canvas) return;
             if (!bufferContext) return;
@@ -213,29 +212,28 @@ const Viewport: React.FC<ViewportProps> = (
 
             // Update state with new zoom and world offset
             setZoom(newZoom);
+            setCenter(center)
 
-            // Optionally, call your onZoomChange handler
-            onZoomChange(newZoom);
         };
 
         canvas.addEventListener('wheel', handleWheel, {passive: false});
 
-        onCenterChange(center)
+        // onCenterChange(center)
         const newWorldview = getWorldViewBounds()
         if (!areBoundsEqual(newWorldview, worldView)) {
             setWorldView(getWorldViewBounds())
             onWorldviewChange(newWorldview)
         }
-        onZoomChange(zoom)
+        // onZoomChange(zoom)
         return () => {
             canvas.removeEventListener('wheel', handleWheel);
         };
     }, [zoom]);
 
-    // TODO
-    useEffect(() => {
-        setCenter(initialCenter);
-    }, [initialCenter]);
+    // // TODO
+    // useEffect(() => {
+    //     setCenter(initialCenter);
+    // }, [initialCenter]);
 
     // TODO
     useEffect(() => {
@@ -271,7 +269,7 @@ const Viewport: React.FC<ViewportProps> = (
 
         setPixelOffset(newPixelOffset);
         setWorldOffset(newWorldOffset)
-        onCenterChange(center)
+        setCenter(center)
     }
 
     const handleMouseMove = (e: React.MouseEvent) => {

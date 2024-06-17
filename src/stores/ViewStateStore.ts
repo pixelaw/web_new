@@ -1,11 +1,11 @@
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 import {create} from 'zustand';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {Coordinate} from "@/webtools/types.ts";
 
 const ZOOM_PRESETS = {tile: 100, pixel: 3100}
 const DEFAULT_ZOOM = ZOOM_PRESETS.pixel
-const DEFAULT_CENTER: Coordinate = [4294967294, 0]
+const DEFAULT_CENTER: Coordinate = [4294967194, 0]
 
 interface AppState {
     selectedApp: string;
@@ -29,7 +29,6 @@ export const useViewStateStore = create<AppState>((set) => ({
     setSelectedColor: (color: string) => set({selectedColor: color}),
 }));
 
-
 export function useSyncedViewStateStore() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -44,61 +43,40 @@ export function useSyncedViewStateStore() {
         setSelectedColor
     } = useViewStateStore();
 
+    const initialLoad = useRef(true);
+
     useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const appInQuery = queryParams.get('app');
-        const centerInQuery = queryParams.get('center')?.split(',').map(Number) as Coordinate;
-        const zoomInQuery = Number(queryParams.get('zoom'));
-        const colorInQuery = queryParams.get('color');
+        if (initialLoad.current) {
+            console.log("ja", location.search)
+            initialLoad.current = false;
+            const queryParams = new URLSearchParams(location.search);
+            const appInQuery = queryParams.get('app');
+            const centerInQuery = queryParams.get('center')?.split(',').map(Number) as Coordinate;
+            const zoomInQuery = Number(queryParams.get('zoom'));
+            const colorInQuery = queryParams.get('color');
 
-        let shouldUpdateURL = false;
+            if (appInQuery && appInQuery.length > 0) setSelectedApp(appInQuery)
+            if (centerInQuery) setCenter(centerInQuery);
+            if (zoomInQuery) setZoom(zoomInQuery);
+            if (colorInQuery) setSelectedColor(colorInQuery);
 
-        if (appInQuery !== selectedApp) {
+        }
+    }, []);
+
+    useEffect(() => {
+        const updateURL = () => {
+            const queryParams = new URLSearchParams();
             queryParams.set('app', selectedApp);
-            shouldUpdateURL = true;
-        }
-
-        if (!centerInQuery || centerInQuery[0] !== center[0] || centerInQuery[1] !== center[1]) {
             queryParams.set('center', `${center[0]},${center[1]}`);
-            shouldUpdateURL = true;
-        }
-
-        if (zoomInQuery !== zoom) {
             queryParams.set('zoom', zoom.toString());
-            shouldUpdateURL = true;
-        }
-
-        if (colorInQuery !== selectedColor) {
             queryParams.set('color', selectedColor);
-            shouldUpdateURL = true;
-        }
+            const newSearch = `?${queryParams.toString()}`;
 
-        if (shouldUpdateURL) {
-            navigate(`?${queryParams.toString()}`, {replace: true});
-        }
-    }, [selectedApp, center, zoom, selectedColor, navigate]);
+            if (window.location.search !== newSearch) {
+                window.history.replaceState(null, '', newSearch);
+            }
+        };
 
-    useEffect(() => {
-        const queryParams = new URLSearchParams(location.search);
-        const appInQuery = queryParams.get('app');
-        const centerInQuery = queryParams.get('center')?.split(',').map(Number) as Coordinate;
-        const zoomInQuery = Number(queryParams.get('zoom'));
-        const colorInQuery = queryParams.get('color');
-
-        if (appInQuery && appInQuery !== selectedApp) {
-            setSelectedApp(appInQuery);
-        }
-
-        if (centerInQuery && (centerInQuery[0] !== center[0] || centerInQuery[1] !== center[1])) {
-            setCenter(centerInQuery);
-        }
-
-        if (!isNaN(zoomInQuery) && zoomInQuery !== zoom) {
-            setZoom(zoomInQuery);
-        }
-
-        if (colorInQuery && colorInQuery !== selectedColor) {
-            setSelectedColor(colorInQuery);
-        }
-    }, [location.search, setSelectedApp, setCenter, setZoom, setSelectedColor, selectedApp, center, zoom, selectedColor]);
+        updateURL();
+    }, [selectedApp, center, zoom, selectedColor]);
 }

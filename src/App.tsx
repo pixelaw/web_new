@@ -31,11 +31,11 @@ function App() {
     const pixelStore = useDojoPixelStore("http://localhost:8080");  // TODO url configurable
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
     const appStore = useDojoAppStore();
-    useSyncedViewStateStore();
     const {clientState, error} = usePixelawProvider();
     const {center, setCenter, zoom, setZoom, selectedApp, setSelectedApp} = useViewStateStore();
 
 
+    useSyncedViewStateStore();
     //</editor-fold>
 
     //<editor-fold desc="Handlers">
@@ -43,9 +43,9 @@ function App() {
         setSelectedApp(appName)
     };
 
-    function onCenterChange(newCenter: Coordinate) {
-        setCenter(newCenter);
-    }
+    // function onCenterChange(newCenter: Coordinate) {
+    //     setCenter(newCenter);
+    // }
 
     function onWorldviewChange(newWorldview: Bounds) {
         updateService.setBounds(newWorldview)
@@ -65,9 +65,11 @@ function App() {
         console.log("onColorSelect", color)
     }
 
-    function onZoomChange(newZoom: number) {
-        setZoom(newZoom);
-    }
+    //
+    // function onZoomChange(newZoom: number) {
+    //     console.log("setZoom", newZoom)
+    //     setZoom(newZoom);
+    // }
 
     //</editor-fold>
 
@@ -124,10 +126,10 @@ function App() {
                                 tileStore={tileStore}
                                 pixelStore={pixelStore}
                                 zoom={zoom}
+                                setZoom={setZoom}
                                 center={center}
+                                setCenter={setCenter}
                                 onWorldviewChange={onWorldviewChange}
-                                onCenterChange={onCenterChange}
-                                onZoomChange={onZoomChange}
                                 onCellClick={onCellClick}
                                 onCellHover={onCellHover}
                             />
