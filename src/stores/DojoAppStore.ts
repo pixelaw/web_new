@@ -1,10 +1,7 @@
 import {App, AppStore} from "@/webtools/types.ts";
 import {usePixelawProvider} from "@/providers/PixelawProvider.tsx";
-import {getEntityIdFromKeys} from "@dojoengine/utils";
 import {shortString} from "starknet";
 import {felt252ToUnicode} from "@/webtools/utils.ts";
-
-// type State = { [key: string]: App | undefined };
 
 
 export function useDojoAppStore(): AppStore {
