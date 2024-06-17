@@ -5,7 +5,7 @@ import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
 import {useDojoPixelStore} from "@/stores/DojoPixelStore.ts";
 import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
 import Viewport from "./webtools/components/Viewport/ViewPort.tsx";
-import SimpleColorPicker from "./webtools/components/ColorPicker/SimpleColorPicker.tsx";
+import SimpleColorPicker from "@/components/ColorPicker/SimpleColorPicker.tsx";
 import MenuBar from "./components/MenuBar/MenuBar.tsx";
 import Apps from "./components/Apps/Apps.tsx";
 import {useDojoAppStore} from "./stores/DojoAppStore.ts";
@@ -15,6 +15,7 @@ import {initializeApp} from "./components/App/setup.ts";
 import Settings from "./components/Settings/Settings.tsx";
 import {usePixelawProvider} from "./providers/PixelawProvider.tsx";
 import {useViewStateStore, useSyncedViewStateStore} from "@/stores/ViewStateStore.ts";
+import {useCellClickHandler} from "@/hooks/useClickedCellHandler.ts";
 
 
 function App() {
@@ -31,36 +32,39 @@ function App() {
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
     const appStore = useDojoAppStore();
     const {clientState, error} = usePixelawProvider();
-    const {center, setCenter, zoom, setZoom, selectedApp, setSelectedApp} = useViewStateStore();
+    const {
+        color,
+        setColor,
+        center,
+        setCenter,
+        zoom,
+        setZoom,
+        setHoveredCell,
+        setClickedCell
+    } = useViewStateStore();
 
-
+    useCellClickHandler();
     useSyncedViewStateStore();
     //</editor-fold>
 
     //<editor-fold desc="Handlers">
-    const onAppSelect = (appName: string) => {
-        setSelectedApp(appName)
-    };
-
 
     function onWorldviewChange(newWorldview: Bounds) {
         updateService.setBounds(newWorldview)
-        // console.log("onWorldviewChange", newWorldview)
     }
 
     function onCellHover(coordinate: Coordinate) {
-        // console.log("onCellHover", coordinate)
         // TODO this is where we'll do some p2p social stuff
+        setHoveredCell(coordinate)
     }
 
     function onCellClick(coordinate: Coordinate) {
-        console.log("onCellClick", coordinate)
+        setClickedCell(coordinate)
     }
 
     function onColorSelect(color: string) {
-        console.log("onColorSelect", color)
+        setColor(color)
     }
-
 
     //</editor-fold>
 
@@ -125,13 +129,11 @@ function App() {
                                 onCellHover={onCellHover}
                             />
                             <div className={styles.colorpicker} style={{bottom: zoombasedAdjustment}}>
-                                <SimpleColorPicker onColorSelect={onColorSelect}/>
+                                <SimpleColorPicker color={color} onColorSelect={onColorSelect}/>
                             </div>
 
                             <div className={styles.apps} style={{left: zoombasedAdjustment}}>
                                 <Apps
-                                    selectedAppName={selectedApp}
-                                    onSelect={onAppSelect}
                                     appStore={appStore}
                                 />
                             </div>

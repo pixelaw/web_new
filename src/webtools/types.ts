@@ -65,6 +65,3 @@ export type Bounds = [topLeft: Coordinate, bottomRight: Coordinate];
 
 export const MAX_UINT32: number = 4_294_967_295
 
-export interface ColorPickerProps {
-    onColorSelect: (color: string) => void; // Callback function to return the selected color
-}

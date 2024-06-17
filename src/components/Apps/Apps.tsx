@@ -1,14 +1,14 @@
 import App from "@/components/App/App.tsx";
 import styles from './Apps.module.css';
 import {AppStore} from "@/webtools/types.ts";
+import {useViewStateStore} from "@/stores/ViewStateStore.ts";
 
 type AppsProps = {
     appStore: AppStore;
-    selectedAppName: string | null;
-    onSelect: (appName: string) => void;
 };
 
-const Apps: React.FC<AppsProps> = ({appStore, selectedAppName, onSelect}) => {
+const Apps: React.FC<AppsProps> = ({appStore}) => {
+    const {selectedApp, setSelectedApp, hoveredCell} = useViewStateStore();
 
     const allApps = appStore.getAll();
 
@@ -17,12 +17,18 @@ const Apps: React.FC<AppsProps> = ({appStore, selectedAppName, onSelect}) => {
             {allApps.map((app, index) => (
                 <div
                     key={index}
-                    onClick={() => onSelect(app.name)}
-                    className={selectedAppName === app.name ? styles.selected : ''}
+                    onClick={() => setSelectedApp(app.name)}
+                    className={selectedApp === app.name ? styles.selected : ''}
                 >
                     <App icon={app.icon} name={app.name}/>
                 </div>
             ))}
+            {hoveredCell &&
+                <div id={"hoveredCell"}>
+                    x: {hoveredCell[0]}
+                    y: {hoveredCell[1]}
+                </div>
+            }
         </div>
     );
 };

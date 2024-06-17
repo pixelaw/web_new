@@ -1,6 +1,6 @@
 import {useEffect, useRef} from "react";
 import {create} from 'zustand';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {Coordinate} from "@/webtools/types.ts";
 
 const ZOOM_PRESETS = {tile: 100, pixel: 3100}
@@ -11,22 +11,30 @@ interface AppState {
     selectedApp: string;
     center: Coordinate;
     zoom: number;
-    selectedColor: string;
+    color: string;
+    hoveredCell?: Coordinate;
+    clickedCell?: Coordinate;
     setSelectedApp: (appName: string) => void;
     setCenter: (center: Coordinate) => void;
     setZoom: (zoom: number) => void;
-    setSelectedColor: (color: string) => void;
+    setColor: (color: string) => void;
+    setHoveredCell: (cell?: Coordinate) => void;
+    setClickedCell: (cell?: Coordinate) => void;
 }
 
 export const useViewStateStore = create<AppState>((set) => ({
     selectedApp: '',
     center: DEFAULT_CENTER,
     zoom: DEFAULT_ZOOM,
-    selectedColor: '#000000',
+    color: '#000000',
+    hoveredCell: undefined,
+    clickedCell: undefined,
     setSelectedApp: (appName: string) => set({selectedApp: appName}),
     setCenter: (center: Coordinate) => set({center}),
     setZoom: (zoom: number) => set({zoom}),
-    setSelectedColor: (color: string) => set({selectedColor: color}),
+    setColor: (color: string) => set({color: color}),
+    setHoveredCell: (cell?: Coordinate) => set({hoveredCell: cell}),
+    setClickedCell: (cell?: Coordinate) => set({clickedCell: cell}),
 }));
 
 export function useSyncedViewStateStore() {
@@ -39,8 +47,8 @@ export function useSyncedViewStateStore() {
         setCenter,
         zoom,
         setZoom,
-        selectedColor,
-        setSelectedColor
+        color,
+        setColor
     } = useViewStateStore();
 
     const initialLoad = useRef(true);
@@ -57,7 +65,7 @@ export function useSyncedViewStateStore() {
             if (appInQuery && appInQuery.length > 0) setSelectedApp(appInQuery)
             if (centerInQuery) setCenter(centerInQuery);
             if (zoomInQuery) setZoom(zoomInQuery);
-            if (colorInQuery) setSelectedColor(colorInQuery);
+            if (colorInQuery) setColor(colorInQuery);
 
         }
     }, []);
@@ -68,7 +76,7 @@ export function useSyncedViewStateStore() {
             queryParams.set('app', selectedApp);
             queryParams.set('center', `${center[0]},${center[1]}`);
             queryParams.set('zoom', zoom.toString());
-            queryParams.set('color', selectedColor);
+            queryParams.set('color', color);
             const newSearch = `?${queryParams.toString()}`;
 
             if (window.location.search !== newSearch) {
@@ -76,5 +84,5 @@ export function useSyncedViewStateStore() {
             }
         };
         updateURL();
-    }, [selectedApp, center, zoom, selectedColor]);
+    }, [selectedApp, center, zoom, color]);
 }
