@@ -1,16 +1,15 @@
 import styles from './App.module.css';
-import {useSearchParams} from "react-router-dom";
 import React, {useEffect, useMemo, useState} from "react";
 import {Bounds, Coordinate} from "./webtools/types.ts";
 import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
 import {useDojoPixelStore} from "@/stores/DojoPixelStore.ts";
 import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
-import Viewport from "./webtools/components/Viewport";
+import Viewport from "./webtools/components/Viewport/ViewPort.tsx";
 import SimpleColorPicker from "./webtools/components/ColorPicker/SimpleColorPicker.tsx";
 import MenuBar from "./components/MenuBar/MenuBar.tsx";
 import Apps from "./components/Apps/Apps.tsx";
 import {useDojoAppStore} from "./stores/DojoAppStore.ts";
-import {Route, Routes, useLocation} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Loading from "./components/Loading/Loading.tsx";
 import {initializeApp} from "./components/App/setup.ts";
 import Settings from "./components/Settings/Settings.tsx";

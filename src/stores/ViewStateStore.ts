@@ -75,7 +75,6 @@ export function useSyncedViewStateStore() {
                 window.history.replaceState(null, '', newSearch);
             }
         };
-        console.log("u", center)
         updateURL();
     }, [selectedApp, center, zoom, selectedColor]);
 }
