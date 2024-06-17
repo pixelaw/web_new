@@ -130,6 +130,21 @@ const Viewport: React.FC<ViewportProps> = (
 
     }, [dimensions, zoom, pixelOffset, hoveredCell, pixelStore.getPixel]);
 
+    const calculateCenter = () => {
+        const [width, height] = dimensions;
+        // Calculate the viewport's center point in pixels
+        const viewportCenter: Coordinate = [width / 2, height / 2];
+        // Adjust by pixelOffset to get the center in "world" pixels
+        const adjustedCenter: Coordinate = [
+            viewportCenter[0] + pixelOffset[0],
+            viewportCenter[1] + pixelOffset[1],
+        ];
+        // Convert to world coordinates (cells)
+        const centerCell = cellForPosition(zoom, [0, 0], adjustedCenter);
+        const worldCenterCell = applyWorldOffset(worldOffset, centerCell)
+        return worldCenterCell;
+    };
+
     // Render when in Tile mode
     useEffect(() => {
         if (zoom <= ZOOM_TILEMODE) {
@@ -266,6 +281,10 @@ const Viewport: React.FC<ViewportProps> = (
 
             setLastDragPoint(mouse);
         } else {
+            // TODO call setCenter with the center cell
+            const newCenterCell = calculateCenter();
+            setCenter(newCenterCell);
+
             if (zoom > ZOOM_TILEMODE) {
                 const rect = e.currentTarget.getBoundingClientRect();
 

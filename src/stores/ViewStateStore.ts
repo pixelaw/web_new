@@ -3,6 +3,10 @@ import {create} from 'zustand';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {Coordinate} from "@/webtools/types.ts";
 
+const ZOOM_PRESETS = {tile: 100, pixel: 3100}
+const DEFAULT_ZOOM = ZOOM_PRESETS.pixel
+const DEFAULT_CENTER: Coordinate = [4294967294, 0]
+
 interface AppState {
     selectedApp: string;
     center: Coordinate;
@@ -14,17 +18,17 @@ interface AppState {
     setSelectedColor: (color: string) => void;
 }
 
-
 export const useViewStateStore = create<AppState>((set) => ({
     selectedApp: '',
-    center: [0, 0],
-    zoom: 1000,
+    center: DEFAULT_CENTER,
+    zoom: DEFAULT_ZOOM,
     selectedColor: '#000000',
     setSelectedApp: (appName: string) => set({selectedApp: appName}),
     setCenter: (center: Coordinate) => set({center}),
     setZoom: (zoom: number) => set({zoom}),
     setSelectedColor: (color: string) => set({selectedColor: color}),
 }));
+
 
 export function useSyncedViewStateStore() {
     const navigate = useNavigate();

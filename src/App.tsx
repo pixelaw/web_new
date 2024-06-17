@@ -17,10 +17,6 @@ import Settings from "./components/Settings/Settings.tsx";
 import {usePixelawProvider} from "./providers/PixelawProvider.tsx";
 import {useViewStateStore, useSyncedViewStateStore} from "@/stores/ViewStateStore.ts";
 
-const ZOOM_PRESETS = {tile: 100, pixel: 3100}
-const DEFAULT_ZOOM = ZOOM_PRESETS.pixel
-const DEFAULT_CENTER: Coordinate = [4294967294, 0]
-
 
 function App() {
     //<editor-fold desc="State">
@@ -34,7 +30,6 @@ function App() {
     const updateService = useUpdateService(`ws://localhost:3001/tiles`)  // TODO url configurable
     const pixelStore = useDojoPixelStore("http://localhost:8080");  // TODO url configurable
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
-    const location = useLocation();
     const appStore = useDojoAppStore();
     useSyncedViewStateStore();
     const {clientState, error} = usePixelawProvider();
