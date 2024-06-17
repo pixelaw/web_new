@@ -2,6 +2,7 @@ import {App, AppStore} from "@/webtools/types.ts";
 import {usePixelawProvider} from "@/providers/PixelawProvider.tsx";
 import {shortString} from "starknet";
 import {felt252ToUnicode} from "@/webtools/utils.ts";
+import {getComponentValue} from "@dojoengine/recs";
 
 
 export function useDojoAppStore(): AppStore {
@@ -20,16 +21,19 @@ export function useDojoAppStore(): AppStore {
     const getAll = (): App[] => {
         if (!gameData) return []
 
-        const all = gameData.setup.apps.map((appComponent): App => {
-            return fromComponent(appComponent)
-        })
-        return all;
+        return gameData.setup.apps.reduce((acc: App[], appComponent) => {
+            const app = fromComponent(appComponent)
+            if (app) acc.push(app)
+            return acc
+        }, [])
+        
     };
 
     return {getByName, getAll, prepare};
 }
 
-function fromComponent(appComponent): App {
+function fromComponent(appComponent: ReturnType<typeof getComponentValue>): App | undefined {
+    if (!appComponent) return undefined
     return {
         name: shortString.decodeShortString(appComponent.name),
         icon: felt252ToUnicode(appComponent.icon),
