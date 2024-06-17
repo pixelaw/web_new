@@ -1,5 +1,5 @@
 import React from 'react';
-import { clearIdb } from "../../webtools/utils.ts";
+import {clearIdb} from "@/webtools/utils.ts";
 import styles from './Settings.module.css';
 
 const Settings = () => {
@@ -17,7 +17,7 @@ const Settings = () => {
                 </li>
                 <li className={styles.settingItem}>
                     <span className={styles.settingLabel}>Example Setting</span>
-                    <input type="text" className={styles.settingInput} />
+                    <input type="text" className={styles.settingInput}/>
                 </li>
             </ul>
         </div>

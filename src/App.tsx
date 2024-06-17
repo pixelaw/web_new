@@ -1,18 +1,18 @@
 import styles from './App.module.css';
 import React, {useMemo} from "react";
-import {Bounds, Coordinate} from "./webtools/types.ts";
-import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
+import {Bounds, Coordinate} from "@/webtools/types.ts";
+import {useSimpleTileStore} from "@/webtools/hooks/SimpleTileStore.ts";
 import {useDojoPixelStore} from "@/stores/DojoPixelStore.ts";
-import {useUpdateService} from "./webtools/hooks/UpdateService.ts";
-import Viewport from "./webtools/components/Viewport/ViewPort.tsx";
+import {useUpdateService} from "@/webtools/hooks/UpdateService.ts";
+import Viewport from "@/webtools/components/Viewport/ViewPort.tsx";
 import SimpleColorPicker from "@/components/ColorPicker/SimpleColorPicker.tsx";
-import MenuBar from "./components/MenuBar/MenuBar.tsx";
-import Apps from "./components/Apps/Apps.tsx";
-import {useDojoAppStore} from "./stores/DojoAppStore.ts";
+import MenuBar from "@/components/MenuBar/MenuBar.tsx";
+import Apps from "@/components/Apps/Apps.tsx";
+import {useDojoAppStore} from "@/stores/DojoAppStore.ts";
 import {Route, Routes} from "react-router-dom";
-import Loading from "./components/Loading/Loading.tsx";
-import Settings from "./components/Settings/Settings.tsx";
-import {usePixelawProvider} from "./providers/PixelawProvider.tsx";
+import Loading from "@/components/Loading/Loading.tsx";
+import Settings from "@/components/Settings/Settings.tsx";
+import {usePixelawProvider} from "@/providers/PixelawProvider.tsx";
 import {useViewStateStore, useSyncedViewStateStore} from "@/stores/ViewStateStore.ts";
 import {useCellClickHandler} from "@/hooks/useClickedCellHandler.ts";
 
@@ -65,6 +65,8 @@ function App() {
 
     //</editor-fold>
 
+    //<editor-fold desc="Custom behavior">
+
     // TODO "slide up" the bottom as the zoomlevel increases
     const zoombasedAdjustment = useMemo(() => {
         if (zoom > 3000) {
@@ -73,6 +75,7 @@ function App() {
         return '-100%';
     }, [zoom]);
 
+    //</editor-fold>
 
     //<editor-fold desc="Output">
     if (clientState === "loading") {

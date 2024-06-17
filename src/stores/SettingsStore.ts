@@ -1,6 +1,6 @@
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
-import manifest from "../dojo/manifest";
+import {create} from "zustand";
+import {immer} from "zustand/middleware/immer";
+import manifest from "@/dojo/manifest";
 
 type DojoConfig = {
     rpcUrl: string;
@@ -24,7 +24,9 @@ export interface ISettingsStore {
     configIsValid: boolean;
     configError?: Error | string | undefined;
     worldAddress?: string;
+
     setDojoConfig(data: Partial<DojoConfig>): Promise<void>;
+
     setSettings(data: Partial<ISettingsStore>): void; // catch all
     setWorldAddress(address: string): Promise<void>;
 }
@@ -91,7 +93,7 @@ const useSettingsStore = create<ISettingsStore>()(
                 } as DojoConfig;
                 await checkDojoConfig(newConfig);
                 set((state) => {
-                    Object.assign(state, { config: newConfig, configIsValid: true });
+                    Object.assign(state, {config: newConfig, configIsValid: true});
                 });
             } catch (e) {
                 set((state) => {
@@ -114,10 +116,10 @@ const useSettingsStore = create<ISettingsStore>()(
     }))
 );
 
-const { getState: getSettingsStore } = useSettingsStore;
+const {getState: getSettingsStore} = useSettingsStore;
 const setDojoConfig = getSettingsStore().setDojoConfig; // syntactic sugar
 
 // uses the set function to validate the default config
 setDojoConfig(defaultDojoConfig);
 
-export { getSettingsStore, useSettingsStore, setDojoConfig };
+export {getSettingsStore, useSettingsStore, setDojoConfig};

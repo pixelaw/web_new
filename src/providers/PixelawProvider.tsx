@@ -1,6 +1,6 @@
 import {ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
-import {IPixelawGameData, setupPixelaw, TPixelLawError} from "../dojo/setupPixelaw";
-import {useSettingsStore} from "../global/settings.store.ts";
+import {IPixelawGameData, setupPixelaw, TPixelLawError} from "@/dojo/setupPixelaw";
+import {useSettingsStore} from "@/global/settings.store.ts";
 import {createDojoConfig} from "@dojoengine/core";
 
 export type IPixelLawContext = {

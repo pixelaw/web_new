@@ -4,11 +4,12 @@ import {
     KATANA_PREFUNDED_ADDRESS, KATANA_PREFUNDED_PRIVATE_KEY,
     LOCAL_KATANA, LOCAL_RELAY, LOCAL_TORII
 } from "@dojoengine/core";
-import manifest from "../dojo/manifest.ts";
+import manifest from "@/dojo/manifest.ts";
 
 import * as torii from "@dojoengine/torii-client";
 
 import {Client} from "@dojoengine/torii-wasm";
+
 interface ClientState {
     client?: Client;
     createClient: () => Promise<void>;
@@ -46,7 +47,7 @@ const useDojoStore = create<DojoConfig & ClientState & {
         set(Object.fromEntries(checks));
     },
     createClient: async () => {
-        const { rpcUrl, toriiUrl, manifest } = get();
+        const {rpcUrl, toriiUrl, manifest} = get();
         // Assuming async initialization logic for ToriiClient
         const client = await torii.createClient([], {
             rpcUrl,
@@ -54,7 +55,7 @@ const useDojoStore = create<DojoConfig & ClientState & {
             worldAddress: manifest.world.address,
             relayUrl: '', // Assuming this needs to be dynamically set or fetched
         });
-        set({ client });
+        set({client});
     },
 }));
 
