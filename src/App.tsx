@@ -1,5 +1,5 @@
 import styles from './App.module.css';
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useMemo} from "react";
 import {Bounds, Coordinate} from "./webtools/types.ts";
 import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
 import {useDojoPixelStore} from "@/stores/DojoPixelStore.ts";
@@ -11,7 +11,6 @@ import Apps from "./components/Apps/Apps.tsx";
 import {useDojoAppStore} from "./stores/DojoAppStore.ts";
 import {Route, Routes} from "react-router-dom";
 import Loading from "./components/Loading/Loading.tsx";
-import {initializeApp} from "./components/App/setup.ts";
 import Settings from "./components/Settings/Settings.tsx";
 import {usePixelawProvider} from "./providers/PixelawProvider.tsx";
 import {useViewStateStore, useSyncedViewStateStore} from "@/stores/ViewStateStore.ts";
@@ -21,8 +20,6 @@ import {useCellClickHandler} from "@/hooks/useClickedCellHandler.ts";
 function App() {
     //<editor-fold desc="State">
 
-    const [isLoading, setIsLoading] = useState(true);
-    const [showSettings, setShowSettings] = useState(false);
 
     //</editor-fold>
 
@@ -53,7 +50,7 @@ function App() {
         updateService.setBounds(newWorldview)
     }
 
-    function onCellHover(coordinate: Coordinate) {
+    function onCellHover(coordinate: Coordinate | undefined) {
         // TODO this is where we'll do some p2p social stuff
         setHoveredCell(coordinate)
     }
