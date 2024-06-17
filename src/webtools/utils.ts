@@ -1,6 +1,7 @@
 import {Bounds, Coordinate, MAX_UINT32, Pixel} from "./types.ts";
 import {ZOOM_FACTOR} from "./components/Viewport/constants.ts";
 import UPNG from "upng-js";
+import {shortString} from "starknet";
 
 export const MAX_VIEW_SIZE = 1_000_000
 
@@ -79,6 +80,29 @@ export function handlePixelChanges(
 //     if (result > MAX_UINT32) result = result % (MAX_UINT32 + 1)
 //     return result
 // }
+export const felt252ToString = (felt252: string | number | bigint) => {
+    if (typeof felt252 === 'bigint' || typeof felt252 === 'object') {
+        felt252 = `0x${felt252.toString(16)}`
+    }
+    if (felt252 === '0x0' || felt252 === '0') return ''
+    if (typeof felt252 === 'string') {
+        try {
+            return shortString.decodeShortString(felt252)
+        } catch (e) {
+            return felt252
+        }
+    }
+    return felt252.toString()
+}
+export const felt252ToUnicode = (felt252: string | number) => {
+    const string = felt252ToString(felt252)
+    if (string.includes('U+')) {
+        const text = string.replace('U+', '')
+        const codePoint = parseInt(text, 16)
+        return String.fromCodePoint(codePoint)
+    }
+    return string
+}
 
 export function getInitialOffset(tileCoord: number, worldCoord: number, offset: number) {
     // offset = uint2relative(offset)
@@ -135,6 +159,7 @@ export async function fillPixelData(imageUrl: string, setPixels: (pixels: { key:
 
 
 export async function clearIdb() {
+    console.log("Clearing keyval indexDB")
     const DB_NAME = 'keyval-store'; // replace with your database name
     const DB_STORE_NAME = 'keyval'; // replace with your store name
 

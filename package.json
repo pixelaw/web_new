@@ -13,17 +13,26 @@
   },
   "dependencies": {
     "@apollo/client": "^3.10.4",
+    "@dojoengine/core": "^0.7.1",
+    "@dojoengine/create-burner": "^0.7.1",
+    "@dojoengine/react": "^0.7.2",
+    "@dojoengine/recs": "^0.1.35",
+    "@dojoengine/state": "^0.7.1",
+    "@dojoengine/torii-client": "^0.7.1",
     "@react-hook/resize-observer": "^2.0.1",
     "@types/upng-js": "^2.1.5",
     "autoprefixer": "^10.4.19",
     "browserify-zlib": "^0.2.0",
     "graphql": "^16.8.1",
+    "graphql-request": "^7.0.1",
     "idb-keyval": "^6.2.1",
     "immer": "^10.1.1",
     "pngjs3": "^6.1.1",
     "postcss": "^8.4.38",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.1",
+    "starknet": "^5.24.3",
     "tailwindcss": "^3.4.4",
     "upng-js": "^2.1.0",
     "zustand": "^4.5.2"
@@ -41,6 +50,8 @@
     "typescript": "^5.2.2",
     "vite": "^5.2.0",
     "vite-plugin-graphql-loader": "^3.0.1",
+    "vite-plugin-top-level-await": "^1.4.1",
+    "vite-plugin-wasm": "^3.3.0",
     "vitest": "^1.6.0"
   }
 }

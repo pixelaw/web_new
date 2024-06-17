@@ -1,18 +1,25 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import styles from './Apps.module.css';
-import App from "./App.tsx";
+import App from "./App/App.tsx";
+import {AppStore} from "../webtools/types.ts";
 
-const appData = [
-    {
-        icon: "U+1F58C U+FE0F".split(' ').map(u => String.fromCodePoint(parseInt(u.substring(2), 16))).join(''),
-        name: "Paint"
-    }
-]
 
-const Apps: React.FC = () => {
+type AppsProps = {
+    appStore: AppStore;
+};
+
+const Apps: React.FC<AppsProps> = ({appStore}) => {
+
+
+    useEffect(() => {
+        appStore.prepare()
+    }, [])
+
+    const allApps = appStore.getAll()
+
     return (
         <div className={styles.inner}>
-            {appData.map((app, index) => (
+            {allApps.map((app, index) => (
                 <App key={index} icon={app.icon} name={app.name} />
             ))}
         </div>
