@@ -8,7 +8,7 @@ import {MAX_VIEW_SIZE} from "@/webtools/utils.ts";
 
 type State = { [key: string]: Pixel | undefined };
 
-export function useToriiPixelStore(baseUrl: string): PixelStore {
+export function useDojoPixelStore(baseUrl: string): PixelStore {
     const [state, setState] = useState<State>({});
 
     // Initialize ApolloClient with dynamic baseUrl

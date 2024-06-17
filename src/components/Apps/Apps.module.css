@@ -9,4 +9,6 @@
     gap: 0.5rem; /* Gap between buttons */
     width: 100vw;
 
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items vertically */
 }

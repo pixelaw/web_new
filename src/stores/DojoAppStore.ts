@@ -13,6 +13,7 @@ export function useDojoAppStore(): AppStore {
         // Not implemented for Dojo
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getByName = (name: string): App | undefined => {
         // TODO
         return;
@@ -26,7 +27,7 @@ export function useDojoAppStore(): AppStore {
             if (app) acc.push(app)
             return acc
         }, [])
-        
+
     };
 
     return {getByName, getAll, prepare};

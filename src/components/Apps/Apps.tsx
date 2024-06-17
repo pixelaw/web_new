@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import styles from './Apps.module.css';
-import App from "./App/App.tsx";
-import {AppStore} from "../webtools/types.ts";
+import App from "@/components/App/App.tsx";
+import {AppStore} from "@/webtools/types.ts";
 
 
 type AppsProps = {
@@ -20,7 +20,7 @@ const Apps: React.FC<AppsProps> = ({appStore}) => {
     return (
         <div className={styles.inner}>
             {allApps.map((app, index) => (
-                <App key={index} icon={app.icon} name={app.name} />
+                <App key={index} icon={app.icon} name={app.name}/>
             ))}
         </div>
     );
