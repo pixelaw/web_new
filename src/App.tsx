@@ -1,5 +1,5 @@
 import styles from './App.module.css';
-
+import {useSearchParams} from "react-router-dom";
 import React, {useEffect, useMemo, useState} from "react";
 import {Bounds, Coordinate} from "./webtools/types.ts";
 import {useSimpleTileStore} from "./webtools/hooks/SimpleTileStore.ts";
@@ -15,6 +15,7 @@ import Loading from "./components/Loading/Loading.tsx";
 import {initializeApp} from "./components/App/setup.ts";
 import Settings from "./components/Settings/Settings.tsx";
 import {usePixelawProvider} from "./providers/PixelawProvider.tsx";
+import {useViewStateStore, useSyncedViewStateStore} from "@/stores/ViewStateStore.ts";
 
 const ZOOM_PRESETS = {tile: 100, pixel: 3100}
 const DEFAULT_ZOOM = ZOOM_PRESETS.pixel
@@ -23,8 +24,7 @@ const DEFAULT_CENTER: Coordinate = [4294967294, 0]
 
 function App() {
     //<editor-fold desc="State">
-    const [viewportZoom, setViewportZoom] = useState<number>(DEFAULT_ZOOM);
-    const [center, setCenter] = useState<Coordinate>(DEFAULT_CENTER);
+
     const [isLoading, setIsLoading] = useState(true);
     const [showSettings, setShowSettings] = useState(false);
 
@@ -36,14 +36,23 @@ function App() {
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
     const location = useLocation();
     const appStore = useDojoAppStore();
-
+    const [searchParams, setSearchParams] = useSearchParams();
+    useSyncedViewStateStore();
     const {clientState, error} = usePixelawProvider();
+    const {center, setCenter, zoom, setZoom} = useViewStateStore();
+
+
+    const selectedAppName = searchParams.get("app");
 
     //</editor-fold>
 
     //<editor-fold desc="Handlers">
-    function onCenterChange(_newCenter: number[]) {
-        // console.log("onCenterChange", _newCenter)
+    const onAppSelect = (appName: string) => {
+        setSearchParams({app: appName});
+    };
+
+    function onCenterChange(newCenter: Coordinate) {
+        setCenter(newCenter);
     }
 
     function onWorldviewChange(newWorldview: Bounds) {
@@ -64,19 +73,18 @@ function App() {
     }
 
     function onZoomChange(newZoom: number) {
-        // console.log("onZoomChange", newZoom)
-        setViewportZoom(newZoom)
+        setZoom(newZoom);
     }
 
     //</editor-fold>
 
     // TODO "slide up" the bottom as the zoomlevel increases
     const zoombasedAdjustment = useMemo(() => {
-        if (viewportZoom > 3000) {
+        if (zoom > 3000) {
             return '1rem';
         }
         return '-100%';
-    }, [viewportZoom]);
+    }, [zoom]);
 
     // // Loading
     // useEffect(() => {
@@ -126,7 +134,7 @@ function App() {
                             <Viewport
                                 tileStore={tileStore}
                                 pixelStore={pixelStore}
-                                zoom={viewportZoom}
+                                zoom={zoom}
                                 center={center}
                                 onWorldviewChange={onWorldviewChange}
                                 onCenterChange={onCenterChange}
@@ -138,8 +146,12 @@ function App() {
                                 <SimpleColorPicker onColorSelect={onColorSelect}/>
                             </div>
 
-                            <div className={styles.apps} style={{right: zoombasedAdjustment}}>
-                                <Apps appStore={appStore}/>
+                            <div className={styles.apps} style={{left: zoombasedAdjustment}}>
+                                <Apps
+                                    selectedAppName={selectedAppName}
+                                    onSelect={onAppSelect}
+                                    appStore={appStore}
+                                />
                             </div>
                         </>
                     }/>

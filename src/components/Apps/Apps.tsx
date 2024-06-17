@@ -1,26 +1,27 @@
-import React, {useEffect} from 'react';
-import styles from './Apps.module.css';
 import App from "@/components/App/App.tsx";
+import styles from './Apps.module.css';
 import {AppStore} from "@/webtools/types.ts";
-
 
 type AppsProps = {
     appStore: AppStore;
+    selectedAppName: string | null;
+    onSelect: (appName: string) => void;
 };
 
-const Apps: React.FC<AppsProps> = ({appStore}) => {
+const Apps: React.FC<AppsProps> = ({appStore, selectedAppName, onSelect}) => {
 
-
-    useEffect(() => {
-        appStore.prepare()
-    }, [])
-
-    const allApps = appStore.getAll()
+    const allApps = appStore.getAll();
 
     return (
         <div className={styles.inner}>
             {allApps.map((app, index) => (
-                <App key={index} icon={app.icon} name={app.name}/>
+                <div
+                    key={index}
+                    onClick={() => onSelect(app.name)}
+                    className={selectedAppName === app.name ? styles.selected : ''}
+                >
+                    <App icon={app.icon} name={app.name}/>
+                </div>
             ))}
         </div>
     );

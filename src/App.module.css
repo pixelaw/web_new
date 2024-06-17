@@ -52,13 +52,13 @@ body {
 .apps {
     position: absolute;
     top: calc(50px + 1rem);
-    right: 1rem;
+    left: 1rem;
     width: 300px;
     display: flex;
     justify-content: center;
-    background-color: transparent; /* Background for entire container is transparent */
-    z-index: 10; /* Ensure it is on top */
-    height: calc(100vh - 50px - 2rem); /* Adjusted height */
+    background-color: transparent;
+    z-index: 10;
+    height: calc(100vh - 50px - 2rem);
 }
 
 .container {
