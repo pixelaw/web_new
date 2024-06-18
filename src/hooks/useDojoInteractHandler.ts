@@ -19,6 +19,8 @@ export const useDojoInteractHandler = (pixelStore: PixelStore, gameData: IPixela
     useEffect(() => {
         if (!clickedCell || !selectedApp) return;
 
+        console.log(`Clicked cell ${clickedCell} with app: ${selectedApp}`);
+
         // Retrieve behavior for the app
         const app = getByName(selectedApp)
 
@@ -47,14 +49,12 @@ export const useDojoInteractHandler = (pixelStore: PixelStore, gameData: IPixela
             coordinateToPosition(clickedCell),
             hexRGBtoNumber(color),
         )
-
+        console.log("dojoCall", dojoCall)
         // Execute the call
         gameData.dojoProvider.execute(gameData.account.account!, dojoCall).then(res => {
             console.log("dojocall", res)
             // Do something with the UI?
         })
 
-        console.log(p)
-        console.log(`Clicked cell ${clickedCell} in ${app}`);
     }, [clickedCell]);
 };
