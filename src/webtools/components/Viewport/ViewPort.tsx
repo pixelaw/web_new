@@ -102,7 +102,7 @@ const Viewport: React.FC<ViewportProps> = (
 
             drawGrid(bufferContext, zoom, pixelOffset, dimensions)
 
-            drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
+            // drawTiles(bufferContext, zoom, pixelOffset, dimensions, worldOffset, tileStore)
 
             drawPixels(bufferContext, zoom, pixelOffset, dimensions, worldOffset, hoveredCell, pixelStore.getPixel)
 
@@ -267,12 +267,13 @@ const Viewport: React.FC<ViewportProps> = (
                     e.clientX - rect.left,
                     e.clientY - rect.top
                 ])
+                const hoveredWorldCell = applyWorldOffset(worldOffset, viewportCell)
                 if (
                     (!hoveredCell && viewportCell) ||
-                    hoveredCell && (hoveredCell[0] !== viewportCell[0] || hoveredCell[1] !== viewportCell[1])
+                    hoveredCell && (hoveredCell[0] !== hoveredWorldCell[0] || hoveredCell[1] !== hoveredWorldCell[1])
                 ) {
-                    const hoveredWorldCell = applyWorldOffset(worldOffset, viewportCell)
-                    setHoveredCell(hoveredWorldCell);
+
+                    setHoveredCell(viewportCell);
                     onCellHover(hoveredWorldCell)
                 }
             }
