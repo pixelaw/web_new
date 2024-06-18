@@ -188,7 +188,7 @@ const Viewport: React.FC<ViewportProps> = (
 
 
         const handleWheel = (e: WheelEvent) => {
-            console.log("handleWheel")
+
             e.preventDefault();
 
             const rect = canvas.getBoundingClientRect();
@@ -235,7 +235,6 @@ const Viewport: React.FC<ViewportProps> = (
         const newWorldview = getWorldViewBounds()
         if (!areBoundsEqual(newWorldview, worldView)) {
             setWorldView(getWorldViewBounds())
-            console.log("b")
             onWorldviewChange(newWorldview)
         }
 
@@ -245,7 +244,7 @@ const Viewport: React.FC<ViewportProps> = (
     }, [zoom]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
-        console.log("handleMouseDown")
+
         setDragStart(Date.now());
         setHoveredCell(undefined);
         dragStartPoint.current = [e.clientX, e.clientY] as Coordinate
@@ -253,7 +252,6 @@ const Viewport: React.FC<ViewportProps> = (
     };
 
     const handleMouseMove = (e: React.MouseEvent) => {
-        console.log("handleMouseMove")
 
         if (dragStart) {
             const mouse: Coordinate = [e.clientX, e.clientY]
@@ -283,13 +281,12 @@ const Viewport: React.FC<ViewportProps> = (
 
 
     const handleMouseLeave = (e: React.MouseEvent) => {
-        console.log("mouseleave", e)
+
         setHoveredCell(undefined);
         onCellHover(undefined);
     }
 
     const handleMouseUp = (e: React.MouseEvent) => {
-        console.log("mouseup")
 
         let distance = 0
         if (dragStartPoint.current !== null) {
