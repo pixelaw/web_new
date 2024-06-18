@@ -3,31 +3,35 @@ import {usePixelawProvider} from "@/providers/PixelawProvider.tsx";
 import {shortString} from "starknet";
 import {felt252ToUnicode} from "@/webtools/utils.ts";
 import {getComponentValue} from "@dojoengine/recs";
+import {useEffect, useState} from "react";
 
 
 export function useDojoAppStore(): AppStore {
     const {gameData} = usePixelawProvider();
+    const [preparedApps, setPreparedApps] = useState<App[]>([]);
 
+    useEffect(() => {
+        if (!gameData) return;
+
+        const apps = gameData.setup.apps.reduce((acc: App[], appComponent) => {
+            const app = fromComponent(appComponent);
+            if (app) acc.push(app);
+            return acc;
+        }, []);
+
+        setPreparedApps(apps);
+    }, [gameData]);
 
     const prepare = (): void => {
         // Not implemented for Dojo
-    }
+    };
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getByName = (name: string): App | undefined => {
-        // TODO
-        return;
+        return preparedApps.find(app => app.name === name);
     };
 
     const getAll = (): App[] => {
-        if (!gameData) return []
-
-        return gameData.setup.apps.reduce((acc: App[], appComponent) => {
-            const app = fromComponent(appComponent)
-            if (app) acc.push(app)
-            return acc
-        }, [])
-
+        return preparedApps;
     };
 
     return {getByName, getAll, prepare};

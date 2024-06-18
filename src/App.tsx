@@ -14,8 +14,7 @@ import Loading from "@/components/Loading/Loading.tsx";
 import Settings from "@/components/Settings/Settings.tsx";
 import {usePixelawProvider} from "@/providers/PixelawProvider.tsx";
 import {useViewStateStore, useSyncedViewStateStore} from "@/stores/ViewStateStore.ts";
-import {useCellClickHandler} from "@/hooks/useClickedCellHandler.ts";
-
+import {useDojoInteractHandler} from "@/hooks/useDojoInteractHandler.ts";
 
 function App() {
     //<editor-fold desc="State">
@@ -24,11 +23,11 @@ function App() {
     //</editor-fold>
 
     //<editor-fold desc="Hooks">
+    const pixelStore = useDojoPixelStore();
     const updateService = useUpdateService(`ws://localhost:3001/tiles`)  // TODO url configurable
-    const pixelStore = useDojoPixelStore("http://localhost:8080");  // TODO url configurable
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
     const appStore = useDojoAppStore();
-    const {clientState, error} = usePixelawProvider();
+    const {clientState, error, gameData} = usePixelawProvider();
     const {
         color,
         setColor,
@@ -40,14 +39,16 @@ function App() {
         setClickedCell
     } = useViewStateStore();
 
-    useCellClickHandler();
+    useDojoInteractHandler(pixelStore, gameData);
     useSyncedViewStateStore();
     //</editor-fold>
 
     //<editor-fold desc="Handlers">
 
     function onWorldviewChange(newWorldview: Bounds) {
+        console.log("a")
         updateService.setBounds(newWorldview)
+        pixelStore.prepare(newWorldview)
     }
 
     function onCellHover(coordinate: Coordinate | undefined) {

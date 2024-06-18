@@ -4,12 +4,17 @@ import {produce} from 'immer';
 import GET_PIXELS_QUERY from "@/../graphql/GetPixels.graphql";
 import {ApolloClient, InMemoryCache} from "@apollo/client";
 import {MAX_VIEW_SIZE} from "@/webtools/utils.ts";
+import {usePixelawProvider} from "@/providers/PixelawProvider.tsx";
+import {shortString} from "starknet";
 
 
 type State = { [key: string]: Pixel | undefined };
 
-export function useDojoPixelStore(baseUrl: string): PixelStore {
+export function useDojoPixelStore(): PixelStore {
+    const {gameData} = usePixelawProvider();
     const [state, setState] = useState<State>({});
+
+    const baseUrl = gameData?.setup.config.toriiUrl
 
     // Initialize ApolloClient with dynamic baseUrl
     const gqlClient = new ApolloClient({
@@ -43,19 +48,25 @@ export function useDojoPixelStore(baseUrl: string): PixelStore {
             data.data.pixelModels.edges.map(({node}: { node: Pixel }) => {
                 // Write the retrieved Pixel to state
                 // TODO, we may run out of memory in State if the user retrieves too many?
+                const pixel: Pixel = {
+                    ...node,
+                    text: shortString.decodeShortString(node.text),
+                    action: shortString.decodeShortString(node.action),
+                    timestamp: parseInt(node.timestamp as string, 16),
+                }
+
                 setState(produce(draftState => {
-                    draftState[`${node.x}_${node.y}`] = node;
+                    draftState[`${node.x}_${node.y}`] = pixel;
                 }));
             })
-
         }).catch((e) => {
             console.error("Error retrieving pixels from torii for", bounds, e.message)
         })
     }
 
-    const loadPixels = ([[left, top], [right, bottom]]: Bounds): void => {
+    const prepare = ([[left, top], [right, bottom]]: Bounds): void => {
 
-        // console.log("loadPixels")
+        console.log("prepare")
         // Determine if the coords wrap
         const xWraps = right - left < 0
         const yWraps = bottom - top < 0
@@ -79,7 +90,7 @@ export function useDojoPixelStore(baseUrl: string): PixelStore {
 
     const getPixel = (coord: Coordinate): Pixel | undefined => {
         const key = `${coord[0]}_${coord[1]}`
-        // if(state[key]) console.log("getPixel", key, state[key])
+
         return state[key];
     };
 
@@ -97,5 +108,5 @@ export function useDojoPixelStore(baseUrl: string): PixelStore {
         }));
     };
 
-    return {getPixel, setPixel, setPixels, loadPixels};
+    return {getPixel, setPixel, setPixels, prepare};
 }

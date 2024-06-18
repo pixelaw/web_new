@@ -24,7 +24,6 @@ interface ViewportProps {
     center: Coordinate;
     setCenter: (newCenter: Coordinate) => void;
     setZoom: (newZoom: number) => void;
-    // onCenterChange: (newCenter: Coordinate) => void;
     onWorldviewChange: (newWorldview: Bounds) => void;
     onCellClick: (coordinate: Coordinate) => void;
     onCellHover: (coordinate: Coordinate | undefined) => void;
@@ -40,6 +39,9 @@ const Viewport: React.FC<ViewportProps> = (
         onCellClick,
         onCellHover
     }) => {
+
+    //<editor-fold desc="State">
+
     const wrapperRef = useRef(null);
     const dimensions = useDimensions(wrapperRef);
 
@@ -52,6 +54,9 @@ const Viewport: React.FC<ViewportProps> = (
     const [hoveredCell, setHoveredCell] = useState<Coordinate | undefined>(undefined);
     const [worldView, setWorldView] = useState<Bounds>([[0, 0], [0, 0]]);
     const isLoaded = useRef<boolean>(false);
+    //</editor-fold>
+
+    //<editor-fold desc="Rendering">
 
     useEffect(() => {
         if (isLoaded.current) return
@@ -110,21 +115,6 @@ const Viewport: React.FC<ViewportProps> = (
 
     }, [dimensions, zoom, pixelOffset, hoveredCell, pixelStore.getPixel]);
 
-    const calculateCenter = () => {
-        const [width, height] = dimensions;
-        // Calculate the viewport's center point in pixels
-        const viewportCenter: Coordinate = [width / 2, height / 2];
-        // Adjust by pixelOffset to get the center in "world" pixels
-        const adjustedCenter: Coordinate = [
-            viewportCenter[0] + pixelOffset[0],
-            viewportCenter[1] + pixelOffset[1],
-        ];
-        // Convert to world coordinates (cells)
-        const centerCell = cellForPosition(zoom, [0, 0], adjustedCenter);
-        const worldCenterCell = applyWorldOffset(worldOffset, centerCell)
-        return worldCenterCell;
-    };
-
     // Render when in Tile mode
     useEffect(() => {
         if (zoom <= ZOOM_TILEMODE && zoom > ZOOM_MIN) {
@@ -146,13 +136,59 @@ const Viewport: React.FC<ViewportProps> = (
             context.drawImage(bufferCanvas, 0, 0);
         }
     }, [dimensions, zoom, pixelOffset, tileStore.getTileset]);
+    //</editor-fold>
 
+    //<editor-fold desc="Helpers">
+    const calculateCenter = () => {
+        const [width, height] = dimensions;
+        // Calculate the viewport's center point in pixels
+        const viewportCenter: Coordinate = [width / 2, height / 2];
+        // Adjust by pixelOffset to get the center in "world" pixels
+        const adjustedCenter: Coordinate = [
+            viewportCenter[0] + pixelOffset[0],
+            viewportCenter[1] + pixelOffset[1],
+        ];
+        // Convert to world coordinates (cells)
+        const centerCell = cellForPosition(zoom, [0, 0], adjustedCenter);
+        const worldCenterCell = applyWorldOffset(worldOffset, centerCell)
+        return worldCenterCell;
+    };
+
+    function drag(lastDragPoint: Coordinate, mouse: Coordinate) {
+        const cellWidth = getCellSize(zoom)
+
+        const [newPixelOffset, newWorldOffset] = handlePixelChanges(
+            [...pixelOffset],
+            [...worldOffset],
+            [
+                lastDragPoint[0] - mouse[0],
+                lastDragPoint[1] - mouse[1]
+            ],
+            cellWidth
+        )
+
+        setPixelOffset(newPixelOffset);
+        setWorldOffset(newWorldOffset)
+    }
+
+    const getWorldViewBounds = (): Bounds => {
+        const [width, height] = dimensions
+        const topLeft = applyWorldOffset(worldOffset, [0, 0])
+        const bottomRightCell = cellForPosition(zoom, pixelOffset, [width, height])
+        const bottomRight = applyWorldOffset(worldOffset, bottomRightCell)
+        return [topLeft, bottomRight]
+    }
+
+    //</editor-fold>
+
+    //<editor-fold desc="Mouse Handlers">
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
 
         const handleWheel = (e: WheelEvent) => {
+            console.log("handleWheel")
             e.preventDefault();
 
             const rect = canvas.getBoundingClientRect();
@@ -199,6 +235,7 @@ const Viewport: React.FC<ViewportProps> = (
         const newWorldview = getWorldViewBounds()
         if (!areBoundsEqual(newWorldview, worldView)) {
             setWorldView(getWorldViewBounds())
+            console.log("b")
             onWorldviewChange(newWorldview)
         }
 
@@ -207,32 +244,17 @@ const Viewport: React.FC<ViewportProps> = (
         };
     }, [zoom]);
 
-
     const handleMouseDown = (e: React.MouseEvent) => {
+        console.log("handleMouseDown")
         setDragStart(Date.now());
         setHoveredCell(undefined);
         dragStartPoint.current = [e.clientX, e.clientY] as Coordinate
         setLastDragPoint([e.clientX, e.clientY]);
     };
 
-    function drag(lastDragPoint: Coordinate, mouse: Coordinate) {
-        const cellWidth = getCellSize(zoom)
-
-        const [newPixelOffset, newWorldOffset] = handlePixelChanges(
-            [...pixelOffset],
-            [...worldOffset],
-            [
-                lastDragPoint[0] - mouse[0],
-                lastDragPoint[1] - mouse[1]
-            ],
-            cellWidth
-        )
-
-        setPixelOffset(newPixelOffset);
-        setWorldOffset(newWorldOffset)
-    }
-
     const handleMouseMove = (e: React.MouseEvent) => {
+        console.log("handleMouseMove")
+
         if (dragStart) {
             const mouse: Coordinate = [e.clientX, e.clientY]
             drag(lastDragPoint, mouse)
@@ -255,21 +277,20 @@ const Viewport: React.FC<ViewportProps> = (
                     setHoveredCell(hoveredWorldCell);
                     onCellHover(hoveredWorldCell)
                 }
-
             }
         }
-
     };
 
-    const getWorldViewBounds = (): Bounds => {
-        const [width, height] = dimensions
-        const topLeft = applyWorldOffset(worldOffset, [0, 0])
-        const bottomRightCell = cellForPosition(zoom, pixelOffset, [width, height])
-        const bottomRight = applyWorldOffset(worldOffset, bottomRightCell)
-        return [topLeft, bottomRight]
+
+    const handleMouseLeave = (e: React.MouseEvent) => {
+        console.log("mouseleave", e)
+        setHoveredCell(undefined);
+        onCellHover(undefined);
     }
 
     const handleMouseUp = (e: React.MouseEvent) => {
+        console.log("mouseup")
+
         let distance = 0
         if (dragStartPoint.current !== null) {
             const startPos = dragStartPoint.current;
@@ -287,10 +308,7 @@ const Viewport: React.FC<ViewportProps> = (
         }
 
         setCenter(calculateCenter())
-        if (e.type == "mouseleave") {
-            setHoveredCell(undefined);
-            onCellHover(undefined);
-        }
+
 
         const newWorldview = getWorldViewBounds()
         if (!areBoundsEqual(newWorldview, worldView)) {
@@ -302,6 +320,10 @@ const Viewport: React.FC<ViewportProps> = (
         dragStartPoint.current = null
     };
 
+    //</editor-fold>
+
+    //<editor-fold desc="Output">
+
     return (
         <div ref={wrapperRef} style={{width: '100%', height: '100%'}}>
             <canvas width={dimensions[0]} height={dimensions[1]}
@@ -309,10 +331,12 @@ const Viewport: React.FC<ViewportProps> = (
                     onMouseDown={handleMouseDown}
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseUp}
+                    onMouseLeave={handleMouseLeave}
             />
         </div>
     );
+    //</editor-fold>
+
 };
 
 export default Viewport

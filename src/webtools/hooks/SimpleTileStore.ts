@@ -41,7 +41,7 @@ export function useSimpleTileStore(baseUrl: string): TileStore {
     }
 
     useEffect(() => {
-        if (tilesLoadedRef.current  ) return
+        if (tilesLoadedRef.current) return
 
         async function loadFromIdb() {
             setIsLoading(true);
@@ -52,9 +52,9 @@ export function useSimpleTileStore(baseUrl: string): TileStore {
                 if (typeof key === 'string') {
                     try {
                         const base64 = await getIdb(key)
-                        if(base64.length == 0){
+                        if (base64.length == 0) {
                             tilesObj[key] = ""
-                        }else{
+                        } else {
                             tilesObj[key] = await loadImage(base64)
                         }
 
@@ -75,13 +75,11 @@ export function useSimpleTileStore(baseUrl: string): TileStore {
     const getTileset = (scaleFactor: number, bounds: Bounds): Tileset | undefined => {
 
         const [topLeft, bottomRight] = bounds
-        if(fetchCounter.current > 0) {
+        if (fetchCounter.current > 0) {
             console.log("skipRender")
             return
         }
-        console.debug("getTileset", scaleFactor, JSON.stringify(bounds))
-        if(isLoading) return
-
+        if (isLoading) return
 
 
         // Choose the tileset Scalefactor based on what's requested
@@ -107,7 +105,7 @@ export function useSimpleTileStore(baseUrl: string): TileStore {
 
         const tileRows = []
 
-        function distance(begin: number, end: number): number{
+        function distance(begin: number, end: number): number {
             return end >= begin
                 ? end - begin // not wrapping
                 : MAX_UINT32 - begin + end // wrapping
@@ -118,9 +116,9 @@ export function useSimpleTileStore(baseUrl: string): TileStore {
 
         for (let x = 0; x <= width; x += tileWorldSize) {
             const tileRow: (Tile | undefined | "")[] = []
-            for (let y = 0; y <= height; y+=tileWorldSize) {
+            for (let y = 0; y <= height; y += tileWorldSize) {
 
-                const tileX = getWrappedTileCoordinate(leftTileCoord , x, tileWorldSize);
+                const tileX = getWrappedTileCoordinate(leftTileCoord, x, tileWorldSize);
                 const tileY = getWrappedTileCoordinate(topTileCoord, y, tileWorldSize);
                 tileRow.push(
                     getTile(`${tileScaleFactor}_${TILESIZE}_${tileX}_${tileY}`)
@@ -173,7 +171,6 @@ export function useSimpleTileStore(baseUrl: string): TileStore {
 
     return {getTile, setTile, setTiles, getTileset};
 }
-
 
 
 const loadImage = (base64: string): Promise<HTMLImageElement> => {

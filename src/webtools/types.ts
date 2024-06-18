@@ -1,9 +1,9 @@
 export type Pixel = {
     action: string
-    color: number
+    color: number | string
     owner: string
     text: string
-    timestamp: string
+    timestamp: number | string
     x: number
     y: number
 }
@@ -32,8 +32,8 @@ export interface UpdateService {
 }
 
 export interface PixelStore {
-    getPixel: (coordinate: Coordinate) => Pixel | undefined;
     prepare: (bounds: Bounds) => void;
+    getPixel: (coordinate: Coordinate) => Pixel | undefined;
     setPixel: (key: string, pixel: Pixel) => void;
     setPixels: (pixels: { key: string, pixel: Pixel }[]) => void;
 }
