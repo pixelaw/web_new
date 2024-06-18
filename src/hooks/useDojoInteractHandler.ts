@@ -4,11 +4,15 @@ import {useDojoAppStore} from "@/stores/DojoAppStore.ts";
 import {PixelStore} from "@/webtools/types.ts";
 import {IPixelawGameData} from "@/dojo/setupPixelaw.ts";
 import getParamsDef from "@/dojo/utils/paramsDef.ts";
+import {coordinateToPosition, hexRGBtoNumber} from "@/global/utils.ts";
+import {DojoCall} from "@dojoengine/core";
+import {Manifest, Position} from "@/global/types.ts";
+import {generateDojoCall} from "@/dojo/utils/call.ts";
 
 // TODO maybe cleaner to directly use the Dojo hook here, but its not working.
 // For now passing the pixelStore
 export const useDojoInteractHandler = (pixelStore: PixelStore, gameData: IPixelawGameData) => {
-    const {clickedCell, selectedApp} = useViewStateStore();
+    const {clickedCell, selectedApp, color} = useViewStateStore();
     const {getByName} = useDojoAppStore()
 
 
@@ -35,6 +39,20 @@ export const useDojoInteractHandler = (pixelStore: PixelStore, gameData: IPixela
             false
         )
 
+        // Generate the DojoCall
+        const dojoCall: DojoCall = generateDojoCall(
+            gameData.setup.manifest,
+            selectedApp,
+            action,
+            coordinateToPosition(clickedCell),
+            hexRGBtoNumber(color),
+        )
+
+        // Execute the call
+        gameData.dojoProvider.execute(gameData.account.account!, dojoCall).then(res => {
+            console.log("dojocall", res)
+            // Do something with the UI?
+        })
 
         console.log(p)
         console.log(`Clicked cell ${clickedCell} in ${app}`);

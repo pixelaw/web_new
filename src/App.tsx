@@ -46,7 +46,6 @@ function App() {
     //<editor-fold desc="Handlers">
 
     function onWorldviewChange(newWorldview: Bounds) {
-        console.log("a")
         updateService.setBounds(newWorldview)
         pixelStore.prepare(newWorldview)
     }
@@ -61,6 +60,8 @@ function App() {
     }
 
     function onColorSelect(color: string) {
+        // remove the leading #
+        color = color.replace('#', '')
         setColor(color)
     }
 

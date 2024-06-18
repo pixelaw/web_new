@@ -18,6 +18,7 @@ export interface ColorPickerProps {
 }
 
 const SimpleColorPicker: React.FC<ColorPickerProps> = ({onColorSelect, color: selectedColor}) => {
+    selectedColor = `#${selectedColor}`
     return (
         <div className={styles.inner}>
             {colors.map((color, index) => (

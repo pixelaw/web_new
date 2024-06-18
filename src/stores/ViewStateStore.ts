@@ -26,7 +26,7 @@ export const useViewStateStore = create<AppState>((set) => ({
     selectedApp: '',
     center: DEFAULT_CENTER,
     zoom: DEFAULT_ZOOM,
-    color: '#000000',
+    color: '000000',
     hoveredCell: undefined,
     clickedCell: undefined,
     setSelectedApp: (appName: string) => set({selectedApp: appName}),
