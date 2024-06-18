@@ -28,23 +28,31 @@ export const useDojoInteractHandler = (pixelStore: PixelStore, gameData: IPixela
         const pixel = pixelStore.getPixel(clickedCell);
 
         // If the pixel is not set, or the action is not overridden, use the default "interact"
-        const action = pixel && pixel.action !== "0x0"
+        const action = pixel && pixel.action !== "0"
             ? pixel.action
             : "interact"
 
-        // Retrieve the signature of the action function from the manifest
-        const p = getParamsDef(
+        const contractName = `${selectedApp}_actions`
+        const position = coordinateToPosition(clickedCell)
+
+        const params = getParamsDef(
             gameData.setup.manifest,
-            `${selectedApp}_actions`,
+            contractName,
             action,
-            clickedCell,
+            position,
             false
         )
 
+        if (params.length) {
+            // User needs to choose parameters first
+            // TODO lets first make the scenario without params work (paint)
+        }
+
         // Generate the DojoCall
         const dojoCall: DojoCall = generateDojoCall(
+            params,
             gameData.setup.manifest,
-            selectedApp,
+            contractName,
             action,
             coordinateToPosition(clickedCell),
             hexRGBtoNumber(color),

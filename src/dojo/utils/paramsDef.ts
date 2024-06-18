@@ -1,6 +1,5 @@
 import {interpret, isInstruction, ParamDefinitionType, Variant} from "./Instruction.ts";
 import {InterfaceType, Manifest} from "@/global/types.ts";
-import {Coordinate} from "@/webtools/types.ts";
 
 const DEFAULT_PARAMETERS_TYPE = 'pixelaw::core::utils::DefaultParameters'
 
@@ -14,7 +13,7 @@ export default function getParamsDef(
     manifest: Manifest,
     contractName: string,
     methodName: string,
-    position: Coordinate,
+    position: { x: number, y: number },
     strict?: boolean
 ): ParamDefinitionType[] {
 
