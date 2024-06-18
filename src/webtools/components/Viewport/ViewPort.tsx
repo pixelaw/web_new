@@ -113,7 +113,7 @@ const Viewport: React.FC<ViewportProps> = (
         }
 
 
-    }, [dimensions, zoom, pixelOffset, hoveredCell, pixelStore.getPixel]);
+    }, [dimensions, zoom, pixelOffset, hoveredCell, pixelStore.refresh]);
 
     // Render when in Tile mode
     useEffect(() => {
@@ -280,6 +280,7 @@ const Viewport: React.FC<ViewportProps> = (
     };
 
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleMouseLeave = (e: React.MouseEvent) => {
 
         setHoveredCell(undefined);
