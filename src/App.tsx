@@ -1,5 +1,5 @@
 import styles from './App.module.css';
-import React, {useMemo} from "react";
+import React, {useEffect, useMemo} from "react";
 import {Bounds, Coordinate} from "@/webtools/types.ts";
 import {useSimpleTileStore} from "@/webtools/hooks/SimpleTileStore.ts";
 import {useDojoPixelStore} from "@/stores/DojoPixelStore.ts";
@@ -23,8 +23,8 @@ function App() {
     //</editor-fold>
 
     //<editor-fold desc="Hooks">
-    const pixelStore = useDojoPixelStore();
     const updateService = useUpdateService(`ws://localhost:3001/tiles`)  // TODO url configurable
+    const pixelStore = useDojoPixelStore();
     const tileStore = useSimpleTileStore("localhost:3001/tiles");   // TODO url configurable
     const appStore = useDojoAppStore();
     const {clientState, error, gameData} = usePixelawProvider();
@@ -44,6 +44,9 @@ function App() {
     //</editor-fold>
 
     //<editor-fold desc="Handlers">
+    useEffect(() => {
+        pixelStore.refresh()
+    }, [updateService.tileChanged]);
 
     function onWorldviewChange(newWorldview: Bounds) {
         updateService.setBounds(newWorldview)

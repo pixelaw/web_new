@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useState} from 'react';
 import {Bounds, Coordinate, Pixel, PixelStore} from "../types.ts";
 import {produce} from 'immer';
 
@@ -6,7 +6,6 @@ type State = { [key: string]: Pixel };
 
 export function useSimplePixelStore(): PixelStore {
     const [state, setState] = useState<State>({});
-
 
 
     const getPixel = (coord: Coordinate): Pixel | undefined => {
@@ -22,15 +21,20 @@ export function useSimplePixelStore(): PixelStore {
 
     const setPixels = (pixels: { key: string, pixel: Pixel }[]): void => {
         setState(produce(draft => {
-            pixels.forEach(({ key, pixel }) => {
+            pixels.forEach(({key, pixel}) => {
                 draft[key] = pixel;
             });
         }));
     };
 
-    const loadPixels = (_bounds: Bounds): void => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const prepare = (_bounds: Bounds): void => {
         // No implementation for now, SimplePixelStore is a dev tool
     }
 
-    return { getPixel, setPixel, setPixels, loadPixels };
+    const refresh = (): void => {
+        // No implementation for now, SimplePixelStore is a dev tool
+    }
+
+    return {getPixel, setPixel, setPixels, prepare, refresh};
 }

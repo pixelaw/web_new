@@ -3,7 +3,7 @@ import {Bounds, Coordinate, MAX_UINT32, Pixel, PixelStore} from "@/webtools/type
 import {produce} from 'immer';
 import GET_PIXELS_QUERY from "@/../graphql/GetPixels.graphql";
 import {ApolloClient, InMemoryCache} from "@apollo/client";
-import {MAX_VIEW_SIZE} from "@/webtools/utils.ts";
+import {areBoundsEqual, MAX_VIEW_SIZE} from "@/webtools/utils.ts";
 import {usePixelawProvider} from "@/providers/PixelawProvider.tsx";
 import {shortString} from "starknet";
 
@@ -13,6 +13,7 @@ type State = { [key: string]: Pixel | undefined };
 export function useDojoPixelStore(): PixelStore {
     const {gameData} = usePixelawProvider();
     const [state, setState] = useState<State>({});
+    const [bounds, setBounds] = useState<Bounds>([[0, 0], [MAX_VIEW_SIZE, MAX_VIEW_SIZE]]);
 
     const baseUrl = gameData?.setup.config.toriiUrl
 
@@ -64,9 +65,10 @@ export function useDojoPixelStore(): PixelStore {
         })
     }
 
-    const prepare = ([[left, top], [right, bottom]]: Bounds): void => {
 
-        console.log("prepare")
+    const refresh = (): void => {
+        const [[left, top], [right, bottom]] = bounds
+        console.log("refresh")
         // Determine if the coords wrap
         const xWraps = right - left < 0
         const yWraps = bottom - top < 0
@@ -85,6 +87,13 @@ export function useDojoPixelStore(): PixelStore {
             fetchData([[left, 0], [right, bottom]])  // bottom half
         } else {
             fetchData([[left, top], [right, bottom]])  // all
+        }
+    }
+
+    const prepare = (newBounds: Bounds): void => {
+        if (!areBoundsEqual(bounds, newBounds)) {
+            setBounds(bounds);
+            refresh()
         }
     };
 
@@ -108,5 +117,6 @@ export function useDojoPixelStore(): PixelStore {
         }));
     };
 
-    return {getPixel, setPixel, setPixels, prepare};
+    return {getPixel, setPixel, setPixels, prepare, refresh};
 }
+

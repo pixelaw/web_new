@@ -32,6 +32,7 @@ export interface UpdateService {
 }
 
 export interface PixelStore {
+    refresh: () => void;
     prepare: (bounds: Bounds) => void;
     getPixel: (coordinate: Coordinate) => Pixel | undefined;
     setPixel: (key: string, pixel: Pixel) => void;

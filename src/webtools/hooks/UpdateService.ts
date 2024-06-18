@@ -13,7 +13,7 @@ type TileChangedMessage = {
 
 export const useUpdateService = (url: string): UpdateService => {
     const [isReady, setIsReady] = useState(false)
-    const [tileChanged, setTileChanged] = useState<TileChangedMessage| null>(null)
+    const [tileChanged, setTileChanged] = useState<TileChangedMessage | null>(null)
 
     useEffect(() => {
         if (!socket) {
@@ -31,7 +31,7 @@ export const useUpdateService = (url: string): UpdateService => {
                 const msg: Message = JSON.parse(event.data);
                 if (msg.cmd === "tileChanged") {
                     const tileChangedMsg = msg.data as TileChangedMessage;
-                    console.log("a", tileChangedMsg)
+
                     setTileChanged(tileChangedMsg);
                 } else {
                     console.log("Unrecognized message from ws: ", msg);
